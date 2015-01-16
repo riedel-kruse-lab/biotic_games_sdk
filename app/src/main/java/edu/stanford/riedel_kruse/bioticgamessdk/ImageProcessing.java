@@ -74,18 +74,7 @@ public class ImageProcessing
      * region of interest
      */
     public static List<Point> findEuglenaInRoi(Mat image, Rect roi) {
-        List<Point> points = findEuglena(image.submat(roi.y, roi.y + roi.height, roi.x,
-                roi.x + roi.width));
-
-        // TODO: Could optimize by translating coordinates in the same pass as centroids are being
-        // computed. Not a serious concern at the moment, though.
-        // Translate all coordinates from ROI-local coordinates to whole image coordinates.
-        for (Point point : points) {
-            point.x = point.x + roi.x;
-            point.y = point.y + roi.y;
-        }
-
-        return points;
+        return findEuglenaInRoi(image, roi.x, roi.y, roi.width, roi.height);
     }
 
     /**
