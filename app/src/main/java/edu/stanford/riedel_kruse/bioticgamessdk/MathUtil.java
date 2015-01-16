@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class MathUtil
 {
+    private static final double VELOCITY_SCALE = 10;
+
     /**
      * Given a point and a list of candidate points, finds the candidate point that is closest to
      * the original point.
@@ -63,16 +65,17 @@ public class MathUtil
      * @return a Point object which represents a unit vector of the average direction of the given
      * points or null if there were not enough points provided to compute a direction
      */
+    // TODO: If we have an average velocity function, do we need an average direction function?
     public static Point computeAverageDirection(List<Point> points) {
         int numPoints = points.size();
-
-        Point averageDirection = new Point();
-        List<Point> directions = new ArrayList<Point>();
 
         // We need at least two points in order to compute a direction.
         if (numPoints <= 1) {
             return null;
         }
+
+        Point averageDirection = new Point();
+        List<Point> directions = new ArrayList<Point>();
 
         // Compute the directions pairwise between the points.
         for (int i = 0; i < numPoints - 1; i++) {
@@ -100,5 +103,45 @@ public class MathUtil
         MathUtil.normalizeVector(averageDirection);
 
         return averageDirection;
+    }
+
+    /**
+     * Computes the average velocity from a list of points representing past locations that an
+     * object has been at.
+     * @param points a list of points that the object has been at
+     * @return a Point object which represents the average velocity of the given points
+     */
+    // TODO: This function assumes an equal amount of time passes between points, which is not
+    // necessarily true.
+    public static Point computeAverageVelocity(List<Point> points) {
+        int numPoints = points.size();
+
+        // If we have fewer than 2 points, then the velocity is 0 and there is no direction, so
+        // just return a point with x=0 and y=0.
+        if (numPoints <= 1) {
+            return new Point();
+        }
+
+        Point averageVelocity = new Point();
+
+        for (int i = 0; i < numPoints - 1; i++) {
+            Point previous = points.get(i);
+            Point next = points.get(i + 1);
+            Point direction = new Point(next.x - previous.x, next.y - previous.y);
+
+            averageVelocity.x += direction.x;
+            averageVelocity.y += direction.y;
+        }
+
+        averageVelocity.x /= numPoints;
+        averageVelocity.y /= numPoints;
+
+        MathUtil.normalizeVector(averageVelocity);
+
+        // TODO: Honesty, why do we need to multiply by VELOCITY_SCALE here?
+        averageVelocity.x *= VELOCITY_SCALE;
+        averageVelocity.y *= VELOCITY_SCALE;
+
+        return averageVelocity;
     }
 }
