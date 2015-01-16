@@ -31,7 +31,8 @@ public class ImageProcessing
      * @param image the image to search for Euglena in
      * @return a list of points where each point is believed to be the location of a Euglena
      */
-    // TODO: Is image passed by value or by reference?
+    // TODO: Is image passed by value or by reference? This will possibly create a bug if modifying
+    // the Mat in the argument modifies the original data as well.
     public static List<Point> findEuglena(Mat image) {
         // Convert image representation into hue-saturation-value format.
         Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2HSV);
@@ -72,9 +73,19 @@ public class ImageProcessing
      * @return a list of points where each point is believed to be the location of a Euglena in the
      * region of interest
      */
-    // TODO: Need to translate from ROI coordinates to whole image coordinates
     public static List<Point> findEuglenaInRoi(Mat image, Rect roi) {
-        return findEuglena(image.submat(roi.y, roi.y + roi.height, roi.x, roi.x + roi.width));
+        List<Point> points = findEuglena(image.submat(roi.y, roi.y + roi.height, roi.x,
+                roi.x + roi.width));
+
+        // TODO: Could optimize by translating coordinates in the same pass as centroids are being
+        // computed. Not a serious concern at the moment, though.
+        // Translate all coordinates from ROI-local coordinates to whole image coordinates.
+        for (Point point : points) {
+            point.x = point.x + roi.x;
+            point.y = point.y + roi.y;
+        }
+
+        return points;
     }
 
     /**
@@ -87,8 +98,18 @@ public class ImageProcessing
      * @return a list of points where each point is believed to be the location of a Euglena in the
      * region of interest
      */
-    // TODO: Need to translate from ROI coordinates to whole image coordinates
     public static List<Point> findEuglenaInRoi(Mat image, int x, int y, int width, int height) {
-        return findEuglena(image.submat(y, y + height, x, x + width));
+        List<Point> points = findEuglena(image.submat(y, y + height, x,
+                x + width));
+
+        // TODO: Could optimize by translating coordinates in the same pass as centroids are being
+        // computed. Not a serious concern at the moment, though.
+        // Translate all coordinates from ROI-local coordinates to whole image coordinates.
+        for (Point point : points) {
+            point.x = point.x + x;
+            point.y = point.y + y;
+        }
+
+        return points;
     }
 }
