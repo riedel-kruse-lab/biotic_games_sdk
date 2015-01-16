@@ -113,13 +113,12 @@ public class MathUtil
      */
     // TODO: This function assumes an equal amount of time passes between points, which is not
     // necessarily true.
-    public static Point computeAverageVelocity(List<Point> points) {
+    public static double computeAverageSpeed(List<Point> points) {
         int numPoints = points.size();
 
-        // If we have fewer than 2 points, then the velocity is 0 and there is no direction, so
-        // just return a point with x=0 and y=0.
+        // If we have fewer than 2 points, then the velocity is 0 and the speed is 0.
         if (numPoints <= 1) {
-            return new Point();
+            return 0;
         }
 
         Point averageVelocity = new Point();
@@ -136,12 +135,8 @@ public class MathUtil
         averageVelocity.x /= numPoints;
         averageVelocity.y /= numPoints;
 
-        MathUtil.normalizeVector(averageVelocity);
-
+        // Convert the velocity vector into a scalar to get speed.
         // TODO: Honesty, why do we need to multiply by VELOCITY_SCALE here?
-        averageVelocity.x *= VELOCITY_SCALE;
-        averageVelocity.y *= VELOCITY_SCALE;
-
-        return averageVelocity;
+        return VELOCITY_SCALE * MathUtil.computeVectorMagnitude(averageVelocity);
     }
 }
