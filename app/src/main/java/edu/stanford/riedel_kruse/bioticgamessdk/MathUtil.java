@@ -2,6 +2,7 @@ package edu.stanford.riedel_kruse.bioticgamessdk;
 
 import org.opencv.core.Point;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,5 +34,71 @@ public class MathUtil
         }
 
         return closestPoint;
+    }
+
+    /**
+     * Normalizes the given vector by directly modifying the properties of the Point.
+     * @param vector the vector to normalize
+     */
+    public static void normalizeVector(Point vector) {
+        double magnitude = MathUtil.computeVectorMagnitude(vector);
+
+        vector.x /= magnitude;
+        vector.y /= magnitude;
+    }
+
+    /**
+     * Computes the magnitude of a vector.
+     * @param vector the vector to compute the magnitude of
+     * @return the magnitude of the vector
+     */
+    public static double computeVectorMagnitude(Point vector) {
+        return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2));
+    }
+
+    /**
+     * Computes the average direction from a list of points representing past locations that an
+     * object has been at.
+     * @param points a list of points that the object has been at
+     * @return a Point object which represents a unit vector of the average direction of the given
+     * points or null if there were not enough points provided to compute a direction
+     */
+    public static Point computeAverageDirection(List<Point> points) {
+        int numPoints = points.size();
+
+        Point averageDirection = new Point();
+        List<Point> directions = new ArrayList<Point>();
+
+        // We need at least two points in order to compute a direction.
+        if (numPoints <= 1) {
+            return null;
+        }
+
+        // Compute the directions pairwise between the points.
+        for (int i = 0; i < numPoints - 1; i++) {
+            Point previous = points.get(i);
+            Point next = points.get(i + 1);
+            Point direction = new Point(next.x - previous.x, next.y - previous.y);
+
+            MathUtil.normalizeVector(direction);
+
+            directions.add(direction);
+        }
+
+        int numDirections = directions.size();
+
+        // Sum up all of the direction vectors
+        for (Point direction: directions) {
+            averageDirection.x += direction.x;
+            averageDirection.y += direction.y;
+        }
+
+        // Divide to compute an average.
+        averageDirection.x /= numDirections;
+        averageDirection.y /= numDirections;
+
+        MathUtil.normalizeVector(averageDirection);
+
+        return averageDirection;
     }
 }
