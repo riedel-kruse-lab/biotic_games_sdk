@@ -118,17 +118,24 @@ public abstract class BioticGameActivity extends Activity implements
     }
 
     @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame frame)
     {
-        return processCameraFrame(inputFrame.rgba());
+        Mat rgbaFrame = frame.rgba();
+        updateGame(rgbaFrame);
+        return drawGame(rgbaFrame);
     }
 
     /**
-     * Processes a frame from the camera. This is the function where it is appropriate to do image
-     * processing tasks like finding all Euglena on the screen or altering the appearance of the
-     * image to be displayed on the main camera view.
-     * @param inputFrame an RGBA image matrix which contains the current frame from the camera
-     * @return the processed frame which will be displayed on the main camera view
+     * Updates the game model and runs game logic. This is the appropriate place to update the state
+     * of your game based on the locations of things in the included frame.
+     * @param frame an RGBA image matrix which contains the current frame from the camera
      */
-    protected abstract Mat processCameraFrame(Mat inputFrame);
+    protected abstract void updateGame(Mat frame);
+
+    /**
+     * Draws the game onto the provided frame and returns it.
+     * @param frame an RGBA image matrix which contains the current frame from the camera
+     * @return
+     */
+    protected abstract Mat drawGame(Mat frame);
 }
