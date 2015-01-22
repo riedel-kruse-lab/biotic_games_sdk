@@ -71,7 +71,7 @@ public abstract class BioticGameActivity extends Activity implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Run first-time initializations.
@@ -79,19 +79,19 @@ public abstract class BioticGameActivity extends Activity implements
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         super.onDestroy();
         disableCameraView();
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
         disableCameraView();
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9, this, mOpenCVLoaderCallback);
     }
