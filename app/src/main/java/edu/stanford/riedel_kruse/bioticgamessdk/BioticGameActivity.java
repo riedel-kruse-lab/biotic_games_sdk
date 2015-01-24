@@ -24,6 +24,15 @@ public abstract class BioticGameActivity extends Activity implements
     // TODO: Should provide a subclass of JavaCameraView which allows passing of camera parameters
     // in order to do things like change the camera zoom level, etc.
     private JavaCameraView mCameraView;
+    /**
+     * Stores the timestamp for the previous frame. Used to compute time deltas between frames.
+     */
+    private long mLastTimestamp;
+    /**
+     * Flag to determine whether or not onCameraFrame has been called before. True means this is the
+     * first time onCameraFrame has been called. False means it has been called before.
+     */
+    private boolean mFirstFrame;
 
     /**
      * Custom OpenCV loader callback called once OpenCV has been loaded. This is the right place to
@@ -57,6 +66,9 @@ public abstract class BioticGameActivity extends Activity implements
 
         // Receive camera view listener callbacks for this camera view like onCameraFrame.
         mCameraView.setCvCameraViewListener(this);
+
+        // Set mFirstFrame to true so that the first time we hit onCameraFrame it is true.
+        mFirstFrame = true;
     }
 
     /**
@@ -120,8 +132,19 @@ public abstract class BioticGameActivity extends Activity implements
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame frame)
     {
+        long timeDelta = 0;
+        long currentTimestamp = System.currentTimeMillis();
+
+        if (mFirstFrame) {
+            mFirstFrame = false;
+        }
+        else {
+            timeDelta = currentTimestamp - mLastTimestamp;
+        }
+        mLastTimestamp = currentTimestamp;
+
         Mat rgbaFrame = frame.rgba();
-        updateGame(rgbaFrame);
+        updateGame(rgbaFrame, timeDelta);
         return drawGame(rgbaFrame);
     }
 
@@ -129,8 +152,10 @@ public abstract class BioticGameActivity extends Activity implements
      * Updates the game model and runs game logic. This is the appropriate place to update the state
      * of your game based on the locations of things in the included frame.
      * @param frame an RGBA image matrix which contains the current frame from the camera
+     * @param timeDelta the amount of time elapsed between the current call of updateGame and the
+     *                  last one. If this is the first call to updateGame, timeDelta will be 0.
      */
-    protected abstract void updateGame(Mat frame);
+    protected abstract void updateGame(Mat frame, long timeDelta);
 
     /**
      * Draws the game onto the provided frame and returns it.
