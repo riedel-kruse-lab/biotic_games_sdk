@@ -14,6 +14,17 @@ public class MathUtil
     private static final double VELOCITY_SCALE = 10;
 
     /**
+     * Adds the x- and y-values of two rectangles together and returns a new point.
+     * @param p1 the first point
+     * @param p2 the second point
+     * @return a new point whose x- and y-values are the sum of the given two points' x- and y-
+     *         values.
+     */
+    public static Point addPoints(Point p1, Point p2) {
+        return new Point(p1.x + p2.x, p1.y + p2.y);
+    }
+
+    /**
      * Given a point and a list of candidate points, finds the candidate point that is closest to
      * the original point.
      * @param point the point to find the closest point to
