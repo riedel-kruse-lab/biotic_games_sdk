@@ -8,22 +8,22 @@ import java.util.List;
 /**
  * The CompositeShape class describes shapes composed of other shapes.
  */
-public class CompositeShape extends DisplayObject {
+public class CompositeShape extends GameObject {
     /**
      * A list of the shapes that comprise this CompositeShape.
      */
-    private List<Shape> mShapes;
+    private List<Shape> mChildren;
 
     /**
      * Constructor of the CompositeShape class.
      * @param position the position of the CompositeShape.
-     * @param shapes a list of the shapes that comprise this CompositeShape.
+     * @param children a list of the shapes that comprise this CompositeShape.
      */
-    public CompositeShape(Point position, List<Shape> shapes) {
+    public CompositeShape(Point position, List<Shape> children) {
         super(position, false);
 
-        mShapes = shapes;
-        mIsPhysical = listContainsPhysicalShape(shapes);
+        mChildren = children;
+        mIsPhysical = listContainsPhysicalShape(children);
     }
 
     /**
@@ -40,9 +40,13 @@ public class CompositeShape extends DisplayObject {
         return false;
     }
 
+    public List<Shape> children() {
+        return mChildren;
+    }
+
     @Override
     public void draw(Mat frame, Point offset) {
-        for (Shape shape : mShapes) {
+        for (Shape shape : mChildren) {
             shape.draw(frame, MathUtil.addPoints(offset, mPosition));
         }
     }

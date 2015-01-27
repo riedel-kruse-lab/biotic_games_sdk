@@ -35,6 +35,22 @@ public class Rectangle extends Shape {
         mRect = new Rect(0, 0, width, height);
     }
 
+    public int width() {
+        return mRect.width;
+    }
+
+    public int height() {
+        return mRect.height;
+    }
+
+    public Point center() {
+        Point center = topLeft();
+        center.x += width() / 2;
+        center.y += height() / 2;
+
+        return center;
+    }
+
     /**
      * Returns the top left corner of the rectangle.
      * @return the top left corner of the rectangle.
@@ -55,5 +71,10 @@ public class Rectangle extends Shape {
     public void draw(Mat frame, Point offset) {
         Core.rectangle(frame, MathUtil.addPoints(offset, topLeft()),
                 MathUtil.addPoints(offset, bottomRight()), mColor, mThickness);
+    }
+
+    @Override
+    public boolean contains(Point point) {
+        return mRect.contains(point);
     }
 }

@@ -30,8 +30,22 @@ public class Circle extends Shape {
         mRadius = radius;
     }
 
+    public int radius() {
+        return mRadius;
+    }
+
+    public Point center() {
+        return mPosition;
+    }
+
     @Override
     public void draw(Mat frame, Point offset) {
         Core.circle(frame, MathUtil.addPoints(offset, mPosition), mRadius, mColor, mThickness);
+    }
+
+    @Override
+    public boolean contains(Point point) {
+        return Math.pow(point.x - mPosition.x, 2) + Math.pow(point.y - mPosition.y, 2) <=
+                Math.pow(mRadius, 2);
     }
 }

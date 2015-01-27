@@ -6,7 +6,7 @@ import org.opencv.core.Point;
 /**
  * The DisplayObject class is the parent class for all drawable objects.
  */
-public abstract class DisplayObject {
+public abstract class GameObject {
     /**
      * Instance variable which keeps track of the position of the DisplayObject on the screen.
      */
@@ -23,7 +23,7 @@ public abstract class DisplayObject {
      * @param isPhysical whether or not this DisplayObject should interact physically with other
      *                   DisplayObjects.
      */
-    public DisplayObject(Point position, boolean isPhysical) {
+    public GameObject(Point position, boolean isPhysical) {
         mPosition = position;
         mIsPhysical = isPhysical;
     }
@@ -59,4 +59,8 @@ public abstract class DisplayObject {
      * @param offset the offset to draw at (translates all subsequent draw calls)
      */
     public abstract void draw(Mat frame, Point offset);
+
+    public boolean intersects(GameObject obj) {
+        return CollisionUtil.intersects(this, obj);
+    }
 }

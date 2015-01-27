@@ -1,15 +1,12 @@
 package edu.stanford.riedel_kruse.bioticgamessdk;
 
-import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-
-import java.util.List;
 
 /**
  * The Shape class models basic shapes like Rectangles and Circles.
  */
-public abstract class Shape extends DisplayObject {
+public abstract class Shape extends GameObject {
     /**
      * Default color to use for drawing if no color is set. This corresponds to black.
      */
@@ -44,4 +41,6 @@ public abstract class Shape extends DisplayObject {
 
         mThickness = thickness;
     }
+
+    public abstract boolean contains(Point point);
 }
