@@ -35,6 +35,8 @@ public abstract class Shape extends GameObject {
         super(position, isPhysical);
 
         mColor = color;
+
+        // If no color is provided, use the default color.
         if (mColor == null) {
             mColor = DEFAULT_COLOR;
         }
@@ -42,5 +44,10 @@ public abstract class Shape extends GameObject {
         mThickness = thickness;
     }
 
+    /**
+     * Determines if a point sits inside this shape.
+     * @param point the point to evaluate
+     * @return true if the given point is inside the shape, false otherwise
+     */
     public abstract boolean contains(Point point);
 }
