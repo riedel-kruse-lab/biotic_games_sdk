@@ -23,6 +23,11 @@ public class CompositeShape extends GameObject {
         super(position, false);
 
         mChildren = children;
+
+        // For a CompositeShape, mIsPhysical is set to true so long as any child is physical.
+        // Basically, this allows us to optimize and not do collision detection on the entire
+        // CompositeShape if it contains no physical children, but if it does, then we handle
+        // collision normally.
         mIsPhysical = listContainsPhysicalShape(children);
     }
 
@@ -40,12 +45,17 @@ public class CompositeShape extends GameObject {
         return false;
     }
 
+    /**
+     * Getter for the list of child shapes that comprise this CompositeShape.
+     * @return a List of the Shapes that comprise this CompositeShape.
+     */
     public List<Shape> children() {
         return mChildren;
     }
 
     @Override
     public void draw(Mat frame, Point offset) {
+        // Draw each child.
         for (Shape shape : mChildren) {
             shape.draw(frame, MathUtil.addPoints(offset, mPosition));
         }
