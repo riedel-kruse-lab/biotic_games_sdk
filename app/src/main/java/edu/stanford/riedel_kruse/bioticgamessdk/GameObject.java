@@ -63,6 +63,6 @@ public abstract class GameObject {
     public abstract void draw(Mat frame, Point offset);
 
     public boolean intersects(GameObject obj) {
-        return CollisionUtil.intersects(this, obj);
+        return CollisionUtil.collided(this, obj);
     }
 }
