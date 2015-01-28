@@ -30,11 +30,21 @@ public class Circle extends Shape {
         mRadius = radius;
     }
 
+    /**
+     * Getter for the radius of the Circle.
+     * @return the radius of the Circle.
+     */
     public int radius() {
         return mRadius;
     }
 
+    /**
+     * Getter for the point at the center of the Circle.
+     * @return a point which is at the center of the Circle.
+     */
     public Point center() {
+        // Circle really just uses the mPosition property for the center, but aliases it as the
+        // center so that it is slightly more intuitive to clients of this class.
         return mPosition;
     }
 
@@ -45,6 +55,7 @@ public class Circle extends Shape {
 
     @Override
     public boolean contains(Point point) {
+        // Check if the distance to the point is less than or equal to the radius of the circle.
         return Math.pow(point.x - mPosition.x, 2) + Math.pow(point.y - mPosition.y, 2) <=
                 Math.pow(mRadius, 2);
     }
