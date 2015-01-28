@@ -10,6 +10,9 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The BioticGameActivity class serves as the base class from which all Biotic Games are created.
  * It makes all of the appropriate calls to OpenCV in order to setup a game that uses the camera to
@@ -33,6 +36,10 @@ public abstract class BioticGameActivity extends Activity implements
      * first time onCameraFrame has been called. False means it has been called before.
      */
     private boolean mFirstFrame;
+
+    private List<GameObject> mGameObjects;
+
+    private List<CollisionCallback> mCollisionCallbacks;
 
     /**
      * Custom OpenCV loader callback called once OpenCV has been loaded. This is the right place to
@@ -69,6 +76,9 @@ public abstract class BioticGameActivity extends Activity implements
 
         // Set mFirstFrame to true so that the first time we hit onCameraFrame it is true.
         mFirstFrame = true;
+
+        mGameObjects = new ArrayList<GameObject>();
+        mCollisionCallbacks = new ArrayList<CollisionCallback>();
     }
 
     /**
@@ -145,7 +155,18 @@ public abstract class BioticGameActivity extends Activity implements
 
         Mat rgbaFrame = frame.rgba();
         updateGame(rgbaFrame, timeDelta);
-        return drawGame(rgbaFrame);
+        processCollisions();
+        drawGame(rgbaFrame);
+
+        return rgbaFrame;
+    }
+
+    protected void addGameObject(GameObject obj) {
+        mGameObjects.add(obj);
+    }
+
+    protected void addCollisionCallback(CollisionCallback callback) {
+        mCollisionCallbacks.add(callback);
     }
 
     /**
@@ -157,10 +178,19 @@ public abstract class BioticGameActivity extends Activity implements
      */
     protected abstract void updateGame(Mat frame, long timeDelta);
 
+    private void processCollisions() {
+        for (CollisionCallback callback : mCollisionCallbacks) {
+            callback.process();
+        }
+    }
+
     /**
      * Draws the game onto the provided frame and returns it.
      * @param frame an RGBA image matrix which contains the current frame from the camera
-     * @return
      */
-    protected abstract Mat drawGame(Mat frame);
+    protected void drawGame(Mat frame) {
+        for (GameObject obj : mGameObjects) {
+            obj.draw(frame);
+        }
+    }
 }
