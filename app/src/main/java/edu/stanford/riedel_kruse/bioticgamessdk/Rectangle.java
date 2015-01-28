@@ -57,8 +57,8 @@ public class Rectangle extends Shape {
      */
     public Point center() {
         Point center = topLeft();
-        center.x += width() / 2;
-        center.y += height() / 2;
+        center.x += width() / 2.0;
+        center.y += height() / 2.0;
 
         return center;
     }

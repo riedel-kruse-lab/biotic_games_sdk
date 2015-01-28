@@ -117,22 +117,22 @@ public class CollisionUtil {
         circleDistance.x = Math.abs(circleCenter.x - rectCenter.x);
         circleDistance.y = Math.abs(circleCenter.y - rectCenter.y);
 
-        if (circleDistance.x > rectWidth / 2 + circleRadius) {
+        if (circleDistance.x > rectWidth / 2.0 + circleRadius) {
             return false;
         }
-        if (circleDistance.y > rectHeight / 2 + circleRadius) {
+        if (circleDistance.y > rectHeight / 2.0 + circleRadius) {
             return false;
         }
 
-        if (circleDistance.x <= rectWidth / 2) {
+        if (circleDistance.x <= rectWidth / 2.0) {
             return true;
         }
-        if (circleDistance.y <= rectHeight / 2) {
+        if (circleDistance.y <= rectHeight / 2.0) {
             return true;
         }
 
-        double cornerDistanceSquared = Math.pow(circleDistance.x - rectWidth / 2, 2) +
-                Math.pow(circleDistance.y - rectHeight / 2, 2);
+        double cornerDistanceSquared = Math.pow(circleDistance.x - rectWidth / 2.0, 2) +
+                Math.pow(circleDistance.y - rectHeight / 2.0, 2);
 
         return cornerDistanceSquared <= Math.pow(circleRadius, 2);
     }
