@@ -53,4 +53,32 @@ public class CollisionUtilTest extends TestCase {
 
         assertEquals(true, CollisionUtil.collided(rect, circle));
     }
+
+    public void testCircleCircleCollision() {
+        // Case where the circles do not overlap.
+        Circle circle1 = new Circle(new Point(0, 0), 5, null, -1, true);
+        Circle circle2 = new Circle(new Point(10, 10), 2, null, -1, true);
+
+        assertEquals(false, CollisionUtil.collided(circle1, circle2));
+
+        // Case where the two circles overlap.
+        circle2.setPosition(new Point(5, 0));
+
+        assertEquals(true, CollisionUtil.collided(circle1, circle2));
+
+        // Case where one circle sits inside the other.
+        circle2.setPosition(new Point(0, 0));
+
+        assertEquals(true, CollisionUtil.collided(circle1, circle2));
+
+        // Case where the circles touch, but do not overlap.
+        circle2.setPosition(new Point(7, 0));
+
+        assertEquals(true, CollisionUtil.collided(circle1, circle2));
+
+        // Case where the circles are just off touching.
+        circle2.setPosition(new Point(7.1, 0));
+
+        assertEquals(false, CollisionUtil.collided(circle1, circle2));
+    }
 }
