@@ -35,14 +35,26 @@ public class Rectangle extends Shape {
         mRect = new Rect(0, 0, width, height);
     }
 
+    /**
+     * Getter for the width property of the Rectangle.
+     * @return the width of the rectangle
+     */
     public int width() {
         return mRect.width;
     }
 
+    /**
+     * Getter for the height property of the Rectangle.
+     * @return the height of the rectangle
+     */
     public int height() {
         return mRect.height;
     }
 
+    /**
+     * Retrieves the center point of the Rectangle.
+     * @return a point which is at the center of the Rectangle.
+     */
     public Point center() {
         Point center = topLeft();
         center.x += width() / 2;
