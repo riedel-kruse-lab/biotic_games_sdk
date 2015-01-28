@@ -91,7 +91,7 @@ public class CollisionUtil {
         }
 
         // Check if one rectangle is above the other
-        return !(tl1.y < br2.y || tl2.y < br1.y);
+        return !(tl1.y > br2.y || tl2.y > br1.y);
     }
 
     /**
