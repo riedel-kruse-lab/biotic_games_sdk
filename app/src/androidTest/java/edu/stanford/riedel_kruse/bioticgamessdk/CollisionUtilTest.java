@@ -8,7 +8,7 @@ import org.opencv.core.Point;
  * Contains test cases for the CollisionUtil class.
  */
 public class CollisionUtilTest extends TestCase {
-    public void testRectangleCollision() {
+    public void testRectangleRectangleCollision() {
         // Case where the two rectangles overlap.
         Rectangle rect1 = new Rectangle(new Point(0, 0), 10, 15, null, -1, true);
         Rectangle rect2 = new Rectangle(new Point(8, 13), 5, 8, null, -1, true);
