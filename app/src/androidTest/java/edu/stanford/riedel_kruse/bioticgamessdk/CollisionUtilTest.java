@@ -81,4 +81,42 @@ public class CollisionUtilTest extends TestCase {
 
         assertEquals(false, CollisionUtil.collided(circle1, circle2));
     }
+
+    public void testCompositeShapeCompositeShapeCollision() {
+        Rectangle stick = new Rectangle(new Point(0, 0), 10, 2, null, -1, true);
+        Circle ball = new Circle(new Point(10, 1), 4, null, -1, true);
+
+        CompositeShape ballAndStick = new CompositeShape(new Point(0, 0), stick, ball);
+
+        Rectangle goalBack = new Rectangle(new Point(0, 0), 2, 10, null, -1, true);
+        Rectangle goalTopArm = new Rectangle(new Point(2, 0), 4, 2, null, -1, false);
+        Rectangle goalBottomArm = new Rectangle(new Point(2, 8), 4, 2, null, -1, false);
+
+        CompositeShape goal = new CompositeShape(new Point(100, 100), goalBack, goalTopArm,
+                goalBottomArm);
+
+        // Case where the two objects do not overlap at all.
+        assertEquals(false, CollisionUtil.collided(ballAndStick, goal));
+    }
+
+    public void testCompositeShapeShapeCollision() {
+        Rectangle goalBack = new Rectangle(new Point(0, 0), 2, 10, null, -1, true);
+        Rectangle goalTopArm = new Rectangle(new Point(2, 0), 4, 2, null, -1, false);
+        Rectangle goalBottomArm = new Rectangle(new Point(2, 8), 4, 2, null, -1, false);
+
+        CompositeShape compositeShape = new CompositeShape(new Point(0, 0), goalBack, goalTopArm,
+                goalBottomArm);
+
+        // Case where the circle intersects the physical back of the goal.
+        Circle circle = new Circle(new Point(2, 5), 2, null, -1, true);
+        assertEquals(true, CollisionUtil.collided(compositeShape, circle));
+
+        // Case where the circle intersects the non-physical arms of the goal.
+        circle.setPosition(new Point(5, 0));
+        assertEquals(false, CollisionUtil.collided(compositeShape, circle));
+
+        // Case where the circle does not intersect the goal at all.
+        circle.setPosition(new Point(10, 0));
+        assertEquals(false, CollisionUtil.collided(compositeShape, circle));
+    }
 }

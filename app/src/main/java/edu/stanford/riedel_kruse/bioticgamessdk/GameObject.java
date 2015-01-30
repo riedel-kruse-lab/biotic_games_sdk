@@ -38,6 +38,14 @@ public abstract class GameObject {
     }
 
     /**
+     * Gets the position of this GameObject.
+     * @return the position of this GameObject.
+     */
+    public Point position() {
+        return mPosition;
+    }
+
+    /**
      * Whether or not this GameObject should interact physically with other GameObjects.
      * @return true if this GameObject should interact physically with other GameObjects, false
      *         otherwise.
