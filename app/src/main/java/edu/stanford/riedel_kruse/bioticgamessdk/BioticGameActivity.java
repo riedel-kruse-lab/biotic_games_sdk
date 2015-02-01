@@ -8,6 +8,7 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
@@ -154,6 +155,8 @@ public abstract class BioticGameActivity extends Activity implements
         mLastTimestamp = currentTimestamp;
 
         Mat rgbaFrame = frame.rgba();
+        // TODO: This flip should maybe happy based on the orientation of the phone?
+        Core.flip(rgbaFrame, rgbaFrame, -1);
         updateGame(rgbaFrame, timeDelta);
         processCollisions();
         drawGame(rgbaFrame);
