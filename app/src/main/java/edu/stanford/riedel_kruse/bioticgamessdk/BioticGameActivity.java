@@ -42,6 +42,9 @@ public abstract class BioticGameActivity extends Activity implements
 
     private List<CollisionCallback> mCollisionCallbacks;
 
+    private int mFrameRows;
+    private int mFrameCols;
+
     /**
      * Custom OpenCV loader callback called once OpenCV has been loaded. This is the right place to
      * do initialization of OpenCV objects.
@@ -143,20 +146,22 @@ public abstract class BioticGameActivity extends Activity implements
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame frame)
     {
+        Mat rgbaFrame = frame.rgba();
+        // TODO: This flip should maybe happy based on the orientation of the phone?
+        Core.flip(rgbaFrame, rgbaFrame, -1);
+
         long timeDelta = 0;
         long currentTimestamp = System.currentTimeMillis();
 
         if (mFirstFrame) {
             mFirstFrame = false;
+            initGame(rgbaFrame.rows(), rgbaFrame.cols());
         }
         else {
             timeDelta = currentTimestamp - mLastTimestamp;
         }
         mLastTimestamp = currentTimestamp;
 
-        Mat rgbaFrame = frame.rgba();
-        // TODO: This flip should maybe happy based on the orientation of the phone?
-        Core.flip(rgbaFrame, rgbaFrame, -1);
         updateGame(rgbaFrame, timeDelta);
         processCollisions();
         drawGame(rgbaFrame);
@@ -171,6 +176,14 @@ public abstract class BioticGameActivity extends Activity implements
     protected void addCollisionCallback(CollisionCallback callback) {
         mCollisionCallbacks.add(callback);
     }
+
+    /**
+     * Initializes the game model. Always called before other game-related functions on the first
+     * frame.
+     * @param rows the number of rows in each frame
+     * @param cols the number of cols in each frame
+     */
+    protected abstract void initGame(int rows, int cols);
 
     /**
      * Updates the game model and runs game logic. This is the appropriate place to update the state
