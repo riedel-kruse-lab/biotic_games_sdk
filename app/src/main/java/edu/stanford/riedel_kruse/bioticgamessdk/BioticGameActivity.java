@@ -25,8 +25,6 @@ public abstract class BioticGameActivity extends Activity implements
     /**
      * The live camera feed view.
      */
-    // TODO: Should provide a subclass of JavaCameraView which allows passing of camera parameters
-    // in order to do things like change the camera zoom level, etc.
     private JavaCameraView mCameraView;
     /**
      * Stores the timestamp for the previous frame. Used to compute time deltas between frames.
@@ -37,13 +35,14 @@ public abstract class BioticGameActivity extends Activity implements
      * first time onCameraFrame has been called. False means it has been called before.
      */
     private boolean mFirstFrame;
-
+    /**
+     * List that keeps track of all of the GameObjects added to this activity.
+     */
     private List<GameObject> mGameObjects;
-
+    /**
+     * List that keeps track of all of the CollisionCallbacks added to this activity.
+     */
     private List<CollisionCallback> mCollisionCallbacks;
-
-    private int mFrameRows;
-    private int mFrameCols;
 
     /**
      * Custom OpenCV loader callback called once OpenCV has been loaded. This is the right place to
@@ -169,10 +168,21 @@ public abstract class BioticGameActivity extends Activity implements
         return rgbaFrame;
     }
 
+    /**
+     * Adds a new GameObject to this activity. Adding a GameObject makes it so that the the object
+     * is drawn automatically.
+     * @param obj the GameObject to add to the game.
+     * @todo might be good to separate the notion of a Game from the notion of a GameActivity
+     */
     protected void addGameObject(GameObject obj) {
         mGameObjects.add(obj);
     }
 
+    /**
+     * Adds a new CollisionCallback to this activity. CollisionCallbacks are processed once a frame
+     * and execute custom code when two particular objects collide.
+     * @param callback the custom callback to add to the game.
+     */
     protected void addCollisionCallback(CollisionCallback callback) {
         mCollisionCallbacks.add(callback);
     }
@@ -194,6 +204,9 @@ public abstract class BioticGameActivity extends Activity implements
      */
     protected abstract void updateGame(Mat frame, long timeDelta);
 
+    /**
+     * Processes all of the collision callbacks attached to this activity.
+     */
     private void processCollisions() {
         for (CollisionCallback callback : mCollisionCallbacks) {
             callback.process();
