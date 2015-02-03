@@ -3,6 +3,7 @@ package edu.stanford.riedel_kruse.bioticgamessdk;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,23 +24,30 @@ public class CompositeShape extends GameObject {
     public CompositeShape(Point position, List<Shape> children) {
         super(position, false);
 
-        mChildren = children;
+        mChildren = new ArrayList<Shape>();
+
+        // Translate each of the children by the CompositeShape's position.
+        // TODO: The way this is written, it would be confusing to get back a child added to a
+        // CompositeShape because its coordinates will be relative to the global context even though
+        // the original coordinates provided were relative to the parent.
+        for (Shape child : children) {
+            addChild(child);
+        }
 
         // For a CompositeShape, mIsPhysical is set to true so long as any child is physical.
         // Basically, this allows us to optimize and not do collision detection on the entire
         // CompositeShape if it contains no physical children, but if it does, then we handle
         // collision normally.
         mIsPhysical = listContainsPhysicalShape(mChildren);
+    }
 
-        // Translate each of the children by the CompositeShape's position.
-        // TODO: The way this is written, it would be confusing to get back a child added to a
-        // CompositeShape because its coordinates will be relative to the global context even though
-        // the original coordinates provided were relative to the parent.
-        for (Shape child : mChildren) {
-            Point childPosition = child.position();
-            child.setPosition(new Point(childPosition.x + mPosition.x,
-                    childPosition.y + mPosition.y));
-        }
+    /**
+     * Constructor for the CompositeShape class.
+     * @param position the position of the CompositeShape.
+     * @param children an indefinitely sized array of children.
+     */
+    public CompositeShape(Point position, Shape... children) {
+        this(position, Arrays.asList(children));
     }
 
     @Override
@@ -53,10 +61,6 @@ public class CompositeShape extends GameObject {
         }
 
         super.setPosition(newPosition);
-    }
-
-    public CompositeShape(Point position, Shape... children) {
-        this(position, Arrays.asList(children));
     }
 
     /**
@@ -79,6 +83,16 @@ public class CompositeShape extends GameObject {
      */
     public List<Shape> children() {
         return mChildren;
+    }
+
+    /**
+     * Adds a Shape to this CompositeShape.
+     * @param child the child Shape to add to this CompositeShape.
+     */
+    public void addChild(Shape child) {
+        Point childPosition = child.position();
+        child.setPosition(new Point(childPosition.x + mPosition.x, childPosition.y + mPosition.y));
+        mChildren.add(child);
     }
 
     @Override
