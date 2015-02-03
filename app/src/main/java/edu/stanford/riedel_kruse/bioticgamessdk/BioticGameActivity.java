@@ -159,8 +159,8 @@ public abstract class BioticGameActivity extends Activity implements
         mLastTimestamp = currentTimestamp;
 
         updateGame(rgbaFrame, timeDelta);
-        processCollisions();
         drawGame(rgbaFrame);
+        processCollisions();
 
         return rgbaFrame;
     }
