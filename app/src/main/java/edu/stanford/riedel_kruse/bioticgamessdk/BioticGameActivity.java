@@ -131,20 +131,17 @@ public abstract class BioticGameActivity extends Activity implements
     protected abstract int getCameraViewResourceId();
 
     @Override
-    public void onCameraViewStarted(int width, int height)
-    {
+    public void onCameraViewStarted(int width, int height) {
 
     }
 
     @Override
-    public void onCameraViewStopped()
-    {
+    public void onCameraViewStopped() {
 
     }
 
     @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame frame)
-    {
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame frame) {
         Mat rgbaFrame = frame.rgba();
         // TODO: This flip should maybe happy based on the orientation of the phone?
         Core.flip(rgbaFrame, rgbaFrame, -1);
