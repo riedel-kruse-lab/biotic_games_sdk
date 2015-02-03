@@ -151,7 +151,7 @@ public abstract class BioticGameActivity extends Activity implements
 
         if (mFirstFrame) {
             mFirstFrame = false;
-            initGame(rgbaFrame.rows(), rgbaFrame.cols());
+            initGame(rgbaFrame.cols(), rgbaFrame.rows());
         }
         else {
             timeDelta = currentTimestamp - mLastTimestamp;
@@ -187,10 +187,10 @@ public abstract class BioticGameActivity extends Activity implements
     /**
      * Initializes the game model. Always called before other game-related functions on the first
      * frame.
-     * @param rows the number of rows in each frame
-     * @param cols the number of cols in each frame
+     * @param width the number of cols in each frame
+     * @param height the number of rows in each frame
      */
-    protected abstract void initGame(int rows, int cols);
+    protected abstract void initGame(int width, int height);
 
     /**
      * Updates the game model and runs game logic. This is the appropriate place to update the state
