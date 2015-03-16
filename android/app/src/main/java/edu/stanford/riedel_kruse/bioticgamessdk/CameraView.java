@@ -33,6 +33,10 @@ public class CameraView extends JavaCameraView {
         return cameraConnected;
     }
 
+    public Camera.Parameters getCameraParameters() {
+        return mCamera.getParameters();
+    }
+
     /**
      * Sets the parameters of the camera to allow control over things like camera zoom level.
      * @param parameters the Camera.Parameters object containing data about the camera's parameters.
