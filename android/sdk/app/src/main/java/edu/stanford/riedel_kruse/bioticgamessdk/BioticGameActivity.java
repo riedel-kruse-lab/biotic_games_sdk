@@ -25,7 +25,7 @@ public abstract class BioticGameActivity extends Activity implements
     /**
      * The live camera feed view.
      */
-    private JavaCameraView mCameraView;
+    private CameraView mCameraView;
     /**
      * Stores the timestamp for the previous frame. Used to compute time deltas between frames.
      */
@@ -72,7 +72,7 @@ public abstract class BioticGameActivity extends Activity implements
         // Call abstract method getCameraViewResourceId() to set the camera view. Subclasses of this
         // class must override getCameraViewResourceId() in order to specify where the main camera
         // view for the game is.
-        mCameraView = (JavaCameraView) findViewById(getCameraViewResourceId());
+        mCameraView = getCameraView();
 
         // Receive camera view listener callbacks for this camera view like onCameraFrame.
         mCameraView.setCvCameraViewListener(this);
@@ -129,6 +129,10 @@ public abstract class BioticGameActivity extends Activity implements
      * @return the Android resource ID for the camera view to use as the main camera feed.
      */
     protected abstract int getCameraViewResourceId();
+
+    protected CameraView getCameraView() {
+        return (CameraView) findViewById(getCameraViewResourceId());
+    }
 
     @Override
     public void onCameraViewStarted(int width, int height) {
