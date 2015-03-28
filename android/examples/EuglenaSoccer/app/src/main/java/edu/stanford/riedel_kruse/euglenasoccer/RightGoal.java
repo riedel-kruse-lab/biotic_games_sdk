@@ -13,10 +13,10 @@ public class RightGoal extends CompositeShape {
     public RightGoal(Point position, int goalWidth, int goalHeight, Scalar color) {
         super(position);
         Rectangle back = new Rectangle(new Point(0, 0), goalWidth, goalHeight, color, -1, true);
-        Rectangle top = new Rectangle(new Point(-goalHeight / 4 + goalWidth, 0), goalHeight / 4, goalWidth,
+        Rectangle top = new Rectangle(new Point(-goalHeight / 8 + goalWidth, 0), goalHeight / 8, goalWidth,
                 color, -1, false);
-        Rectangle bottom = new Rectangle(new Point(-goalHeight / 4 + goalWidth, goalHeight - goalWidth),
-                goalHeight / 4, goalWidth, color, -1, false);
+        Rectangle bottom = new Rectangle(new Point(-goalHeight / 8 + goalWidth, goalHeight - goalWidth),
+                goalHeight / 8, goalWidth, color, -1, false);
 
         addChild(back);
         addChild(top);

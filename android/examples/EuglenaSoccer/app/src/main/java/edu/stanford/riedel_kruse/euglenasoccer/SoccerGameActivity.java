@@ -1,5 +1,6 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -11,6 +12,7 @@ import org.opencv.core.Scalar;
 import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
+import edu.stanford.riedel_kruse.bioticgamessdk.CameraView;
 import edu.stanford.riedel_kruse.bioticgamessdk.Circle;
 import edu.stanford.riedel_kruse.bioticgamessdk.CollisionCallback;
 import edu.stanford.riedel_kruse.bioticgamessdk.ImageProcessing;
@@ -20,6 +22,8 @@ import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
  * Created by dchiu on 1/31/15.
  */
 public class SoccerGameActivity extends BioticGameActivity {
+
+    private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
 
     private Circle mBall;
     private int mFieldWidth;
@@ -38,44 +42,51 @@ public class SoccerGameActivity extends BioticGameActivity {
 
     @Override
     protected void initGame(final int width, final int height) {
+        CameraView cameraView = getCameraView();
+
+        Camera.Parameters params = cameraView.getCameraParameters();
+        params.setZoom(params.getMaxZoom() / 2);
+        cameraView.setCameraParameters(params);
+
         mFieldWidth = width;
         mFieldHeight = height;
         int goalHeight = height * 3 / 4;
         int goalWidth = 10;
         int goalY = (height - goalHeight) / 2;
-        LeftGoal redGoal = new LeftGoal(new Point(0, goalY), goalWidth, goalHeight,
-                new Scalar(255, 0, 0));
-        addGameObject(redGoal);
+        LeftGoal leftGoal = new LeftGoal(new Point(0, goalY), goalWidth, goalHeight, COLOR_RED);
+        addGameObject(leftGoal);
 
-        RightGoal blueGoal = new RightGoal(new Point(width - goalWidth, goalY), goalWidth,
-                goalHeight, new Scalar(0, 0, 255));
-        addGameObject(blueGoal);
+        RightGoal rightGoal = new RightGoal(new Point(width - goalWidth, goalY), goalWidth,
+                goalHeight, COLOR_RED);
+        addGameObject(rightGoal);
 
-        mBall = new Circle(new Point(width / 2, height / 2), 20, new Scalar(255, 0, 0), 1, true);
+        mBall = new Circle(new Point(width / 2, height / 2), 20, COLOR_RED, 1, true);
         addGameObject(mBall);
 
-        addCollisionCallback(new CollisionCallback(mBall, blueGoal) {
+        // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
+        addCollisionCallback(new CollisionCallback(mBall, leftGoal) {
             @Override
             public void onCollision() {
-                mBall.position().x = width / 2;
-                mBall.position().y = height / 2;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Goal!", Toast.LENGTH_LONG).show();
-                    }
-                });
+                onGoalScored();
             }
         });
+
+        addCollisionCallback(new CollisionCallback(mBall, rightGoal) {
+            @Override
+            public void onCollision() {
+                onGoalScored();
+            }
+        });
+
+
     }
 
     @Override
     protected void updateGame(Mat frame, long timeDelta) {
-        /*Point closestEuglenaLocation = findClosestEuglenaToBall(frame);
+        Point closestEuglenaLocation = findClosestEuglenaToBall(frame);
         if (closestEuglenaLocation != null) {
             mBall.setPosition(closestEuglenaLocation);
-        }*/
-        //mBall.position().x += 10;
+        }
     }
 
     private Point findClosestEuglenaToBall(Mat frame) {
@@ -95,5 +106,16 @@ public class SoccerGameActivity extends BioticGameActivity {
 
         // Find the location of the Euglena that is closest to the ball.
         return MathUtil.findClosestPoint(ballLocation, euglenaLocations);
+    }
+
+    private void onGoalScored() {
+        mBall.position().x = mFieldWidth / 2;
+        mBall.position().y = mFieldHeight / 2;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "Goal!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

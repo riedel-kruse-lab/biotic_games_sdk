@@ -7,8 +7,8 @@
 
     <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
         android:id="@+id/camera_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="450dp"
+        android:layout_height="fill_parent"
         opencv:camera_id="any"
         opencv:show_fps="true"/>
 

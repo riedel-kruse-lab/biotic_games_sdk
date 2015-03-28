@@ -14,9 +14,9 @@ public class LeftGoal extends CompositeShape {
     public LeftGoal(Point position, int goalWidth, int goalHeight, Scalar color) {
         super(position);
         Rectangle back = new Rectangle(new Point(0, 0), goalWidth, goalHeight, color, -1, true);
-        Rectangle top = new Rectangle(new Point(0, 0), goalHeight / 4, goalWidth, color, -1, false);
+        Rectangle top = new Rectangle(new Point(0, 0), goalHeight / 8, goalWidth, color, -1, false);
         Point bottomPosition = new Point(0, goalHeight - goalWidth);
-        Rectangle bottom = new Rectangle(bottomPosition, goalHeight / 4, goalWidth, color, -1,
+        Rectangle bottom = new Rectangle(bottomPosition, goalHeight / 8, goalWidth, color, -1,
                 false);
 
         addChild(back);
