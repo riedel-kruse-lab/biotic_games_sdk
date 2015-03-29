@@ -50,18 +50,24 @@ public class SoccerGameActivity extends BioticGameActivity {
 
         mFieldWidth = width;
         mFieldHeight = height;
-        int goalHeight = height * 3 / 4;
+        int goalHeight = height * 4 / 7;
         int goalWidth = 10;
         int goalY = (height - goalHeight) / 2;
-        LeftGoal leftGoal = new LeftGoal(new Point(0, goalY), goalWidth, goalHeight, COLOR_RED);
+        int goalOffset = SoccerField.PADDING + SoccerField.LINE_THICKNESS;
+        LeftGoal leftGoal = new LeftGoal(new Point(goalOffset, goalY), goalWidth, goalHeight,
+                COLOR_RED);
         addGameObject(leftGoal);
 
-        RightGoal rightGoal = new RightGoal(new Point(width - goalWidth, goalY), goalWidth,
-                goalHeight, COLOR_RED);
+        RightGoal rightGoal = new RightGoal(new Point(width - goalWidth - goalOffset, goalY),
+                goalWidth, goalHeight, COLOR_RED);
         addGameObject(rightGoal);
 
         SoccerBall soccerBall = new SoccerBall(new Point(width / 2, height / 2));
         addGameObject(soccerBall);
+
+        SoccerField soccerField = new SoccerField();
+        addGameObject(soccerField);
+
         mBall = new Circle(new Point(width / 2, height / 2), 60, COLOR_RED, 1, true);
         addGameObject(mBall);
 
