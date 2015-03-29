@@ -60,7 +60,9 @@ public class SoccerGameActivity extends BioticGameActivity {
                 goalHeight, COLOR_RED);
         addGameObject(rightGoal);
 
-        mBall = new Circle(new Point(width / 2, height / 2), 20, COLOR_RED, 1, true);
+        SoccerBall soccerBall = new SoccerBall(new Point(width / 2, height / 2));
+        addGameObject(soccerBall);
+        mBall = new Circle(new Point(width / 2, height / 2), 60, COLOR_RED, 1, true);
         addGameObject(mBall);
 
         // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
