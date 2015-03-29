@@ -1,6 +1,7 @@
 # How to use the SDK
 ## Setup
 1. If you do not already have it, download and install [Android Studio](http://developer.android.com/sdk/index.html). This will also install the Android SDK.
+2. If you do not already have it, download and install the [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html).
 2. Create a new Android Studio project for your game.
 3. Download the latest version of the [OpenCV4Android SDK](http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/O4A_SDK.html). Unzip the OpenCV4Android SDK to a location of your choice.
 4. Include the OpenCV library in your Android Studio project, as it is a dependency of the Biotic Games SDK.
@@ -29,6 +30,7 @@
         compile project(':sdk')
     }
     ```
+8. Add this line to the `local.properties` file in your Android Studio project: `ndk.dir=/Users/dchiu/Developer/android/android-ndk-r10b`. Make sure to replace the path with the path to the NDK on your own machine.
 7. Create a new class that extends `BioticGameActivity`.
 
 ## Documentation
