@@ -38,11 +38,11 @@ public abstract class GameObject {
     }
 
     /**
-     * Gets the position of this GameObject.
-     * @return the position of this GameObject.
+     * Gets a copy of the position of this GameObject.
+     * @return a copy of the position of this GameObject.
      */
     public Point position() {
-        return mPosition;
+        return mPosition.clone();
     }
 
     /**

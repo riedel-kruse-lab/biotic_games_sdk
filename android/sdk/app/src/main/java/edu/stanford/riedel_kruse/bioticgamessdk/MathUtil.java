@@ -59,8 +59,10 @@ public class MathUtil
     public static void normalizeVector(Point vector) {
         double magnitude = MathUtil.computeVectorMagnitude(vector);
 
-        vector.x /= magnitude;
-        vector.y /= magnitude;
+        if (magnitude != 0) {
+            vector.x /= magnitude;
+            vector.y /= magnitude;
+        }
     }
 
     /**
