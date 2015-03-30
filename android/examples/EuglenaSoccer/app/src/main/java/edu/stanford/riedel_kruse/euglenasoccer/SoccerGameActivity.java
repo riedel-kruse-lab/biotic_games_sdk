@@ -25,7 +25,7 @@ public class SoccerGameActivity extends BioticGameActivity {
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
 
-    private Circle mBall;
+    private SoccerBall mBall;
     private int mFieldWidth;
     private int mFieldHeight;
 
@@ -50,25 +50,25 @@ public class SoccerGameActivity extends BioticGameActivity {
 
         mFieldWidth = width;
         mFieldHeight = height;
+
+        // Add the soccer field lines
+        SoccerField soccerField = new SoccerField();
+        addGameObject(soccerField);
+
+        // Set up the goals
         int goalHeight = height * 4 / 7;
         int goalWidth = 10;
         int goalY = (height - goalHeight) / 2;
         int goalOffset = SoccerField.PADDING + SoccerField.LINE_THICKNESS;
         LeftGoal leftGoal = new LeftGoal(new Point(goalOffset, goalY), goalWidth, goalHeight,
                 COLOR_RED);
-        addGameObject(leftGoal);
-
         RightGoal rightGoal = new RightGoal(new Point(width - goalWidth - goalOffset, goalY),
                 goalWidth, goalHeight, COLOR_RED);
+        addGameObject(leftGoal);
         addGameObject(rightGoal);
 
-        SoccerBall soccerBall = new SoccerBall(new Point(width / 2, height / 2));
-        addGameObject(soccerBall);
-
-        SoccerField soccerField = new SoccerField();
-        addGameObject(soccerField);
-
-        mBall = new Circle(new Point(width / 2, height / 2), 60, COLOR_RED, 1, true);
+        // Add the soccer ball
+        mBall = new SoccerBall(new Point(width / 2, height / 2));
         addGameObject(mBall);
 
         // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
@@ -100,14 +100,13 @@ public class SoccerGameActivity extends BioticGameActivity {
     private Point findClosestEuglenaToBall(Mat frame) {
         // Get the model data about the ball.
         Point ballLocation = mBall.position();
-        int ballRadius = mBall.radius();
 
         // Create a region of interest based on the location of the ball.
         Rect roi = new Rect();
-        roi.x = Math.max((int) ballLocation.x - ballRadius, 0);
-        roi.y = Math.max((int) ballLocation.y - ballRadius, 0);
-        roi.width = Math.min(ballRadius * 2, mFieldWidth - roi.x);
-        roi.height = Math.min(ballRadius * 2, mFieldHeight - roi.y);
+        roi.x = Math.max((int) ballLocation.x - SoccerBall.RADIUS, 0);
+        roi.y = Math.max((int) ballLocation.y - SoccerBall.RADIUS, 0);
+        roi.width = Math.min(SoccerBall.RADIUS * 2, mFieldWidth - roi.x);
+        roi.height = Math.min(SoccerBall.RADIUS * 2, mFieldHeight - roi.y);
 
         // Find all things that look like Euglena in the region of interest.
         List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi);

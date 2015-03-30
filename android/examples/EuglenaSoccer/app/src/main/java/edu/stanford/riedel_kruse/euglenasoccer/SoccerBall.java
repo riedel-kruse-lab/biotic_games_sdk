@@ -8,32 +8,42 @@ import org.opencv.core.Scalar;
 
 import java.util.ArrayList;
 
+import edu.stanford.riedel_kruse.bioticgamessdk.Circle;
+import edu.stanford.riedel_kruse.bioticgamessdk.GameObject;
 import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
 import edu.stanford.riedel_kruse.bioticgamessdk.Shape;
 
 /**
  * Created by dchiu on 3/28/15.
  */
-public class SoccerBall extends Shape {
-    private static int SOCCER_BALL_RADIUS = 30;
-    private static Scalar SOCCER_BALL_COLOR = new Scalar(255, 255, 255);
-    private static Scalar SOCCER_BALL_OUTLINE_COLOR = new Scalar(0, 0, 0);
-    private static int SOCCER_BALL_OUTLINE_THICKNESS = 5;
-    private static Scalar SOCCER_BALL_PENTAGONS_COLOR = new Scalar(150, 150, 150);
+public class SoccerBall extends Circle {
+    public static final int RADIUS = 30;
+    private static final Scalar COLOR = new Scalar(255, 255, 255);
+    private static final Scalar OUTLINE_COLOR = new Scalar(0, 0, 0);
+    private static final int OUTLINE_THICKNESS = 5;
+    private static final Scalar PENTAGONS_COLOR = new Scalar(150, 150, 150);
+
+    private static final int TRACKING_CIRCLE_RADIUS = RADIUS * 2;
+    private static final Scalar TRACKING_CIRCLE_COLOR = new Scalar(255, 0, 0);
+    private static final int TRACKING_CIRCLE_THICKNESS = 3;
 
     public SoccerBall(Point position) {
-        super(position, SOCCER_BALL_COLOR, -1, false);
+        super(position, TRACKING_CIRCLE_RADIUS, TRACKING_CIRCLE_COLOR, TRACKING_CIRCLE_THICKNESS,
+                false);
     }
 
     @Override
     public void draw(Mat frame, Point offset) {
         Point drawPosition = MathUtil.addPoints(offset, mPosition);
+        Core.circle(frame, drawPosition, TRACKING_CIRCLE_RADIUS, TRACKING_CIRCLE_COLOR,
+                TRACKING_CIRCLE_THICKNESS);
+
         // Draws the black outline of the ball.
-        Core.circle(frame, drawPosition, SOCCER_BALL_RADIUS, SOCCER_BALL_OUTLINE_COLOR,
-                SOCCER_BALL_OUTLINE_THICKNESS);
+        Core.circle(frame, drawPosition, RADIUS, OUTLINE_COLOR,
+                OUTLINE_THICKNESS);
 
         // Draws a filled white circle, which is the background of the ball.
-        Core.circle(frame, drawPosition, SOCCER_BALL_RADIUS, SOCCER_BALL_COLOR, -1);
+        Core.circle(frame, drawPosition, RADIUS, COLOR, -1);
 
         //Draw pentagons
         ArrayList<MatOfPoint> pentagons = new ArrayList<MatOfPoint>();
@@ -66,12 +76,6 @@ public class SoccerBall extends Shape {
                 new Point(drawPosition.x + 6, drawPosition.y + 22),
                 new Point(drawPosition.x + 8, drawPosition.y + 27),
                 new Point(drawPosition.x - 8, drawPosition.y + 27)));
-        Core.fillPoly(frame, pentagons, SOCCER_BALL_PENTAGONS_COLOR);
-    }
-
-    @Override
-    public boolean contains(Point point) {
-        // Soccer ball is non-physical, so no need to provide any logic for contains.
-        return false;
+        Core.fillPoly(frame, pentagons, PENTAGONS_COLOR);
     }
 }
