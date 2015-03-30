@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:opencv="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="#000000"
               android:orientation="vertical">
 
     <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
@@ -12,4 +13,44 @@
         opencv:camera_id="any"
         opencv:show_fps="true"/>
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/score_board"
+        android:layout_width="450dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingTop="9dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <TextView
+            android:id="@+id/score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/action_button"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="onActionButtonPressed"
+            android:soundEffectsEnabled="false"
+            android:text="@string/bounce"
+            android:textSize="17sp"/>
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="@string/time"
+            android:textSize="20sp"/>
+    </RelativeLayout>
+
+</RelativeLayout>

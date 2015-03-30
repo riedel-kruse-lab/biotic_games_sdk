@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Euglena Soccer</string>
+    <string name="score">Score: %1$d</string>
+    <string name="time">Time: %1$d</string>
+    <string name="bounce">Bounce</string>
+    <string name="pass">Pass</string>
 </resources>

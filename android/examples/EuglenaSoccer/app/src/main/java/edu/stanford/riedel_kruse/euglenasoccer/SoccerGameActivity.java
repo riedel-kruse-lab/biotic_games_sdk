@@ -1,7 +1,10 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.content.res.Resources;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.core.Mat;
@@ -28,11 +31,23 @@ public class SoccerGameActivity extends BioticGameActivity {
     private SoccerBall mBall;
     private int mFieldWidth;
     private int mFieldHeight;
+    private int mScore;
+    private int mTime;
+
+    private Resources mResources;
+
+    private TextView mScoreTextView;
+    private TextView mTimeTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
         super.onCreate(savedInstanceState);
+
+        mResources = getResources();
+
+        mScoreTextView = (TextView) findViewById(R.id.score);
+        mTimeTextView = (TextView) findViewById(R.id.time);
     }
 
     @Override
@@ -71,6 +86,9 @@ public class SoccerGameActivity extends BioticGameActivity {
         mBall = new SoccerBall(new Point(width / 2, height / 2));
         addGameObject(mBall);
 
+        setScore(0);
+        setTime(0);
+
         // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
         addCollisionCallback(new CollisionCallback(mBall, leftGoal) {
             @Override
@@ -85,8 +103,6 @@ public class SoccerGameActivity extends BioticGameActivity {
                 onGoalScored();
             }
         });
-
-
     }
 
     @Override
@@ -124,5 +140,29 @@ public class SoccerGameActivity extends BioticGameActivity {
                 Toast.makeText(getApplicationContext(), "Goal!", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void setScore(int newScore) {
+        mScore = newScore;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mScoreTextView.setText(String.format(mResources.getString(R.string.score), mScore));
+            }
+        });
+    }
+
+    private void setTime(int newTime) {
+        mTime = newTime;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTimeTextView.setText(String.format(mResources.getString(R.string.time), mTime));
+            }
+        });
+    }
+
+    public void onActionButtonPressed(View view) {
+
     }
 }
