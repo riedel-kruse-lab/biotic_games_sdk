@@ -134,6 +134,10 @@ public class SoccerGameActivity extends BioticGameActivity {
     private void onGoalScored() {
         mBall.position().x = mFieldWidth / 2;
         mBall.position().y = mFieldHeight / 2;
+
+        // Increase the score
+        setScore(mScore + 1);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
