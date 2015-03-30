@@ -12,6 +12,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
@@ -39,6 +40,8 @@ public class SoccerGameActivity extends BioticGameActivity {
     private TextView mScoreTextView;
     private TextView mTimeTextView;
 
+    private List<Point> mRecentBallPositions;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
@@ -63,6 +66,7 @@ public class SoccerGameActivity extends BioticGameActivity {
         params.setZoom(params.getMaxZoom() / 2);
         cameraView.setCameraParameters(params);
 
+        // Store image width and height for future use
         mFieldWidth = width;
         mFieldHeight = height;
 
@@ -86,8 +90,12 @@ public class SoccerGameActivity extends BioticGameActivity {
         mBall = new SoccerBall(new Point(width / 2, height / 2));
         addGameObject(mBall);
 
+        // Initialize score and time
         setScore(0);
         setTime(0);
+
+        // Initialize recent ball positions array
+        mRecentBallPositions = new ArrayList<Point>();
 
         // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
         addCollisionCallback(new CollisionCallback(mBall, leftGoal) {
@@ -110,6 +118,8 @@ public class SoccerGameActivity extends BioticGameActivity {
         Point closestEuglenaLocation = findClosestEuglenaToBall(frame);
         if (closestEuglenaLocation != null) {
             mBall.setPosition(closestEuglenaLocation);
+            mRecentBallPositions.add(mBall.position());
+            mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
         }
     }
 
