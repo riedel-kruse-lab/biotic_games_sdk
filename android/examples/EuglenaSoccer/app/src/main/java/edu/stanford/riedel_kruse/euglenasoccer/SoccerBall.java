@@ -89,6 +89,10 @@ public class SoccerBall extends Circle {
         Core.fillPoly(frame, pentagons, PENTAGONS_COLOR);
     }
 
+    public Point direction() {
+        return mDirection.clone();
+    }
+
     public void setDirection(Point direction) {
         mDirection = direction;
     }

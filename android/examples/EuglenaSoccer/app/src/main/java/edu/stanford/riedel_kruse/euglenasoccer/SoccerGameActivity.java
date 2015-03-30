@@ -17,7 +17,6 @@ import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
 import edu.stanford.riedel_kruse.bioticgamessdk.CameraView;
-import edu.stanford.riedel_kruse.bioticgamessdk.Circle;
 import edu.stanford.riedel_kruse.bioticgamessdk.CollisionCallback;
 import edu.stanford.riedel_kruse.bioticgamessdk.ImageProcessing;
 import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
@@ -28,6 +27,13 @@ import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
 public class SoccerGameActivity extends BioticGameActivity {
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
+    private static final int PASS_TIME = 1000;
+    /**
+     * How fast the ball moves when passed in pixels/ms.
+     */
+    private static final double PASS_SPEED = 1;
+
+    private static final int NUM_RECENT_POSITIONS = 10;
 
     private SoccerBall mBall;
     private int mFieldWidth;
@@ -35,12 +41,16 @@ public class SoccerGameActivity extends BioticGameActivity {
     private int mScore;
     private int mTime;
 
+    private boolean mPassing;
+    private int mPassingTime;
+
     private Resources mResources;
 
     private TextView mScoreTextView;
     private TextView mTimeTextView;
 
     private List<Point> mRecentBallPositions;
+    private double mBallSpeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +100,9 @@ public class SoccerGameActivity extends BioticGameActivity {
         mBall = new SoccerBall(new Point(width / 2, height / 2));
         addGameObject(mBall);
 
+        mPassing = false;
+        mPassingTime = 0;
+
         // Initialize score and time
         setScore(0);
         setTime(0);
@@ -115,11 +128,75 @@ public class SoccerGameActivity extends BioticGameActivity {
 
     @Override
     protected void updateGame(Mat frame, long timeDelta) {
-        Point closestEuglenaLocation = findClosestEuglenaToBall(frame);
-        if (closestEuglenaLocation != null) {
-            mBall.setPosition(closestEuglenaLocation);
-            mRecentBallPositions.add(mBall.position());
-            mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
+        updateBallLocation(frame, timeDelta);
+    }
+
+    private void updateBallLocation(Mat frame, long timeDelta) {
+        Point newPosition;
+        if (mPassing) {
+            int distance = (int) (timeDelta * PASS_SPEED);
+            newPosition = mBall.direction();
+            newPosition.x *= distance;
+            newPosition.y *= distance;
+
+            newPosition = MathUtil.addPoints(newPosition, mBall.position());
+            mBall.setPosition(newPosition);
+
+            mPassingTime += timeDelta;
+
+            if (mPassingTime > PASS_TIME) {
+                mPassing = false;
+                mPassingTime = 0;
+                mBall.setDirection(new Point(0, 0));
+                mRecentBallPositions.clear();
+                mBallSpeed = 0;
+            }
+        }
+        else {
+            newPosition = findClosestEuglenaToBall(frame);
+            if (newPosition != null) {
+                mBall.setPosition(newPosition);
+                mRecentBallPositions.add(newPosition);
+                if (mRecentBallPositions.size() > NUM_RECENT_POSITIONS) {
+                    mRecentBallPositions.remove(0);
+                }
+                mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
+                mBallSpeed = MathUtil.computeAverageSpeed(mRecentBallPositions);
+            }
+        }
+
+        if (newPosition == null) {
+            return;
+        }
+
+        if (newPosition.x < 0 || newPosition.x > mFieldWidth || newPosition.y < 0
+                || newPosition.y > mFieldHeight) {
+            if (!mPassing) {
+                onOutOfBounds();
+            }
+            else {
+                Point newDirection = mBall.direction();
+                if (newPosition.x < 0) {
+                    newDirection.x *= -1;
+                    newPosition.x = 0;
+                }
+                else if (newPosition.x > mFieldWidth) {
+                    newDirection.x *= -1;
+                    newPosition.x = mFieldWidth;
+                }
+
+                if (newPosition.y < 0) {
+                    newDirection.y *= -1;
+                    newPosition.y = 0;
+                }
+                else if (newPosition.y > mFieldHeight) {
+                    newDirection.y *= -1;
+                    newPosition.y = mFieldHeight;
+                }
+
+                mBall.setPosition(newPosition);
+                mBall.setDirection(newDirection);
+            }
         }
     }
 
@@ -156,6 +233,10 @@ public class SoccerGameActivity extends BioticGameActivity {
         });
     }
 
+    private void onOutOfBounds() {
+
+    }
+
     private void setScore(int newScore) {
         mScore = newScore;
         runOnUiThread(new Runnable() {
@@ -177,6 +258,12 @@ public class SoccerGameActivity extends BioticGameActivity {
     }
 
     public void onActionButtonPressed(View view) {
+        mPassing = true;
 
+        if (mBallSpeed == 0) {
+            Point newDirection = new Point(Math.random() - 0.5, Math.random() - 0.5);
+            MathUtil.normalizeVector(newDirection);
+            mBall.setDirection(newDirection);
+        }
     }
 }
