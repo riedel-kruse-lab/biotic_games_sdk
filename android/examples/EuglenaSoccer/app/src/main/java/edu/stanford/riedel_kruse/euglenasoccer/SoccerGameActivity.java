@@ -215,24 +215,18 @@ public class SoccerGameActivity extends BioticGameActivity {
     }
 
     private void onGoalScored() {
-        mBall.position().x = mFieldWidth / 2;
-        mBall.position().y = mFieldHeight / 2;
-
-        stopPassing();
+        resetBall();
 
         // Increase the score
         setScore(mScore + 1);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "Goal!", Toast.LENGTH_LONG).show();
-            }
-        });
+        displayMessage(mResources.getString(R.string.goal));
     }
 
     private void onOutOfBounds() {
+        resetBall();
 
+        displayMessage(mResources.getString(R.string.out_of_bounds));
     }
 
     private void setScore(int newScore) {
@@ -256,8 +250,10 @@ public class SoccerGameActivity extends BioticGameActivity {
     }
 
     public void onActionButtonPressed(View view) {
-        mPassing = true;
+        startPassing();
 
+        // If the ball is not moving, then instead of passing in the direction of the ball, we
+        // "bounce" the ball by choosing a random direction for the ball to move in.
         if (mBallSpeed == 0) {
             Point newDirection = new Point(Math.random() - 0.5, Math.random() - 0.5);
             MathUtil.normalizeVector(newDirection);
@@ -275,5 +271,21 @@ public class SoccerGameActivity extends BioticGameActivity {
         mBall.setDirection(new Point(0, 0));
         mRecentBallPositions.clear();
         mBallSpeed = 0;
+    }
+
+    public void resetBall() {
+        mBall.position().x = mFieldWidth / 2;
+        mBall.position().y = mFieldHeight / 2;
+
+        stopPassing();
+    }
+
+    public void displayMessage(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

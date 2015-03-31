@@ -4,4 +4,6 @@
     <string name="time">Time: %1$d</string>
     <string name="bounce">Bounce</string>
     <string name="pass">Pass</string>
+    <string name="out_of_bounds">Out of bounds!</string>
+    <string name="goal">Goal!</string>
 </resources>
