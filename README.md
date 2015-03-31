@@ -35,5 +35,21 @@
 
 ## Documentation
 
+## Features
+### Bluetooth
+The Biotic Games SDK provides developers with the ability to connect to an Arduino broadcasting joystick inputs. This allows the the developer to respond to joystick events on the Android device (e.g. one of the lights has turned on or the joystick has been pushed down).
+
+In order to use this functionality, the Android app must request Bluetooth permissions by adding the following two lines as a sibling to the `<application>` tag in `AndroidManifest.xml`:
+```
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+<application>
+    ...
+</application>
+```
+
+The developer must then call the function `startBluetooth(BluetoothThreadListener)` in `onCreate()` or before the game starts. In order to respond to the events received, write a class that implements the `BluetoothThreadListener` interface.
+
 ## Examples
 A limited set of examples of SDK usage has been made available in the `examples/` folder in this repository.
