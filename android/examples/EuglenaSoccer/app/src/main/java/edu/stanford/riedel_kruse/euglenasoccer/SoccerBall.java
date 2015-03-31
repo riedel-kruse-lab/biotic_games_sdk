@@ -31,7 +31,7 @@ public class SoccerBall extends Circle {
 
     public SoccerBall(Point position) {
         super(position, TRACKING_CIRCLE_RADIUS, TRACKING_CIRCLE_COLOR, TRACKING_CIRCLE_THICKNESS,
-                false);
+                true);
 
         mDirection = new Point(0, 0);
     }

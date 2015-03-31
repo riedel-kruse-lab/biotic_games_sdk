@@ -27,7 +27,7 @@ import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
 public class SoccerGameActivity extends BioticGameActivity {
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
-    private static final int PASS_TIME = 1000;
+    private static final int PASS_TIME = 400;
     /**
      * How fast the ball moves when passed in pixels/ms.
      */
@@ -145,11 +145,7 @@ public class SoccerGameActivity extends BioticGameActivity {
             mPassingTime += timeDelta;
 
             if (mPassingTime > PASS_TIME) {
-                mPassing = false;
-                mPassingTime = 0;
-                mBall.setDirection(new Point(0, 0));
-                mRecentBallPositions.clear();
-                mBallSpeed = 0;
+                stopPassing();
             }
         }
         else {
@@ -222,6 +218,8 @@ public class SoccerGameActivity extends BioticGameActivity {
         mBall.position().x = mFieldWidth / 2;
         mBall.position().y = mFieldHeight / 2;
 
+        stopPassing();
+
         // Increase the score
         setScore(mScore + 1);
 
@@ -265,5 +263,17 @@ public class SoccerGameActivity extends BioticGameActivity {
             MathUtil.normalizeVector(newDirection);
             mBall.setDirection(newDirection);
         }
+    }
+
+    public void startPassing() {
+        mPassing = true;
+    }
+
+    public void stopPassing() {
+        mPassing = false;
+        mPassingTime = 0;
+        mBall.setDirection(new Point(0, 0));
+        mRecentBallPositions.clear();
+        mBallSpeed = 0;
     }
 }
