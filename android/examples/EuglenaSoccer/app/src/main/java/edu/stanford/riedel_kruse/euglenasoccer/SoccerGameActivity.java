@@ -28,6 +28,8 @@ import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
  */
 public class SoccerGameActivity extends BioticGameActivity implements BluetoothThreadListener {
 
+    private static final int MILLIS_PER_SEC = 1000;
+    private static final int MILLIS_PER_DIRECTION = 30 * 1000;
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final int PASS_TIME = 400;
     /**
@@ -37,11 +39,22 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
     private static final int NUM_RECENT_POSITIONS = 10;
 
+    private enum Direction {
+        LEFT,
+        RIGHT
+    }
+
     private SoccerBall mBall;
+    private LeftGoal mLeftGoal;
+    private RightGoal mRightGoal;
+
     private int mFieldWidth;
     private int mFieldHeight;
     private int mScore;
-    private int mTime;
+    private long mTimeMillis;
+    private int mNumDirectionSwitches;
+
+    private Direction mCurrentDirection;
 
     private boolean mPassing;
     private int mPassingTime;
@@ -93,12 +106,20 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         int goalWidth = 10;
         int goalY = (height - goalHeight) / 2;
         int goalOffset = SoccerField.PADDING + SoccerField.LINE_THICKNESS;
-        LeftGoal leftGoal = new LeftGoal(new Point(goalOffset, goalY), goalWidth, goalHeight,
+        mLeftGoal = new LeftGoal(new Point(goalOffset, goalY), goalWidth, goalHeight,
                 COLOR_RED);
-        RightGoal rightGoal = new RightGoal(new Point(width - goalWidth - goalOffset, goalY),
+        mRightGoal = new RightGoal(new Point(width - goalWidth - goalOffset, goalY),
                 goalWidth, goalHeight, COLOR_RED);
-        addGameObject(leftGoal);
-        addGameObject(rightGoal);
+        addGameObject(mLeftGoal);
+        addGameObject(mRightGoal);
+
+        // Set the current direction to right and hide the left goal.
+        mCurrentDirection = Direction.RIGHT;
+        mLeftGoal.setVisible(false);
+        mLeftGoal.setPhysical(false);
+
+        // Initialize the number of switches in direction to 0 since none have happened yet.
+        mNumDirectionSwitches = 0;
 
         // Add the soccer ball
         mBall = new SoccerBall(new Point(width / 2, height / 2));
@@ -115,14 +136,14 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         mRecentBallPositions = new ArrayList<Point>();
 
         // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
-        addCollisionCallback(new CollisionCallback(mBall, leftGoal) {
+        addCollisionCallback(new CollisionCallback(mBall, mLeftGoal) {
             @Override
             public void onCollision() {
                 onGoalScored();
             }
         });
 
-        addCollisionCallback(new CollisionCallback(mBall, rightGoal) {
+        addCollisionCallback(new CollisionCallback(mBall, mRightGoal) {
             @Override
             public void onCollision() {
                 onGoalScored();
@@ -132,7 +153,17 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
     @Override
     protected void updateGame(Mat frame, long timeDelta) {
+
         updateBallLocation(frame, timeDelta);
+
+        // Update the time based on how long it's been since the last frame.
+        setTime(mTimeMillis + timeDelta);
+
+        // Decide whether or not it's time to switch directions. Need to add 1 otherwise direction
+        // will switch before the first time MILLIS_PER_DIRECTION milliseconds have passed.
+        if (mTimeMillis > (mNumDirectionSwitches + 1) * MILLIS_PER_DIRECTION) {
+            switchDirections();
+        }
     }
 
     @Override
@@ -154,8 +185,6 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     public void onJoystickUp() {
         passBall();
     }
-
-
 
     private void updateBallLocation(Mat frame, long timeDelta) {
         Point newPosition;
@@ -265,12 +294,13 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         });
     }
 
-    private void setTime(int newTime) {
-        mTime = newTime;
+    private void setTime(long newTime) {
+        mTimeMillis = newTime;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mTimeTextView.setText(String.format(mResources.getString(R.string.time), mTime));
+                mTimeTextView.setText(String.format(mResources.getString(R.string.time),
+                        mTimeMillis / MILLIS_PER_SEC));
             }
         });
     }
@@ -279,7 +309,7 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         passBall();
     }
 
-    public void passBall() {
+    private void passBall() {
         mPassing = true;
 
         // If the ball is not moving, then instead of passing in the direction of the ball, we
@@ -291,7 +321,7 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         }
     }
 
-    public void stopPassing() {
+    private void stopPassing() {
         mPassing = false;
         mPassingTime = 0;
         mBall.setDirection(new Point(0, 0));
@@ -299,19 +329,36 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         mBallSpeed = 0;
     }
 
-    public void resetBall() {
+    private void resetBall() {
         mBall.setX(mFieldWidth / 2);
         mBall.setY(mFieldHeight / 2);
 
         stopPassing();
     }
 
-    public void displayMessage(final String message) {
+    private void displayMessage(final String message) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void switchDirections() {
+        mLeftGoal.setPhysical(!mLeftGoal.isPhysical());
+        mLeftGoal.setVisible(!mLeftGoal.isVisible());
+
+        mRightGoal.setPhysical(!mRightGoal.isPhysical());
+        mRightGoal.setVisible(!mLeftGoal.isVisible());
+
+        if (mCurrentDirection == Direction.RIGHT) {
+            mCurrentDirection = Direction.LEFT;
+        }
+        else {
+            mCurrentDirection = Direction.RIGHT;
+        }
+
+        mNumDirectionSwitches++;
     }
 }
