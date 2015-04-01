@@ -147,12 +147,12 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
     @Override
     public void onJoystickDown() {
-        displayMessage("Joystick down.");
+
     }
 
     @Override
     public void onJoystickUp() {
-        displayMessage("Joystick up.");
+        passBall();
     }
 
     private void updateBallLocation(Mat frame, long timeDelta) {
@@ -274,7 +274,11 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     }
 
     public void onActionButtonPressed(View view) {
-        startPassing();
+        passBall();
+    }
+
+    public void passBall() {
+        mPassing = true;
 
         // If the ball is not moving, then instead of passing in the direction of the ball, we
         // "bounce" the ball by choosing a random direction for the ball to move in.
@@ -283,10 +287,6 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
             MathUtil.normalizeVector(newDirection);
             mBall.setDirection(newDirection);
         }
-    }
-
-    public void startPassing() {
-        mPassing = true;
     }
 
     public void stopPassing() {
