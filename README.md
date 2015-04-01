@@ -52,4 +52,7 @@ In order to use this functionality, the Android app must request Bluetooth permi
 The developer must then call the function `startBluetooth(BluetoothThreadListener)` in `onCreate()` or before the game starts. In order to respond to the events received, write a class that implements the `BluetoothThreadListener` interface.
 
 ## Examples
-A limited set of examples of SDK usage has been made available in the `examples/` folder in this repository.
+A limited set of examples of SDK usage has been made available in the `examples/` folder in this repository. There are also a few code snippets and documentation links provided in this document for common game tasks.
+
+### Sound Effects
+Sound effects are supported using the Android API rather than the Biotic Games SDK. To add sound effects to your game, create a new `raw` resource folder (i.e. `res/raw`) and place your sound effect files in this folder. Then use the [SoundPool](http://developer.android.com/reference/android/media/SoundPool.html) object to load the sound effects from the resources and to play them.
