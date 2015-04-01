@@ -81,6 +81,10 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
     private SoundPool mSoundPool;
     private int mSoundIdWallBounce;
+    private int mSoundIdPassBall;
+    private int mSoundIdOutOfBounds;
+    private int mSoundIdCrowdCheer;
+    private int mSoundIdBounceBall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +98,11 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
         mSoundPool = new SoundPool(SOUND_POOL_MAX_STREAMS, AudioManager.STREAM_MUSIC,
                 SOUND_POOL_SRC_QUALITY);
-        mSoundIdWallBounce = mSoundPool.load(this, R.raw.wall_bounce, 1);
+        mSoundIdWallBounce = mSoundPool.load(this, R.raw.wall_bounce, SOUND_POOL_PRIORITY);
+        mSoundIdPassBall = mSoundPool.load(this, R.raw.pass_ball, SOUND_POOL_PRIORITY);
+        mSoundIdOutOfBounds = mSoundPool.load(this, R.raw.out_of_bounds, SOUND_POOL_PRIORITY);
+        mSoundIdCrowdCheer = mSoundPool.load(this, R.raw.crowd_cheer, SOUND_POOL_PRIORITY);
+        mSoundIdBounceBall = mSoundPool.load(this, R.raw.bounce_ball, SOUND_POOL_PRIORITY);
 
         startBluetooth(this);
     }
@@ -202,7 +210,7 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
     @Override
     public void onJoystickUp() {
-        passBall();
+        passOrBounceBall();
     }
 
     private void updateBallLocation(Mat frame, long timeDelta) {
@@ -296,6 +304,8 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         // Increase the score
         setScore(mScore + 1);
 
+        playSound(mSoundIdCrowdCheer);
+
         displayMessage(mResources.getString(R.string.goal));
     }
 
@@ -327,18 +337,23 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     }
 
     public void onActionButtonPressed(View view) {
-        passBall();
+        passOrBounceBall();
     }
 
-    private void passBall() {
+    private void passOrBounceBall() {
         mPassing = true;
 
         // If the ball is not moving, then instead of passing in the direction of the ball, we
         // "bounce" the ball by choosing a random direction for the ball to move in.
+        // Logically, a bounce is considered the same as a pass, but in a random starting direction.
         if (mBallSpeed == 0) {
             Point newDirection = new Point(Math.random() - 0.5, Math.random() - 0.5);
             MathUtil.normalizeVector(newDirection);
             mBall.setDirection(newDirection);
+            playSound(mSoundIdBounceBall);
+        }
+        else {
+            playSound(mSoundIdPassBall);
         }
     }
 
