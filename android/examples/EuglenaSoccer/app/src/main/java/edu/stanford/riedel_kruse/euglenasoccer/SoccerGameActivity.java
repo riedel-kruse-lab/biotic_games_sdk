@@ -155,6 +155,8 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         passBall();
     }
 
+
+
     private void updateBallLocation(Mat frame, long timeDelta) {
         Point newPosition;
         if (mPassing) {
@@ -298,8 +300,8 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     }
 
     public void resetBall() {
-        mBall.position().x = mFieldWidth / 2;
-        mBall.position().y = mFieldHeight / 2;
+        mBall.setX(mFieldWidth / 2);
+        mBall.setY(mFieldHeight / 2);
 
         stopPassing();
     }
