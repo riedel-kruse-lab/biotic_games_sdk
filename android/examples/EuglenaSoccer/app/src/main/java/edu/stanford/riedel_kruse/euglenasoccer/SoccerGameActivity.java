@@ -2,6 +2,8 @@ package edu.stanford.riedel_kruse.euglenasoccer;
 
 import android.content.res.Resources;
 import android.hardware.Camera;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -30,7 +32,9 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
     private static final int MILLIS_PER_SEC = 1000;
     private static final int MILLIS_PER_DIRECTION = 30 * 1000;
+
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
+
     private static final int PASS_TIME = 400;
     /**
      * How fast the ball moves when passed in pixels/ms.
@@ -38,6 +42,14 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     private static final double PASS_SPEED = 1;
 
     private static final int NUM_RECENT_POSITIONS = 10;
+
+    private static final int SOUND_POOL_MAX_STREAMS = 1;
+    private static final int SOUND_POOL_SRC_QUALITY = 0;
+    private static final float SOUND_POOL_LEFT_VOLUME = 1.0f;
+    private static final float SOUND_POOL_RIGHT_VOLUME = SOUND_POOL_LEFT_VOLUME;
+    private static final int SOUND_POOL_PRIORITY = 1;
+    private static final int SOUND_POOL_LOOP = 0;
+    private static final float SOUND_POOL_FLOAT_RATE = 1.0f;
 
     private enum Direction {
         LEFT,
@@ -67,6 +79,9 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     private List<Point> mRecentBallPositions;
     private double mBallSpeed;
 
+    private SoundPool mSoundPool;
+    private int mSoundIdWallBounce;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
@@ -76,6 +91,10 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
         mScoreTextView = (TextView) findViewById(R.id.score);
         mTimeTextView = (TextView) findViewById(R.id.time);
+
+        mSoundPool = new SoundPool(SOUND_POOL_MAX_STREAMS, AudioManager.STREAM_MUSIC,
+                SOUND_POOL_SRC_QUALITY);
+        mSoundIdWallBounce = mSoundPool.load(this, R.raw.wall_bounce, 1);
 
         startBluetooth(this);
     }
@@ -247,6 +266,8 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
                 mBall.setPosition(newPosition);
                 mBall.setDirection(newDirection);
+
+                playSound(mSoundIdWallBounce);
             }
         }
     }
@@ -360,5 +381,10 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
         }
 
         mNumDirectionSwitches++;
+    }
+
+    private void playSound(int soundId) {
+        mSoundPool.play(soundId, SOUND_POOL_LEFT_VOLUME, SOUND_POOL_RIGHT_VOLUME,
+                SOUND_POOL_PRIORITY, SOUND_POOL_LOOP, SOUND_POOL_FLOAT_RATE);
     }
 }
