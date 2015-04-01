@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
+import edu.stanford.riedel_kruse.bioticgamessdk.BluetoothThread;
+import edu.stanford.riedel_kruse.bioticgamessdk.BluetoothThreadListener;
 import edu.stanford.riedel_kruse.bioticgamessdk.CameraView;
 import edu.stanford.riedel_kruse.bioticgamessdk.CollisionCallback;
 import edu.stanford.riedel_kruse.bioticgamessdk.ImageProcessing;
@@ -24,7 +26,7 @@ import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
 /**
  * Created by dchiu on 1/31/15.
  */
-public class SoccerGameActivity extends BioticGameActivity {
+public class SoccerGameActivity extends BioticGameActivity implements BluetoothThreadListener {
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final int PASS_TIME = 400;
@@ -61,6 +63,8 @@ public class SoccerGameActivity extends BioticGameActivity {
 
         mScoreTextView = (TextView) findViewById(R.id.score);
         mTimeTextView = (TextView) findViewById(R.id.time);
+
+        startBluetooth(this);
     }
 
     @Override
@@ -129,6 +133,26 @@ public class SoccerGameActivity extends BioticGameActivity {
     @Override
     protected void updateGame(Mat frame, long timeDelta) {
         updateBallLocation(frame, timeDelta);
+    }
+
+    @Override
+    public void onLightOn(BluetoothThread.Direction direction) {
+        displayMessage("Light turned on: " + direction.toString());
+    }
+
+    @Override
+    public void onLightOff(BluetoothThread.Direction direction) {
+        displayMessage("Light turned off: " + direction.toString());
+    }
+
+    @Override
+    public void onJoystickDown() {
+        displayMessage("Joystick down.");
+    }
+
+    @Override
+    public void onJoystickUp() {
+        displayMessage("Joystick up.");
     }
 
     private void updateBallLocation(Mat frame, long timeDelta) {
