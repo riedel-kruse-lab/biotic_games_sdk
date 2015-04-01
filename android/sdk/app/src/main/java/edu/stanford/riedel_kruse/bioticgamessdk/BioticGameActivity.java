@@ -223,4 +223,17 @@ public abstract class BioticGameActivity extends Activity implements
             obj.draw(frame);
         }
     }
+
+    /**
+     * Creates and starts a thread for bluetooth communication with an Arduino controller. Used to
+     * receive joystick inputs from the hardware. Games that wish to do something in response to
+     * hardware input should call this function early in their game's running.
+     * @param listener a BluetoothThreadListener object which contains implementations for when
+     *                 events of interest occur (e.g. a light turns on)
+     */
+    public void startBluetooth(BluetoothThreadListener listener) {
+        BluetoothThread btt = new BluetoothThread(listener);
+
+        btt.start();
+    }
 }
