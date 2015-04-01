@@ -189,6 +189,12 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     private void updateBallLocation(Mat frame, long timeDelta) {
         Point newPosition;
         if (mPassing) {
+            mPassingTime += timeDelta;
+
+            if (mPassingTime > PASS_TIME) {
+                stopPassing();
+            }
+
             int distance = (int) (timeDelta * PASS_SPEED);
             newPosition = mBall.direction();
             newPosition.x *= distance;
@@ -196,12 +202,6 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
             newPosition = MathUtil.addPoints(newPosition, mBall.position());
             mBall.setPosition(newPosition);
-
-            mPassingTime += timeDelta;
-
-            if (mPassingTime > PASS_TIME) {
-                stopPassing();
-            }
         }
         else {
             newPosition = findClosestEuglenaToBall(frame);
