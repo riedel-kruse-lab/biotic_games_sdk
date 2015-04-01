@@ -19,6 +19,11 @@ public abstract class GameObject {
     protected boolean mIsPhysical;
 
     /**
+     * Instance variable flag which indicates whether or not this GameObject should be drawn.
+     */
+    protected boolean mIsVisible;
+
+    /**
      * Constructor for the GameObject class.
      * @param position the position of the GameObject.
      * @param isPhysical whether or not this GameObject should interact physically with other
@@ -27,6 +32,7 @@ public abstract class GameObject {
     public GameObject(Point position, boolean isPhysical) {
         mPosition = position;
         mIsPhysical = isPhysical;
+        mIsVisible = true;
     }
 
     /**
@@ -46,12 +52,73 @@ public abstract class GameObject {
     }
 
     /**
+     * Gets the x-value of this GameObject's position.
+     * @return the x-value of this GameObject's position.
+     */
+    public double x() {
+        return mPosition.x;
+    }
+
+    /**
+     * Gets the y-value of this GameObject's position.
+     * @return the y-value of this GameObject's position.
+     */
+    public double y() {
+        return mPosition.y;
+    }
+
+    /**
+     * Sets the x-value of this GameObject's position.
+     * @param newX the new x-value to set.
+     */
+    public void setX(double newX) {
+        mPosition.x = newX;
+    }
+
+    /**
+     * Sets the y-value of this GameObject's position.
+     * @param newY the new y-value to set.
+     */
+    public void setY(double newY) {
+        mPosition.y = newY;
+    }
+
+    /**
      * Whether or not this GameObject should interact physically with other GameObjects.
      * @return true if this GameObject should interact physically with other GameObjects, false
      *         otherwise.
      */
     public boolean isPhysical() {
         return mIsPhysical;
+    }
+
+    /**
+     * Setter for the isPhysical property of this GameObject. GameObjects involved in collisions
+     * that are made non-physical will no longer activate the collision callback.
+     * @param isPhysical the new value for whether or not this GameObject is physical.
+     */
+    public void setPhysical(boolean isPhysical) {
+        mIsPhysical = isPhysical;
+    }
+
+    /**
+     * Getter for the visibility property of this GameObject. True means that this GameObject is
+     * being drawn to the screen. False means that this GameObject is currently being hidden from
+     * view.
+     * @return true if this GameObject is being drawn; false otherwise.
+     */
+    public boolean isVisible() {
+        return mIsVisible;
+    }
+
+    /**
+     * Setter for the visibility property of this GameObject. True means that this GameObject is
+     * being drawn to the screen. False means that this GameObject is currently being hidden from
+     * view.
+     * @param isVisible the new value for whether or not this GameObject is visible.
+     */
+    public void setVisible(boolean isVisible) {
+        mIsVisible = isVisible;
     }
 
     /**

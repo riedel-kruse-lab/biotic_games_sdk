@@ -220,7 +220,9 @@ public abstract class BioticGameActivity extends Activity implements
      */
     protected void drawGame(Mat frame) {
         for (GameObject obj : mGameObjects) {
-            obj.draw(frame);
+            if (obj.isVisible()) {
+                obj.draw(frame);
+            }
         }
     }
 
