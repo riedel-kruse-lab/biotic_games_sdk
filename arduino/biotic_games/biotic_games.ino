@@ -130,17 +130,17 @@ void parseMessage(String message) {
   int rightValue = 0;
   
   if (vertical == 1) {
-    topValue = 255;
+    bottomValue = 255;
   }
   else if (vertical == -1) {
-    bottomValue = 255;
+    topValue = 255;
   }
   
   if (horizontal == 1) {
-    leftValue = 255;
+    rightValue = 255;
   }
   else if (horizontal == -1) {
-    rightValue = 255;
+    leftValue = 255;
   }
   
   analogWrite(PIN_LED_TOP, topValue);
