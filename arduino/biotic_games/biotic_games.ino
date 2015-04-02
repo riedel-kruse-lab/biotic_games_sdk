@@ -67,7 +67,7 @@ void setup() {
 }
 
 void loop() {
-  //processJoystick();
+  processJoystick();
   processBluetoothInput();
 }
 
@@ -115,7 +115,10 @@ void processBluetoothInput() {
   }
 }
 
-void parseMessage(String message) {  
+void parseMessage(String message) {
+  Serial.println(message);
+  
+  
   int firstCommaIndex = message.indexOf(',');
   int secondCommaIndex = message.indexOf(',', firstCommaIndex + 1);
   int vertical = message.substring(0, firstCommaIndex).toInt();
