@@ -18,18 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
-import edu.stanford.riedel_kruse.bioticgamessdk.BluetoothThread;
-import edu.stanford.riedel_kruse.bioticgamessdk.BluetoothThreadListener;
 import edu.stanford.riedel_kruse.bioticgamessdk.CameraView;
 import edu.stanford.riedel_kruse.bioticgamessdk.CollisionCallback;
 import edu.stanford.riedel_kruse.bioticgamessdk.ImageProcessing;
+import edu.stanford.riedel_kruse.bioticgamessdk.JoystickListener;
+import edu.stanford.riedel_kruse.bioticgamessdk.JoystickThread;
 import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
 import edu.stanford.riedel_kruse.bioticgamessdk.Rectangle;
 
 /**
  * Created by dchiu on 1/31/15.
  */
-public class SoccerGameActivity extends BioticGameActivity implements BluetoothThreadListener {
+public class SoccerGameActivity extends BioticGameActivity implements JoystickListener {
 
     private static final int MILLIS_PER_SEC = 1000;
     private static final int MILLIS_PER_DIRECTION = 30 * 1000;
@@ -228,14 +228,14 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     }
 
     @Override
-    public void onLightOn(BluetoothThread.Direction direction) {
-        if (direction == BluetoothThread.Direction.LEFT) {
+    public void onJoystickDirectionStarted(JoystickThread.Direction direction) {
+        if (direction == JoystickThread.Direction.LEFT) {
             mRightLightIndicator.setVisible(true);
         }
-        else if (direction == BluetoothThread.Direction.RIGHT) {
+        else if (direction == JoystickThread.Direction.RIGHT) {
             mLeftLightIndicator.setVisible(true);
         }
-        else if (direction == BluetoothThread.Direction.TOP) {
+        else if (direction == JoystickThread.Direction.TOP) {
             mBottomLightIndicator.setVisible(true);
         }
         else {
@@ -244,14 +244,14 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     }
 
     @Override
-    public void onLightOff(BluetoothThread.Direction direction) {
-        if (direction == BluetoothThread.Direction.LEFT) {
+    public void onJoystickDirectionFinished(JoystickThread.Direction direction) {
+        if (direction == JoystickThread.Direction.LEFT) {
             mRightLightIndicator.setVisible(false);
         }
-        else if (direction == BluetoothThread.Direction.RIGHT) {
+        else if (direction == JoystickThread.Direction.RIGHT) {
             mLeftLightIndicator.setVisible(false);
         }
-        else if (direction == BluetoothThread.Direction.TOP) {
+        else if (direction == JoystickThread.Direction.TOP) {
             mBottomLightIndicator.setVisible(false);
         }
         else {
