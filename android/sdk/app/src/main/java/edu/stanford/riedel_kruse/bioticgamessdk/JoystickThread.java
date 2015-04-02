@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Created by dchiu on 3/17/15.
  */
-public class BluetoothThread extends Thread {
+public class JoystickThread extends Thread {
     public enum Direction {
         LEFT,
         RIGHT,
@@ -36,9 +36,9 @@ public class BluetoothThread extends Thread {
     private int mLastHorz;
     private boolean mLastSel;
 
-    private BluetoothThreadListener mListener;
+    private JoystickListener mListener;
 
-    public BluetoothThread(BluetoothThreadListener listener) {
+    public JoystickThread(JoystickListener listener) {
         mListener = listener;
 
         mLastVert = 0;
@@ -101,33 +101,33 @@ public class BluetoothThread extends Thread {
             if (mListener != null) {
                 if (mLastVert != vert) {
                     if (mLastVert == 1) {
-                        mListener.onLightOff(Direction.TOP);
+                        mListener.onJoystickDirectionFinished(Direction.TOP);
                     }
                     else if (mLastVert == -1) {
-                        mListener.onLightOff(Direction.BOTTOM);
+                        mListener.onJoystickDirectionFinished(Direction.BOTTOM);
                     }
 
                     if (vert == 1) {
-                        mListener.onLightOn(Direction.TOP);
+                        mListener.onJoystickDirectionStarted(Direction.TOP);
                     }
                     else if (vert == -1) {
-                        mListener.onLightOn(Direction.BOTTOM);
+                        mListener.onJoystickDirectionStarted(Direction.BOTTOM);
                     }
                 }
 
                 if (mLastHorz != horz) {
                     if (mLastHorz == 1) {
-                        mListener.onLightOff(Direction.LEFT);
+                        mListener.onJoystickDirectionFinished(Direction.LEFT);
                     }
                     else if (mLastHorz == -1) {
-                        mListener.onLightOff(Direction.RIGHT);
+                        mListener.onJoystickDirectionFinished(Direction.RIGHT);
                     }
 
                     if (horz == 1) {
-                        mListener.onLightOn(Direction.LEFT);
+                        mListener.onJoystickDirectionStarted(Direction.LEFT);
                     }
                     else if (horz == -1) {
-                        mListener.onLightOn(Direction.RIGHT);
+                        mListener.onJoystickDirectionStarted(Direction.RIGHT);
                     }
                 }
 
@@ -148,11 +148,13 @@ public class BluetoothThread extends Thread {
     }
 
     public void run() {
-        try {
-            connect();
-        }
-        catch (Exception e) {
-            Log.e(TAG, "Failed to connect!", e);
+        while (mInStream == null || mOutStream == null) {
+            try {
+                connect();
+            }
+            catch (Exception e) {
+                Log.e(TAG, "Failed to connect!", e);
+            }
         }
 
         while (!this.isInterrupted()) {

@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
@@ -233,8 +232,8 @@ public abstract class BioticGameActivity extends Activity implements
      * @param listener a BluetoothThreadListener object which contains implementations for when
      *                 events of interest occur (e.g. a light turns on)
      */
-    public void startBluetooth(BluetoothThreadListener listener) {
-        BluetoothThread btt = new BluetoothThread(listener);
+    public void startBluetooth(JoystickListener listener) {
+        JoystickThread btt = new JoystickThread(listener);
 
         btt.start();
     }
