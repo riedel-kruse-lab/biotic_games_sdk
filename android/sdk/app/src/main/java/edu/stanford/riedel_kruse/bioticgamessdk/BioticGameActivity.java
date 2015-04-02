@@ -2,6 +2,7 @@ package edu.stanford.riedel_kruse.bioticgamessdk;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -97,6 +98,10 @@ public abstract class BioticGameActivity extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Makes sure that the screen of the devices doesn't automatically turn off while this
+        // activity is active.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Run first-time initializations.
         init();
