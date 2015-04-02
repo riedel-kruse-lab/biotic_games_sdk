@@ -230,32 +230,32 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     @Override
     public void onLightOn(BluetoothThread.Direction direction) {
         if (direction == BluetoothThread.Direction.LEFT) {
-            mLeftLightIndicator.setVisible(true);
-        }
-        else if (direction == BluetoothThread.Direction.RIGHT) {
             mRightLightIndicator.setVisible(true);
         }
+        else if (direction == BluetoothThread.Direction.RIGHT) {
+            mLeftLightIndicator.setVisible(true);
+        }
         else if (direction == BluetoothThread.Direction.TOP) {
-            mTopLightIndicator.setVisible(true);
+            mBottomLightIndicator.setVisible(true);
         }
         else {
-            mBottomLightIndicator.setVisible(true);
+            mTopLightIndicator.setVisible(true);
         }
     }
 
     @Override
     public void onLightOff(BluetoothThread.Direction direction) {
         if (direction == BluetoothThread.Direction.LEFT) {
-            mLeftLightIndicator.setVisible(false);
-        }
-        else if (direction == BluetoothThread.Direction.RIGHT) {
             mRightLightIndicator.setVisible(false);
         }
+        else if (direction == BluetoothThread.Direction.RIGHT) {
+            mLeftLightIndicator.setVisible(false);
+        }
         else if (direction == BluetoothThread.Direction.TOP) {
-            mTopLightIndicator.setVisible(false);
+            mBottomLightIndicator.setVisible(false);
         }
         else {
-            mBottomLightIndicator.setVisible(false);
+            mTopLightIndicator.setVisible(false);
         }
     }
 
