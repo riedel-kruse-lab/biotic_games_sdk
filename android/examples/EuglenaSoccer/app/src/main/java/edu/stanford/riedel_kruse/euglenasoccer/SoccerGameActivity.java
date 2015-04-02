@@ -24,6 +24,7 @@ import edu.stanford.riedel_kruse.bioticgamessdk.CameraView;
 import edu.stanford.riedel_kruse.bioticgamessdk.CollisionCallback;
 import edu.stanford.riedel_kruse.bioticgamessdk.ImageProcessing;
 import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
+import edu.stanford.riedel_kruse.bioticgamessdk.Rectangle;
 
 /**
  * Created by dchiu on 1/31/15.
@@ -34,6 +35,7 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     private static final int MILLIS_PER_DIRECTION = 30 * 1000;
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
+    private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
 
     private static final int PASS_TIME = 400;
     /**
@@ -85,6 +87,11 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
     private int mSoundIdOutOfBounds;
     private int mSoundIdCrowdCheer;
     private int mSoundIdBounceBall;
+
+    private Rectangle mLeftLightIndicator;
+    private Rectangle mRightLightIndicator;
+    private Rectangle mTopLightIndicator;
+    private Rectangle mBottomLightIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +146,33 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
                 goalWidth, goalHeight, COLOR_RED);
         addGameObject(mLeftGoal);
         addGameObject(mRightGoal);
+
+        // Initialize light indicators which show the direction that lights are turned on
+        int lightIndicatorSize = SoccerField.PADDING - SoccerField.LINE_THICKNESS;
+        mLeftLightIndicator = new Rectangle(new Point(0, lightIndicatorSize), lightIndicatorSize,
+                mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1, false);
+        mLeftLightIndicator.setVisible(false);
+        addGameObject(mLeftLightIndicator);
+
+        mRightLightIndicator = new Rectangle(
+                new Point(mFieldWidth - lightIndicatorSize, lightIndicatorSize),
+                lightIndicatorSize, mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1,
+                false);
+        mRightLightIndicator.setVisible(false);
+        addGameObject(mRightLightIndicator);
+
+        mTopLightIndicator = new Rectangle(new Point(lightIndicatorSize, 0),
+                mFieldWidth - 2 * lightIndicatorSize, lightIndicatorSize, COLOR_YELLOW, -1,
+                false);
+        mTopLightIndicator.setVisible(false);
+        addGameObject(mTopLightIndicator);
+
+        mBottomLightIndicator = new Rectangle(
+                new Point(lightIndicatorSize, mFieldHeight - lightIndicatorSize),
+                mFieldWidth - 2 * lightIndicatorSize, lightIndicatorSize, COLOR_YELLOW, -1,
+                false);
+        mBottomLightIndicator.setVisible(false);
+        addGameObject(mBottomLightIndicator);
 
         // Set the current direction to right and hide the left goal.
         mCurrentDirection = Direction.RIGHT;
@@ -195,12 +229,34 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
 
     @Override
     public void onLightOn(BluetoothThread.Direction direction) {
-        displayMessage("Light turned on: " + direction.toString());
+        if (direction == BluetoothThread.Direction.LEFT) {
+            mLeftLightIndicator.setVisible(true);
+        }
+        else if (direction == BluetoothThread.Direction.RIGHT) {
+            mRightLightIndicator.setVisible(true);
+        }
+        else if (direction == BluetoothThread.Direction.TOP) {
+            mTopLightIndicator.setVisible(true);
+        }
+        else {
+            mBottomLightIndicator.setVisible(true);
+        }
     }
 
     @Override
     public void onLightOff(BluetoothThread.Direction direction) {
-        displayMessage("Light turned off: " + direction.toString());
+        if (direction == BluetoothThread.Direction.LEFT) {
+            mLeftLightIndicator.setVisible(false);
+        }
+        else if (direction == BluetoothThread.Direction.RIGHT) {
+            mRightLightIndicator.setVisible(false);
+        }
+        else if (direction == BluetoothThread.Direction.TOP) {
+            mTopLightIndicator.setVisible(false);
+        }
+        else {
+            mBottomLightIndicator.setVisible(false);
+        }
     }
 
     @Override
@@ -251,6 +307,7 @@ public class SoccerGameActivity extends BioticGameActivity implements BluetoothT
                 || newPosition.y > mFieldHeight) {
             if (!mPassing) {
                 onOutOfBounds();
+                playSound(mSoundIdOutOfBounds);
             }
             else {
                 Point newDirection = mBall.direction();
