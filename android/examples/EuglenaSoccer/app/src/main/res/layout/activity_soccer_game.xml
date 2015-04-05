@@ -6,12 +6,29 @@
               android:background="#000000"
               android:orientation="vertical">
 
-    <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
-        android:id="@+id/camera_view"
-        android:layout_width="450dp"
-        android:layout_height="fill_parent"
-        opencv:camera_id="any"
-        opencv:show_fps="true"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
+            android:id="@+id/camera_view"
+            android:layout_width="450dp"
+            android:layout_height="fill_parent"
+            opencv:camera_id="any"
+            opencv:show_fps="true"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <ImageView
+                android:id="@+id/zoom_view"
+                android:layout_width="fill_parent"
+                android:layout_height="150dp"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/score_board"

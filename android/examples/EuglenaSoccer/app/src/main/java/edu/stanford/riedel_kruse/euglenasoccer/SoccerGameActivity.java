@@ -1,14 +1,17 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -244,6 +247,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         if (mTimeMillis > (mNumDirectionSwitches + 1) * MILLIS_PER_DIRECTION) {
             switchDirections();
         }
+
+        updateZoomView(frame);
     }
 
     @Override
@@ -357,7 +362,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
     }
 
-    private Point findClosestEuglenaToBall(Mat frame) {
+    private Rect roiForBall() {
         // Get the model data about the ball.
         Point ballLocation = mBall.position();
 
@@ -367,6 +372,16 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         roi.y = Math.max((int) ballLocation.y - SoccerBall.RADIUS, 0);
         roi.width = Math.min(SoccerBall.RADIUS * 2, mFieldWidth - roi.x);
         roi.height = Math.min(SoccerBall.RADIUS * 2, mFieldHeight - roi.y);
+
+        return roi;
+    }
+
+    private Point findClosestEuglenaToBall(Mat frame) {
+        // Get the model data about the ball.
+        Point ballLocation = mBall.position();
+
+        // Create a region of interest based on the location of the ball.
+        Rect roi = roiForBall();
 
         // Find all things that look like Euglena in the region of interest.
         List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi);
@@ -483,5 +498,22 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private void playSound(int soundId) {
         mSoundPool.play(soundId, SOUND_POOL_LEFT_VOLUME, SOUND_POOL_RIGHT_VOLUME,
                 SOUND_POOL_PRIORITY, SOUND_POOL_LOOP, SOUND_POOL_FLOAT_RATE);
+    }
+
+    private void updateZoomView(Mat frame) {
+        Rect roi = roiForBall();
+        Mat zoomMat = new Mat(frame, roi);
+        final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
+                Bitmap.Config.ARGB_8888);
+
+        Utils.matToBitmap(zoomMat, zoomBitmap);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ImageView zoomView = (ImageView) findViewById(R.id.zoom_view);
+                zoomView.setImageBitmap(zoomBitmap);
+            }
+        });
     }
 }
