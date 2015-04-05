@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -39,6 +38,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private static final int MILLIS_PER_SEC = 1000;
     private static final int MILLIS_PER_DIRECTION = 30 * 1000;
+    private static final int MILLIS_PER_MESSAGE = 5 * 1000;
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
@@ -79,6 +79,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private boolean mPassing;
     private int mPassingTime;
+    private int mMessageTime;
 
     private Resources mResources;
 
@@ -211,6 +212,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mPassing = false;
         mPassingTime = 0;
 
+        mMessageTime = 0;
+
         // Initialize score and time
         setScore(0);
         setTime(0);
@@ -249,6 +252,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
 
         updateZoomView(frame);
+
+        mMessageTime += timeDelta;
+        if (mMessageTime > MILLIS_PER_MESSAGE) {
+            displayMessage("");
+        }
     }
 
     @Override
@@ -470,10 +478,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void displayMessage(final String message) {
+        mMessageTime = 0;
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                TextView messageView = (TextView) findViewById(R.id.message);
+                messageView.setText(message);
             }
         });
     }
