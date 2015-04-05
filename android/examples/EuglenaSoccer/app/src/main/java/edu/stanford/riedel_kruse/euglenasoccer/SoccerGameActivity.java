@@ -24,7 +24,7 @@ import edu.stanford.riedel_kruse.bioticgamessdk.ImageProcessing;
 import edu.stanford.riedel_kruse.bioticgamessdk.JoystickListener;
 import edu.stanford.riedel_kruse.bioticgamessdk.JoystickThread;
 import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
-import edu.stanford.riedel_kruse.bioticgamessdk.Rectangle;
+import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.RectangleObject;
 
 /**
  * Created by dchiu on 1/31/15.
@@ -88,10 +88,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private int mSoundIdCrowdCheer;
     private int mSoundIdBounceBall;
 
-    private Rectangle mLeftLightIndicator;
-    private Rectangle mRightLightIndicator;
-    private Rectangle mTopLightIndicator;
-    private Rectangle mBottomLightIndicator;
+    private RectangleObject mLeftLightIndicator;
+    private RectangleObject mRightLightIndicator;
+    private RectangleObject mTopLightIndicator;
+    private RectangleObject mBottomLightIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,28 +149,25 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         // Initialize light indicators which show the direction that lights are turned on
         int lightIndicatorSize = SoccerField.PADDING - SoccerField.LINE_THICKNESS;
-        mLeftLightIndicator = new Rectangle(new Point(0, lightIndicatorSize), lightIndicatorSize,
-                mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1, false);
+        mLeftLightIndicator = new RectangleObject(new Point(0, lightIndicatorSize), lightIndicatorSize,
+                mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1);
         mLeftLightIndicator.setVisible(false);
         addGameObject(mLeftLightIndicator);
 
-        mRightLightIndicator = new Rectangle(
+        mRightLightIndicator = new RectangleObject(
                 new Point(mFieldWidth - lightIndicatorSize, lightIndicatorSize),
-                lightIndicatorSize, mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1,
-                false);
+                lightIndicatorSize, mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1);
         mRightLightIndicator.setVisible(false);
         addGameObject(mRightLightIndicator);
 
-        mTopLightIndicator = new Rectangle(new Point(lightIndicatorSize, 0),
-                mFieldWidth - 2 * lightIndicatorSize, lightIndicatorSize, COLOR_YELLOW, -1,
-                false);
+        mTopLightIndicator = new RectangleObject(new Point(lightIndicatorSize, 0),
+                mFieldWidth - 2 * lightIndicatorSize, lightIndicatorSize, COLOR_YELLOW, -1);
         mTopLightIndicator.setVisible(false);
         addGameObject(mTopLightIndicator);
 
-        mBottomLightIndicator = new Rectangle(
+        mBottomLightIndicator = new RectangleObject(
                 new Point(lightIndicatorSize, mFieldHeight - lightIndicatorSize),
-                mFieldWidth - 2 * lightIndicatorSize, lightIndicatorSize, COLOR_YELLOW, -1,
-                false);
+                mFieldWidth - 2 * lightIndicatorSize, lightIndicatorSize, COLOR_YELLOW, -1);
         mBottomLightIndicator.setVisible(false);
         addGameObject(mBottomLightIndicator);
 
@@ -443,7 +440,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mLeftGoal.setVisible(!mLeftGoal.isVisible());
 
         mRightGoal.setPhysical(!mRightGoal.isPhysical());
-        mRightGoal.setVisible(!mLeftGoal.isVisible());
+        mRightGoal.setVisible(!mRightGoal.isVisible());
 
         if (mCurrentDirection == Direction.RIGHT) {
             mCurrentDirection = Direction.LEFT;
