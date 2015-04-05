@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -24,7 +25,9 @@ import edu.stanford.riedel_kruse.bioticgamessdk.ImageProcessing;
 import edu.stanford.riedel_kruse.bioticgamessdk.JoystickListener;
 import edu.stanford.riedel_kruse.bioticgamessdk.JoystickThread;
 import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
+import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.LineObject;
 import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.RectangleObject;
+import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.TextObject;
 
 /**
  * Created by dchiu on 1/31/15.
@@ -36,6 +39,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
+    private static final Scalar COLOR_LIGHT_BLUE = new Scalar(200, 200, 250);
 
     private static final int PASS_TIME = 400;
     /**
@@ -93,6 +97,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private RectangleObject mTopLightIndicator;
     private RectangleObject mBottomLightIndicator;
 
+    private TextObject mSpeedText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
@@ -147,10 +153,26 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addGameObject(mLeftGoal);
         addGameObject(mRightGoal);
 
+        LineObject scaleLine = new LineObject(mFieldWidth - 300,
+                mFieldHeight - SoccerField.PADDING * 2 - 50, mFieldWidth - 150,
+                mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
+        addGameObject(scaleLine);
+
+        TextObject scaleText = new TextObject(mFieldWidth - 312.5,
+                mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
+                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+        addGameObject(scaleText);
+
+        mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
+                String.format(mResources.getString(R.string.speed), mBallSpeed),
+                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+        addGameObject(mSpeedText);
+        setBallSpeed(0);
+
         // Initialize light indicators which show the direction that lights are turned on
         int lightIndicatorSize = SoccerField.PADDING - SoccerField.LINE_THICKNESS;
-        mLeftLightIndicator = new RectangleObject(new Point(0, lightIndicatorSize), lightIndicatorSize,
-                mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1);
+        mLeftLightIndicator = new RectangleObject(new Point(0, lightIndicatorSize),
+                lightIndicatorSize, mFieldHeight - 2 * lightIndicatorSize, COLOR_YELLOW, -1);
         mLeftLightIndicator.setVisible(false);
         addGameObject(mLeftLightIndicator);
 
@@ -285,15 +307,16 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
         else {
             newPosition = findClosestEuglenaToBall(frame);
-            if (newPosition != null) {
-                mBall.setPosition(newPosition);
-                mRecentBallPositions.add(newPosition);
-                if (mRecentBallPositions.size() > NUM_RECENT_POSITIONS) {
-                    mRecentBallPositions.remove(0);
-                }
-                mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
-                mBallSpeed = MathUtil.computeAverageSpeed(mRecentBallPositions);
+            if (newPosition == null) {
+                newPosition = mBall.position();
             }
+            mBall.setPosition(newPosition);
+            mRecentBallPositions.add(newPosition);
+            if (mRecentBallPositions.size() > NUM_RECENT_POSITIONS) {
+                mRecentBallPositions.remove(0);
+            }
+            mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
+            setBallSpeed(MathUtil.computeAverageSpeed(mRecentBallPositions));
         }
 
         if (newPosition == null) {
@@ -390,6 +413,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
+    private void setBallSpeed(double newSpeed) {
+        mBallSpeed = newSpeed;
+        mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed));
+    }
+
     public void onActionButtonPressed(View view) {
         passOrBounceBall();
     }
@@ -416,7 +444,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mPassingTime = 0;
         mBall.setDirection(new Point(0, 0));
         mRecentBallPositions.clear();
-        mBallSpeed = 0;
+        setBallSpeed(0);
     }
 
     private void resetBall() {
