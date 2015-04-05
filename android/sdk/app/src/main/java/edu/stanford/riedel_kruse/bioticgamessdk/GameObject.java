@@ -12,6 +12,8 @@ public abstract class GameObject {
      * Instance variable which keeps track of the position of the GameObject on the screen.
      */
     protected Point mPosition;
+    protected Renderable mRenderable;
+    protected PhysicalBody mPhysicalBody;
     /**
      * Instance variable flag which indicates whether or not this GameObject should interact
      * physically with other GameObjects (e.g. collisions).
@@ -23,16 +25,26 @@ public abstract class GameObject {
      */
     protected boolean mIsVisible;
 
-    /**
-     * Constructor for the GameObject class.
-     * @param position the position of the GameObject.
-     * @param isPhysical whether or not this GameObject should interact physically with other
-     *                   GameObjects.
-     */
-    public GameObject(Point position, boolean isPhysical) {
+    public GameObject(Point position) {
         mPosition = position;
-        mIsPhysical = isPhysical;
+
         mIsVisible = true;
+        mIsPhysical = true;
+    }
+
+    public GameObject(int x, int y) {
+        this(new Point(x, y));
+    }
+
+    public GameObject(Point position, Renderable renderable, PhysicalBody body) {
+        this(position);
+
+        mRenderable = renderable;
+        mPhysicalBody = body;
+    }
+
+    public GameObject(int x, int y, Renderable renderable, PhysicalBody body) {
+        this(new Point(x, y), renderable, body);
     }
 
     /**
@@ -89,7 +101,7 @@ public abstract class GameObject {
      *         otherwise.
      */
     public boolean isPhysical() {
-        return mIsPhysical;
+        return mPhysicalBody != null && mIsPhysical;
     }
 
     /**
@@ -101,6 +113,10 @@ public abstract class GameObject {
         mIsPhysical = isPhysical;
     }
 
+    public PhysicalBody physicalBody() {
+        return mPhysicalBody;
+    }
+
     /**
      * Getter for the visibility property of this GameObject. True means that this GameObject is
      * being drawn to the screen. False means that this GameObject is currently being hidden from
@@ -108,7 +124,7 @@ public abstract class GameObject {
      * @return true if this GameObject is being drawn; false otherwise.
      */
     public boolean isVisible() {
-        return mIsVisible;
+        return mRenderable != null && mIsVisible;
     }
 
     /**
@@ -121,23 +137,17 @@ public abstract class GameObject {
         mIsVisible = isVisible;
     }
 
-    /**
-     * Draws this GameObject to the given frame. Since no origin point is specified, this draws
-     * without translating the object at all.
-     * @param frame the frame to draw the GameObject on.
-     */
-    public void draw(Mat frame) {
-        draw(frame, new Point(0, 0));
+    public Renderable renderable() {
+        return mRenderable;
     }
 
-    /**
-     * Draws this GameObject to the given frame.
-     * @param frame the frame to draw the GameObject on.
-     * @param offset the offset to draw at (translates all subsequent draw calls)
-     */
-    public abstract void draw(Mat frame, Point offset);
+    public void draw(Mat frame) {
+        if (isVisible()) {
+            mRenderable.draw(frame);
+        }
+    }
 
     public boolean intersects(GameObject obj) {
-        return CollisionUtil.collided(this, obj);
+        return isPhysical() && obj.isPhysical() && mPhysicalBody.intersects(obj.physicalBody());
     }
 }

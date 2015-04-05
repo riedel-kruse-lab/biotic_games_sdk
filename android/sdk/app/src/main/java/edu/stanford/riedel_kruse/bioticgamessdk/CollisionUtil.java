@@ -4,6 +4,9 @@ import org.opencv.core.Point;
 
 import java.util.List;
 
+import edu.stanford.riedel_kruse.bioticgamessdk.physicalbodies.RectangleBody;
+import edu.stanford.riedel_kruse.bioticgamessdk.physicalbodies.CircleBody;
+
 /**
  * The CollisionUtil class contains static helper functions for deciding if two GameObjects have
  * collided.
@@ -15,51 +18,28 @@ public class CollisionUtil {
      * @param obj2 the second object to check collision for
      * @return true if the two objects have collided, false otherwise
      */
-    public static boolean collided(GameObject obj1, GameObject obj2) {
+    public static boolean collided(PhysicalBody obj1, PhysicalBody obj2) {
         // TODO: There is probably a cleaner way of doing this. This requires a combinatorial number
         // of cases. Yuck!
-        if (obj1 instanceof Rectangle) {
-            Rectangle rect1 = (Rectangle) obj1;
-            if (obj2 instanceof Rectangle) {
-                Rectangle rect2 = (Rectangle) obj2;
+        if (obj1 instanceof RectangleBody) {
+            RectangleBody rect1 = (RectangleBody) obj1;
+            if (obj2 instanceof RectangleBody) {
+                RectangleBody rect2 = (RectangleBody) obj2;
                 return collided(rect1, rect2);
             }
-            else if (obj2 instanceof CompositeShape) {
-                CompositeShape shape2 = (CompositeShape) obj2;
-                return collided(shape2, rect1);
-            }
-            else if (obj2 instanceof Circle) {
-                Circle circle2 = (Circle) obj2;
+            else if (obj2 instanceof CircleBody) {
+                CircleBody circle2 = (CircleBody) obj2;
                 return collided(rect1, circle2);
             }
         }
-        else if (obj1 instanceof CompositeShape) {
-            CompositeShape shape1 = (CompositeShape) obj1;
-            if (obj2 instanceof Rectangle) {
-                Rectangle rect2 = (Rectangle) obj2;
-                return collided(shape1, rect2);
-            }
-            else if (obj2 instanceof CompositeShape) {
-                CompositeShape shape2 = (CompositeShape) obj2;
-                return collided(shape1, shape2);
-            }
-            else if (obj2 instanceof Circle) {
-                Circle circle2 = (Circle) obj2;
-                return collided(shape1, circle2);
-            }
-        }
-        else if (obj1 instanceof Circle) {
-            Circle circle1 = (Circle) obj1;
-            if (obj2 instanceof Rectangle) {
-                Rectangle rect2 = (Rectangle) obj2;
+        else if (obj1 instanceof CircleBody) {
+            CircleBody circle1 = (CircleBody) obj1;
+            if (obj2 instanceof RectangleBody) {
+                RectangleBody rect2 = (RectangleBody) obj2;
                 return collided(rect2, circle1);
             }
-            else if (obj2 instanceof CompositeShape) {
-                CompositeShape shape2 = (CompositeShape) obj2;
-                return collided(shape2, circle1);
-            }
-            else if (obj2 instanceof Circle) {
-                Circle circle2 = (Circle) obj2;
+            else if (obj2 instanceof CircleBody) {
+                CircleBody circle2 = (CircleBody) obj2;
                 return collided(circle1, circle2);
             }
         }
@@ -74,12 +54,7 @@ public class CollisionUtil {
      * @param rect2 the second Rectangle to check
      * @return true if the Rectangles have collided, false otherwise
      */
-    public static boolean collided(Rectangle rect1, Rectangle rect2) {
-        // If either shape isn't physical, it's not possible for them to intersect.
-        if (!rect1.isPhysical() || !rect2.isPhysical()) {
-            return false;
-        }
-
+    public static boolean collided(RectangleBody rect1, RectangleBody rect2) {
         Point tl1 = rect1.topLeft();
         Point tl2 = rect2.topLeft();
         Point br1 = rect1.bottomRight();
@@ -101,12 +76,7 @@ public class CollisionUtil {
      * @param circle the Circle to check
      * @return true if the Rectangle and the Circle have collided, false otherwise
      */
-    public static boolean collided(Rectangle rect, Circle circle) {
-        // If either shape isn't physical, it's not possible for them to intersect.
-        if (!rect.isPhysical() || !circle.isPhysical()) {
-            return false;
-        }
-
+    public static boolean collided(RectangleBody rect, CircleBody circle) {
         Point circleCenter = circle.center();
         int circleRadius = circle.radius();
         Point rectCenter = rect.center();
@@ -143,12 +113,7 @@ public class CollisionUtil {
      * @param circle2 the second Circle to check
      * @return true if the two Circles have collided, false otherwise
      */
-    public static boolean collided(Circle circle1, Circle circle2) {
-        // If either shape isn't physical, it's not possible for them to intersect.
-        if (!circle1.isPhysical() || !circle2.isPhysical()) {
-            return false;
-        }
-
+    public static boolean collided(CircleBody circle1, CircleBody circle2) {
         Point center1 = circle1.center();
         Point center2 = circle2.center();
         int radius1 = circle1.radius();
@@ -157,56 +122,5 @@ public class CollisionUtil {
         double distance = MathUtil.distance(center1, center2);
 
         return distance <= radius1 + radius2;
-    }
-
-    /**
-     * Checks if two CompositeShapes have collided.
-     * @param shape1 the first CompositeShape to check
-     * @param shape2 the second CompositeShape to check
-     * @return true if any of the children of either CompositeShape has collided with any child
-     *         in the other CompositeShape, false otherwise
-     */
-    public static boolean collided(CompositeShape shape1, CompositeShape shape2) {
-        // If either shape isn't physical, it's not possible for them to intersect.
-        if (!shape1.isPhysical() || ! shape2.isPhysical()) {
-            return false;
-        }
-
-        List<Shape> children1 = shape1.children();
-        List<Shape> children2 = shape2.children();
-
-        for (Shape childShape1 : children1) {
-            for (Shape childShape2 : children2) {
-                if (childShape1.intersects(childShape2)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if a CompositeShape has collided with a Shape object.
-     * @param compositeShape the CompositeShape to check
-     * @param shape the Shape to check
-     * @return true if any of the CompositeShape's children have collided with the Shape, false
-     *         otherwise
-     */
-    public static boolean collided(CompositeShape compositeShape, Shape shape) {
-        // If either shape isn't physical, it's not possible for them to intersect.
-        if (!compositeShape.isPhysical() || !shape.isPhysical()) {
-            return false;
-        }
-
-        List<Shape> children = compositeShape.children();
-
-        for (Shape child : children) {
-            if (child.intersects(shape)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

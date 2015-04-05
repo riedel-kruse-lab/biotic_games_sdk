@@ -48,7 +48,8 @@ public abstract class CollisionCallback {
      * @return true if the GameObjects for this CollisionCallback have collided; false otherwise.
      */
     public boolean collisionHasOccurred() {
-        return mObj1.isPhysical() && mObj2.isPhysical() && CollisionUtil.collided(mObj1, mObj2);
+        return mObj1.isPhysical() && mObj2.isPhysical()
+                && CollisionUtil.collided(mObj1.physicalBody(), mObj2.physicalBody());
     }
 
     /**

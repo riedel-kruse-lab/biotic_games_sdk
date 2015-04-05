@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.bioticgamessdk;
+package edu.stanford.riedel_kruse.bioticgamessdk.physicalbodies;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -6,10 +6,14 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
+import edu.stanford.riedel_kruse.bioticgamessdk.GameObject;
+import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
+import edu.stanford.riedel_kruse.bioticgamessdk.PhysicalBody;
+
 /**
- * The Rectangle class describes a basic rectangular shape.
+ * The RectangleBody class describes a basic rectangular shape.
  */
-public class Rectangle extends Shape {
+public class RectangleBody extends PhysicalBody {
     /**
      * An OpenCV rectangle object. Use this as the backing for a rectangle because OpenCV has
      * several convenient functions already implemented for checking whether or not a rectangle
@@ -18,19 +22,13 @@ public class Rectangle extends Shape {
     private Rect mRect;
 
     /**
-     * Constructor for the Rectangle class.
-     * @param position the position of the top left corner of the rectangle.
+     * Constructor for the RectangleBody class.
+     * @param gameObject the GameObject associated with this RectangleBody
      * @param width the width of the rectangle.
      * @param height the height of the rectangle.
-     * @param color the color of the rectangle expressed as an RGB value
-     * @param thickness the thickness of the rectangle. Negative values specify that the rectangle
-     *                  should be filled.
-     * @param isPhysical whether or not the rectangle should interact physically with other
-     *                   DisplayObjects.
      */
-    public Rectangle(Point position, int width, int height, Scalar color, int thickness,
-                     boolean isPhysical) {
-        super(position, color, thickness, isPhysical);
+    public RectangleBody(GameObject gameObject, int width, int height) {
+        super(gameObject);
 
         mRect = new Rect(0, 0, width, height);
     }
@@ -68,7 +66,7 @@ public class Rectangle extends Shape {
      * @return the top left corner of the rectangle.
      */
     public Point topLeft() {
-        return MathUtil.addPoints(mRect.tl(), mPosition);
+        return MathUtil.addPoints(mRect.tl(), mGameObject.position());
     }
 
     /**
@@ -76,17 +74,12 @@ public class Rectangle extends Shape {
      * @return the bottom right corner of the rectangle.
      */
     public Point bottomRight() {
-        return MathUtil.addPoints(mRect.br(), mPosition);
-    }
-
-    @Override
-    public void draw(Mat frame, Point offset) {
-        Core.rectangle(frame, MathUtil.addPoints(offset, topLeft()),
-                MathUtil.addPoints(offset, bottomRight()), mColor, mThickness);
+        return MathUtil.addPoints(mRect.br(), mGameObject.position());
     }
 
     @Override
     public boolean contains(Point point) {
-        return mRect.contains(point);
+        Rect rect = new Rect((int) point.x, (int) point.y, width(), height());
+        return rect.contains(point);
     }
 }

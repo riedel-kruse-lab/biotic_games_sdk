@@ -4,14 +4,16 @@ import junit.framework.TestCase;
 
 import org.opencv.core.Point;
 
+import edu.stanford.riedel_kruse.bioticgamessdk.physicalbodies.RectangleBody;
+
 /**
  * Contains test cases for the CollisionUtil class.
  */
 public class CollisionUtilTest extends TestCase {
     public void testRectangleRectangleCollision() {
         // Case where the two rectangles overlap.
-        Rectangle rect1 = new Rectangle(new Point(0, 0), 10, 15, null, -1, true);
-        Rectangle rect2 = new Rectangle(new Point(8, 13), 5, 8, null, -1, true);
+        RectangleBody rect1 = new RectangleBody(new Point(0, 0), 10, 15, null, -1, true);
+        RectangleBody rect2 = new RectangleBody(new Point(8, 13), 5, 8, null, -1, true);
 
         assertEquals(true, CollisionUtil.collided(rect1, rect2));
 
@@ -33,8 +35,8 @@ public class CollisionUtilTest extends TestCase {
 
     public void testRectangleCircleCollision() {
         // Case where the rectangle and circle overlap.
-        Rectangle rect = new Rectangle(new Point(0, 0), 5, 5, null, -1, true);
-        Circle circle = new Circle(new Point(0, 0), 3, null, -1, true);
+        RectangleBody rect = new RectangleBody(new Point(0, 0), 5, 5, null, -1, true);
+        CircleBody circle = new CircleBody(new Point(0, 0), 3, null, -1, true);
 
         assertEquals(true, CollisionUtil.collided(rect, circle));
 
@@ -56,8 +58,8 @@ public class CollisionUtilTest extends TestCase {
 
     public void testCircleCircleCollision() {
         // Case where the circles do not overlap.
-        Circle circle1 = new Circle(new Point(0, 0), 5, null, -1, true);
-        Circle circle2 = new Circle(new Point(10, 10), 2, null, -1, true);
+        CircleBody circle1 = new CircleBody(new Point(0, 0), 5, null, -1, true);
+        CircleBody circle2 = new CircleBody(new Point(10, 10), 2, null, -1, true);
 
         assertEquals(false, CollisionUtil.collided(circle1, circle2));
 
@@ -83,14 +85,14 @@ public class CollisionUtilTest extends TestCase {
     }
 
     public void testCompositeShapeCompositeShapeCollision() {
-        Rectangle stick = new Rectangle(new Point(0, 0), 10, 2, null, -1, true);
-        Circle ball = new Circle(new Point(10, 1), 4, null, -1, true);
+        RectangleBody stick = new RectangleBody(new Point(0, 0), 10, 2, null, -1, true);
+        CircleBody ball = new CircleBody(new Point(10, 1), 4, null, -1, true);
 
         CompositeShape ballAndStick = new CompositeShape(new Point(0, 0), stick, ball);
 
-        Rectangle goalBack = new Rectangle(new Point(0, 0), 2, 10, null, -1, true);
-        Rectangle goalTopArm = new Rectangle(new Point(2, 0), 4, 2, null, -1, false);
-        Rectangle goalBottomArm = new Rectangle(new Point(2, 8), 4, 2, null, -1, false);
+        RectangleBody goalBack = new RectangleBody(new Point(0, 0), 2, 10, null, -1, true);
+        RectangleBody goalTopArm = new RectangleBody(new Point(2, 0), 4, 2, null, -1, false);
+        RectangleBody goalBottomArm = new RectangleBody(new Point(2, 8), 4, 2, null, -1, false);
 
         CompositeShape goal = new CompositeShape(new Point(100, 100), goalBack, goalTopArm,
                 goalBottomArm);
@@ -100,15 +102,15 @@ public class CollisionUtilTest extends TestCase {
     }
 
     public void testCompositeShapeShapeCollision() {
-        Rectangle goalBack = new Rectangle(new Point(0, 0), 2, 10, null, -1, true);
-        Rectangle goalTopArm = new Rectangle(new Point(2, 0), 4, 2, null, -1, false);
-        Rectangle goalBottomArm = new Rectangle(new Point(2, 8), 4, 2, null, -1, false);
+        RectangleBody goalBack = new RectangleBody(new Point(0, 0), 2, 10, null, -1, true);
+        RectangleBody goalTopArm = new RectangleBody(new Point(2, 0), 4, 2, null, -1, false);
+        RectangleBody goalBottomArm = new RectangleBody(new Point(2, 8), 4, 2, null, -1, false);
 
         CompositeShape compositeShape = new CompositeShape(new Point(0, 0), goalBack, goalTopArm,
                 goalBottomArm);
 
         // Case where the circle intersects the physical back of the goal.
-        Circle circle = new Circle(new Point(2, 5), 2, null, -1, true);
+        CircleBody circle = new CircleBody(new Point(2, 5), 2, null, -1, true);
         assertEquals(true, CollisionUtil.collided(compositeShape, circle));
 
         // Case where the circle intersects the non-physical arms of the goal.
