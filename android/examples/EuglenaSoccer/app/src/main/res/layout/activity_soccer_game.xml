@@ -20,13 +20,37 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/zoom_view"
                 android:layout_width="fill_parent"
                 android:layout_height="150dp"
                 android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:id="@+id/tutorial_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <TextView
+                    android:id="@+id/tutorial_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:gravity="center_horizontal"/>
+
+                <Button
+                    android:id="@+id/tutorial_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onTutorialButtonPressed"
+                    android:text="@string/tutorial_button_next"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

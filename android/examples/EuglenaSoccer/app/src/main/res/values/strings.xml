@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">Euglena Soccer</string>
+    <string name="play">Play</string>
+    <string name="tutorial">Tutorial</string>
+    <string name="high_scores">High Scores</string>
+    <string name="biotics_info">Biotics Info</string>
+    <string name="credits">Credits</string>
     <string name="score">Score: %1$d</string>
     <string name="time">Time: %1$d</string>
     <string name="bounce">Bounce</string>
@@ -8,4 +13,35 @@
     <string name="goal">Goal!</string>
     <string name="scale">100 um</string>
     <string name="speed">%1$.1f um/sec</string>
+
+    <string name="tutorial_button_next">Next</string>
+    <string name="tutorial_button_finish">Finish</string>
+    <string name="tutorial_push_joystick">Tilt and hold the joystick to observe movement.</string>
+    <string name="tutorial_change_direction">
+        Change direction. Can you see the Euglena respond?
+    </string>
+    <string name="tutorial_play_around">Play around!</string>
+    <string name="tutorial_euglena_in_ball">Now try to get a Euglena in the circle!</string>
+    <string name="tutorial_zoom_view">
+        Notice the circle tracks the Euglena, and the zoomed view above.
+    </string>
+    <string name="tutorial_direction_tracking">Now let\'s add a Soccer ball! The ball is oriented in the direction of movement.</string>
+    <string name="tutorial_out_of_bounds">If carried out of bounds, the ball resets!</string>
+    <string name="tutorial_tap_to_act1">
+        Tap the screen or press the button to bounce or pass the ball.
+    </string>
+    <string name="tutorial_tap_to_act2">
+        Pass occurs when a Euglena is carrying the ball. Bounce when one is not.
+    </string>
+    <string name="tutorial_pass_tip">
+        Passed balls will bounce off walls and not go out of bounds! Pass the ball near walls to remain in play!
+    </string>
+    <string name="tutorial_bounce_tip">Press the bounce button to randomly bounce the ball! Use this to reposition the ball.</string>
+    <string name="tutorial_try_for_goal">Now let\'s play soccer! Score 5 points as quickly as you can!</string>
+    <string name="tutorial_goal_carry_or_pass">
+        To score points, you can carry or pass the ball into the goal. Try it!
+    </string>
+    <string name="tutorial_score">
+        The score changed! You get a point for passing the ball in, and two points for carrying it in.
+    </string>
 </resources>

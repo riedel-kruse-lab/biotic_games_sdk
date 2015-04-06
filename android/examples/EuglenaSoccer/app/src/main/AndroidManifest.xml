@@ -1,23 +1,37 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="edu.stanford.riedel_kruse.euglenasoccer">
+<manifest
+    package="edu.stanford.riedel_kruse.euglenasoccer"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-feature android:name="android.hardware.camera" android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true"/>
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
-    <application android:allowBackup="true"
-                 android:label="@string/app_name"
-                 android:icon="@drawable/ic_launcher"
-                 android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
         <activity
-            android:name="edu.stanford.riedel_kruse.euglenasoccer.SoccerGameActivity"
+            android:name="edu.stanford.riedel_kruse.euglenasoccer.MainActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name="edu.stanford.riedel_kruse.euglenasoccer.SoccerGameActivity"
+            android:screenOrientation="landscape">
+        </activity>
+
+        <activity
+            android:name="edu.stanford.riedel_kruse.euglenasoccer.HighScoreActivity"
+            android:screenOrientation="landscape">
         </activity>
     </application>
 

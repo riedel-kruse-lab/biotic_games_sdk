@@ -1,5 +1,6 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
@@ -7,6 +8,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,6 +38,11 @@ import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.TextObject;
  */
 public class SoccerGameActivity extends BioticGameActivity implements JoystickListener {
 
+    public static final String EXTRA_TUTORIAL_MODE =
+            "edu.stanford.riedel_kruse.euglenasoccer.TUTORIAL_MODE";
+    public static final String EXTRA_TIME =
+            "edu.stanford.riedel_kruse.euglenasoccer.TIME";
+
     private static final int MILLIS_PER_SEC = 1000;
     private static final int MILLIS_PER_DIRECTION = 30 * 1000;
     private static final int MILLIS_PER_MESSAGE = 5 * 1000;
@@ -43,6 +50,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
     private static final Scalar COLOR_LIGHT_BLUE = new Scalar(200, 200, 250);
+
+    private static final int GAME_OVER_SCORE = 1;
 
     private static final int PASS_TIME = 400;
     /**
@@ -59,6 +68,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static final int SOUND_POOL_PRIORITY = 1;
     private static final int SOUND_POOL_LOOP = 0;
     private static final float SOUND_POOL_FLOAT_RATE = 1.0f;
+
+    private Tutorial mTutorial;
 
     private enum Direction {
         LEFT,
@@ -122,6 +133,15 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mSoundIdBounceBall = mSoundPool.load(this, R.raw.bounce_ball, SOUND_POOL_PRIORITY);
 
         startBluetooth(this);
+
+        Intent intent = getIntent();
+        boolean tutorialMode = intent.getBooleanExtra(EXTRA_TUTORIAL_MODE, false);
+
+        if (tutorialMode) {
+            mTutorial = new Tutorial();
+            findViewById(R.id.tutorial_layout).setVisibility(View.VISIBLE);
+            updateTutorialViews();
+        }
     }
 
     @Override
@@ -240,10 +260,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     @Override
     protected void updateGame(Mat frame, long timeDelta) {
 
-        updateBallLocation(frame, timeDelta);
+        if (mTutorial == null || mTutorial.shouldTrack()) {
+            updateBallLocation(frame, timeDelta);
+        }
 
         // Update the time based on how long it's been since the last frame.
-        setTime(mTimeMillis + timeDelta);
+        if (mTutorial == null || mTutorial.shouldKeepTime()) {
+            setTime(mTimeMillis + timeDelta);
+        }
 
         // Decide whether or not it's time to switch directions. Need to add 1 otherwise direction
         // will switch before the first time MILLIS_PER_DIRECTION milliseconds have passed.
@@ -251,11 +275,21 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             switchDirections();
         }
 
-        updateZoomView(frame);
+        if (mTutorial == null || mTutorial.shouldUpdateZoomView()) {
+            updateZoomView(frame);
+        }
 
         mMessageTime += timeDelta;
         if (mMessageTime > MILLIS_PER_MESSAGE) {
             displayMessage("");
+        }
+
+        if (mTutorial != null) {
+            mBall.setVisible(mTutorial.shouldDrawBall());
+            mBall.setDirectionVisible(mTutorial.shouldDrawDirection());
+            if (mNumDirectionSwitches == 0) {
+                mRightGoal.setVisible(mTutorial.shouldDrawGoals());
+            }
         }
     }
 
@@ -407,6 +441,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         playSound(mSoundIdCrowdCheer);
 
         displayMessage(mResources.getString(R.string.goal));
+
+        if (mScore >= GAME_OVER_SCORE) {
+            finish();
+
+            Intent intent = new Intent(this, HighScoreActivity.class);
+            intent.putExtra(EXTRA_TIME, (int) mTimeMillis / MILLIS_PER_SEC);
+            startActivity(intent);
+        }
     }
 
     private void onOutOfBounds() {
@@ -443,6 +485,49 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     public void onActionButtonPressed(View view) {
         passOrBounceBall();
+    }
+
+    public void onTutorialButtonPressed(View view) {
+        mTutorial.advance();
+        updateTutorialViews();
+
+        if (mTutorial.finished()) {
+            finish();
+        }
+    }
+
+    public void updateTutorialViews() {
+        TextView tutorialText = (TextView) findViewById(R.id.tutorial_text);
+        tutorialText.setText(mTutorial.getCurrentStringResource());
+
+        Button tutorialButton = (Button) findViewById(R.id.tutorial_button);
+        tutorialButton.setText(mTutorial.getButtonTextResource());
+
+        TextView scoreText = (TextView) findViewById(R.id.score);
+        TextView timeText = (TextView) findViewById(R.id.time);
+
+        Button actionButton = (Button) findViewById(R.id.action_button);
+
+        if (mTutorial.shouldDisplayScores()) {
+            scoreText.setVisibility(View.VISIBLE);
+        }
+        else {
+            scoreText.setVisibility(View.GONE);
+        }
+
+        if (mTutorial.shouldDisplayTime()) {
+            timeText.setVisibility(View.VISIBLE);
+        }
+        else {
+            timeText.setVisibility(View.GONE);
+        }
+
+        if (mTutorial.shouldDisplayActionButton()) {
+            actionButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            actionButton.setVisibility(View.GONE);
+        }
     }
 
     private void passOrBounceBall() {
@@ -490,6 +575,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void switchDirections() {
+        if (mTutorial != null && !mTutorial.shouldDrawGoals()) {
+            return;
+        }
+
         mLeftGoal.setPhysical(!mLeftGoal.isPhysical());
         mLeftGoal.setVisible(!mLeftGoal.isVisible());
 

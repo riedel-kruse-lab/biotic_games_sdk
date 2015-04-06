@@ -28,6 +28,7 @@ public class SoccerBall extends GameObject {
     private static final int TRACKING_CIRCLE_THICKNESS = 3;
 
     private Point mDirection;
+    private boolean mDrawDirection;
 
     class SoccerBallRenderable extends Renderable {
 
@@ -40,6 +41,10 @@ public class SoccerBall extends GameObject {
             Point drawPosition = mPosition;
             Core.circle(frame, drawPosition, TRACKING_CIRCLE_RADIUS, TRACKING_CIRCLE_COLOR,
                     TRACKING_CIRCLE_THICKNESS);
+
+            if (!mDrawDirection) {
+                return;
+            }
 
             Point ballPosition = mDirection.clone();
             ballPosition.x *= TRACKING_CIRCLE_RADIUS;
@@ -95,6 +100,9 @@ public class SoccerBall extends GameObject {
         mDirection = new Point(0, 0);
     }
 
+    public void setDirectionVisible(boolean directionVisible) {
+        mDrawDirection = directionVisible;
+    }
 
 
     public Point direction() {
