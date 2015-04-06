@@ -133,7 +133,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mSoundIdCrowdCheer = mSoundPool.load(this, R.raw.crowd_cheer, SOUND_POOL_PRIORITY);
         mSoundIdBounceBall = mSoundPool.load(this, R.raw.bounce_ball, SOUND_POOL_PRIORITY);
 
-        startBluetooth(this);
+        connectToJoystick(this, "00:06:66:67:E8:99");
 
         Intent intent = getIntent();
         boolean tutorialMode = intent.getBooleanExtra(EXTRA_TUTORIAL_MODE, false);
