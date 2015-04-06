@@ -38,7 +38,9 @@ public class JoystickThread extends Thread {
 
     private JoystickListener mListener;
 
-    public JoystickThread(JoystickListener listener) {
+    private String mAddress;
+
+    public JoystickThread(JoystickListener listener, String hardwareAddress) {
         mListener = listener;
 
         mLastVert = 0;
@@ -46,6 +48,8 @@ public class JoystickThread extends Thread {
         mLastSel = false;
 
         mReceiveBuffer = "";
+
+        mAddress = hardwareAddress;
     }
 
     private void connect() throws Exception {
@@ -54,7 +58,7 @@ public class JoystickThread extends Thread {
             throw new Exception("Bluetooth adapter not found or not enabled!");
         }
 
-        BluetoothDevice remoteDevice = adapter.getRemoteDevice(ADDRESS);
+        BluetoothDevice remoteDevice = adapter.getRemoteDevice(mAddress);
 
         BluetoothSocket socket = remoteDevice.createRfcommSocketToServiceRecord(uuid);
 

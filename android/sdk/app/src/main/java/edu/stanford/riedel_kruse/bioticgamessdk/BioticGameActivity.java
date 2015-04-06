@@ -236,9 +236,10 @@ public abstract class BioticGameActivity extends Activity implements
      * hardware input should call this function early in their game's running.
      * @param listener a BluetoothThreadListener object which contains implementations for when
      *                 events of interest occur (e.g. a light turns on)
+     * @param hardwareAddress the hardware address of the Bluetooth chip to connect to
      */
-    public void startBluetooth(JoystickListener listener) {
-        JoystickThread btt = new JoystickThread(listener);
+    public void connectToJoystick(JoystickListener listener, String hardwareAddress) {
+        JoystickThread btt = new JoystickThread(listener, hardwareAddress);
 
         btt.start();
     }
