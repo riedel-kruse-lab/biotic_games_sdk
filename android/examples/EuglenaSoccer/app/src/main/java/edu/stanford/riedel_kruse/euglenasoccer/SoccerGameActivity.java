@@ -52,7 +52,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
     private static final Scalar COLOR_LIGHT_BLUE = new Scalar(200, 200, 250);
 
-    private static final int GAME_OVER_SCORE = 1;
+    private static final int GAME_OVER_SCORE = 5;
 
     private static final int PASS_TIME = 400;
     /**
@@ -333,7 +333,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     @Override
     public void onJoystickUp() {
-        simulateButtonPress((Button) findViewById(R.id.action_button));
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                simulateButtonPress((Button) findViewById(R.id.action_button));
+            }
+        });
     }
 
     @Override

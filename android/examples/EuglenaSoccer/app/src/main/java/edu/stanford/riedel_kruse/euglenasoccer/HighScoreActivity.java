@@ -43,7 +43,7 @@ public class HighScoreActivity extends Activity {
 
         LinearLayout leaderBoardLayout = (LinearLayout) findViewById(R.id.leader_board);
 
-        while (timesTokenizer.hasMoreTokens()) {
+        while (timesTokenizer.hasMoreTokens() && initialsTokenizer.hasMoreTokens()) {
             RelativeLayout leaderBoardEntry = new RelativeLayout(this);
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(400,
                     RelativeLayout.LayoutParams.WRAP_CONTENT);
