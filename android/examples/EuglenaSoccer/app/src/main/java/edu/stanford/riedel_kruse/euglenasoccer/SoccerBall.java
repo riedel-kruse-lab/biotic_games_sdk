@@ -98,6 +98,8 @@ public class SoccerBall extends GameObject {
         mRenderable = new SoccerBallRenderable(this);
         mPhysicalBody = new CircleBody(this, TRACKING_CIRCLE_RADIUS);
         mDirection = new Point(0, 0);
+
+        mDrawDirection = true;
     }
 
     public void setDirectionVisible(boolean directionVisible) {
