@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -332,7 +333,38 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     @Override
     public void onJoystickUp() {
-        passOrBounceBall();
+        simulateButtonPress((Button) findViewById(R.id.action_button));
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mTutorial != null && !mTutorial.shouldDisplayActionButton()) {
+            return super.onTouchEvent(event);
+        }
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                simulateButtonPress((Button) findViewById(R.id.action_button));
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+    private void simulateButtonPress(final Button button) {
+        // Run the button's onClick functionality.
+        button.performClick();
+
+        // Make the button look pressed.
+        button.setPressed(true);
+        button.invalidate();
+
+        // Reset the button to normal after a small delay.
+        button.postDelayed(new Runnable() {
+            public void run() {
+                button.setPressed(false);
+                button.invalidate();
+            }
+        }, 100);
     }
 
     private void updateBallLocation(Mat frame, long timeDelta) {
