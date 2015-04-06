@@ -34,6 +34,7 @@
 7. Create a new class that extends `BioticGameActivity`.
 
 ## Documentation
+Detailed documentation is provided along with the full source code in this GitHub repository.
 
 ## Features
 ### Bluetooth
@@ -53,6 +54,20 @@ The developer must then call the function `startBluetooth(BluetoothThreadListene
 
 ## Examples
 A limited set of examples of SDK usage has been made available in the `examples/` folder in this repository. There are also a few code snippets and documentation links provided in this document for common game tasks.
+
+### Changing Camera Parameters
+Sometimes it is useful to change certain parameters of the camera for example the zoom level and autofocus settings. Check out the [`Camera.Parameters`](http://developer.android.com/reference/android/hardware/Camera.Parameters.html) documentation for more information about what parameters can be changed. The Biotic Games SDK supplies a `CameraView` class which simplifies this process. To change the camera parameters, call `getCameraView()` in `initGame()`, then call `getCameraParameters()` on the `CameraView`, and set values on the `Camera.Parameters` object that is returned before setting the `CameraView`'s new parameters with `setCameraParameters`. This looks like the following, which sets the zoom level of the camera to half of its maximum:
+
+```
+@Override
+protected void initGame(final int width, final int height) {
+    CameraView cameraView = getCameraView();
+    Camera.Parameters params = cameraView.getCameraParameters();
+    params.setZoom(params.getMaxZoom() / 2);
+    cameraView.setCameraParameters(params);
+    ...
+}
+```
 
 ### Sound Effects
 Sound effects are supported using the Android API rather than the Biotic Games SDK. To add sound effects to your game, create a new `raw` resource folder (i.e. `res/raw`) and place your sound effect files in this folder. Then use the [SoundPool](http://developer.android.com/reference/android/media/SoundPool.html) object to load the sound effects from the resources and to play them.
