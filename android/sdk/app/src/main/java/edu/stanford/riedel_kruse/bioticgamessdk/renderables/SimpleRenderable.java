@@ -14,6 +14,9 @@ public abstract class SimpleRenderable extends Renderable {
 
     public SimpleRenderable(GameObject gameObject, Scalar color, int thickness) {
         super(gameObject);
+
+        mColor = color;
+        mThickness = thickness;
     }
 
     public Scalar color() {
