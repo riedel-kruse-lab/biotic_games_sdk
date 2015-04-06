@@ -26,7 +26,7 @@ int sendCounter = 0;
 const int PIN_LED_LEFT = 3;
 const int PIN_LED_TOP = 5;
 const int PIN_LED_RIGHT = 6;
-const int PIN_LED_BOTTOM = 9;
+const int PIN_LED_BOTTOM = 10;
 
 /* 
  * Constants for determining whether or not the joystick is pushed
