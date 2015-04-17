@@ -7,7 +7,7 @@
     <string name="credits">Credits</string>
     <string name="score">Score: %1$d</string>
     <string name="time">Time: %1$d</string>
-    <string name="bounce">Bounce</string>
+    <string name="bounce">Tap</string>
     <string name="pass">Pass</string>
     <string name="out_of_bounds">Out of bounds!</string>
     <string name="goal">Goal!</string>
@@ -25,8 +25,8 @@
     <string name="tutorial_zoom_view">
         Notice the circle tracks the Euglena, and the zoomed view above.
     </string>
-    <string name="tutorial_direction_tracking">Now let\'s add a Soccer ball! The ball is oriented in the direction of movement.</string>
-    <string name="tutorial_out_of_bounds">If carried out of bounds, the ball resets!</string>
+    <string name="tutorial_direction_tracking">Now let\'s add a Soccer ball!</string>
+    <string name="tutorial_out_of_bounds">Can you see the ball faces the direction the Euglena is swimming?</string>
     <string name="tutorial_tap_to_act1">
         Tap the screen or press the button to bounce or pass the ball.
     </string>
@@ -34,7 +34,7 @@
         Pass occurs when a Euglena is carrying the ball. Bounce when one is not.
     </string>
     <string name="tutorial_pass_tip">
-        Passed balls will bounce off walls and not go out of bounds! Pass the ball near walls to remain in play!
+        Passed balls will bounce off walls!
     </string>
     <string name="tutorial_bounce_tip">Press the bounce button to randomly bounce the ball! Use this to reposition the ball.</string>
     <string name="tutorial_try_for_goal">Now let\'s play soccer! Score 5 points as quickly as you can!</string>
@@ -42,6 +42,6 @@
         To score points, you can carry or pass the ball into the goal. Try it!
     </string>
     <string name="tutorial_score">
-        The score changed! You get a point for passing the ball in, and two points for carrying it in.
+        The score changed! The lower the time the better.
     </string>
 </resources>
