@@ -137,4 +137,43 @@ public class MathUtil
         // makes physical sense (i.e. mapping from screen pixels to micrometers).
         return VELOCITY_SCALE * MathUtil.computeVectorMagnitude(averageVelocity);
     }
+
+    /**
+     * Computes the angle formed by a point.
+     * @param point the point the angle will be calculated for
+     * @return the angle formed as a double. If there is no angle, return 10.
+     */
+
+    public static Double computeAngleFromPoint(Point point){
+
+        if(point.x == 0 && point.y == 0){
+            return 10.0;
+        }else if(point.x == 0){
+            if(point.y > 0) {
+                return Math.PI/2;
+            }else{
+                return 3*Math.PI/2;
+            }
+        }else if(point.y == 0){
+            if(point.x > 0){
+                return 0.0;
+            }else {
+                return Math.PI;
+            }
+        }else {
+            double angle = Math.atan2(point.x, point.y);
+
+            //Case Quadrant I:
+            //Do nothing
+
+            //Case Quadrant II/III:
+            if(point.x < 0){
+                angle += Math.PI;
+            }else if(point.y <0){ //case Quadrant IV:
+                angle = 2*Math.PI + angle;
+            }
+
+            return angle;
+        }
+    }
 }

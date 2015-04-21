@@ -1,17 +1,22 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.media.AudioManager;
+import android.media.MediaScannerConnection;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.opencsv.CSVWriter;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -20,6 +25,11 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +62,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
     private static final Scalar COLOR_LIGHT_BLUE = new Scalar(200, 200, 250);
 
-    private static final int GAME_OVER_SCORE = 5;
+    private static final int GAME_OVER_SCORE = 2;
 
     private static final int PASS_TIME = 400;
     /**
@@ -292,21 +302,29 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mRightGoal.setVisible(mTutorial.shouldDrawGoals());
             }
         }
+
+        if (mTutorial == null){
+            trackData(mBall.x(),mBall.y(),pointToAngle(mBall.direction()),mBallSpeed,mLightDir);
+        }
     }
 
     @Override
     public void onJoystickDirectionStarted(JoystickThread.Direction direction) {
         if (direction == JoystickThread.Direction.LEFT) {
             mRightLightIndicator.setVisible(true);
+            mLightDir += 1000;
         }
         else if (direction == JoystickThread.Direction.RIGHT) {
             mLeftLightIndicator.setVisible(true);
+            mLightDir += 100;
         }
         else if (direction == JoystickThread.Direction.TOP) {
             mBottomLightIndicator.setVisible(true);
+            mLightDir += 10;
         }
         else {
             mTopLightIndicator.setVisible(true);
+            mLightDir += 1;
         }
     }
 
@@ -314,15 +332,19 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     public void onJoystickDirectionFinished(JoystickThread.Direction direction) {
         if (direction == JoystickThread.Direction.LEFT) {
             mRightLightIndicator.setVisible(false);
+            mLightDir -= 1000;
         }
         else if (direction == JoystickThread.Direction.RIGHT) {
             mLeftLightIndicator.setVisible(false);
+            mLightDir -= 100;
         }
         else if (direction == JoystickThread.Direction.TOP) {
             mBottomLightIndicator.setVisible(false);
+            mLightDir -= 10;
         }
         else {
             mTopLightIndicator.setVisible(false);
+            mLightDir -= 1;
         }
     }
 
@@ -480,6 +502,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         displayMessage(mResources.getString(R.string.goal));
 
         if (mScore >= GAME_OVER_SCORE) {
+
+            // at the end of the game, save data collection
+            try {
+                createDataFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             finish();
 
             Intent intent = new Intent(this, HighScoreActivity.class);
@@ -653,4 +683,152 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             }
         });
     }
+
+    //temporarily place all the data logging stuff here!
+
+    //variables
+
+    List<String> mXPosList = new ArrayList<String>();
+    List<String> mYPosList = new ArrayList<String>();
+    List<String> mAngleList = new ArrayList<String>();
+    List<String> mSpeedList = new ArrayList<String>();
+    List<String> mLightDirList = new ArrayList<String>();
+    double mLightDir = 0; //four digit double where the 1000's place is left, 100's is right, 10's is up, and 1's is down
+
+    //Called every frame, and calls all the other functions necessary to log data
+    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir){
+        updateX(xPos);
+        updateY(yPos);
+        updateAngle(angle);
+        updateSpeed(speed);
+        updateLightDir(lightDir);
+    }
+
+    public void updateX(double xPos){
+        mXPosList.add(Double.toString(xPos));
+    }
+
+    public void updateY(double yPos){
+        mYPosList.add(Double.toString(yPos));
+    }
+
+    public void updateAngle(double angle){
+        mAngleList.add(Double.toString(angle));
+    }
+
+    public void updateSpeed(double speed){
+        mSpeedList.add(Double.toString(speed));
+    }
+
+    public void updateLightDir(double lightDir){
+        mLightDirList.add(Double.toString(lightDir));
+    }
+
+    public String convertListToString(List<String> input){
+        String output = "";
+        for (String s : input){
+            output += s + ",";
+        }
+
+        return output;
+    }
+
+    public void createDataFile() throws IOException {
+        String xPos = convertListToString(mXPosList);
+        String yPos = convertListToString(mYPosList);
+        String angle = convertListToString(mAngleList);
+        String speed = convertListToString(mSpeedList);
+        String lightDir = convertListToString(mLightDirList);
+
+/*        String csv = "data.csv";
+
+        //File dir = getExternalFilesDir(null);
+        File dir = new File("/DCIM/");
+        CSVWriter writer = new CSVWriter(new FileWriter(dir + csv));
+
+        //Create record
+        String [] recordX = xPos.split(",");
+        String [] recordY = yPos.split(",");
+        String [] recordAng = angle.split(",");
+        String [] recordSpd = speed.split(",");
+        String [] recordLight = lightDir.split(",");
+        //Write the record to file
+        writer.writeNext(recordX);
+        writer.writeNext(recordY);
+        writer.writeNext(recordAng);
+        writer.writeNext(recordSpd);
+        writer.writeNext(recordLight);
+
+        //close the writer
+        writer.close();*/
+
+        try
+        {
+            // Creates a trace file in the primary external storage space of the
+            // current application.
+            // If the file does not exists, it is created.
+            File traceFile = new File(((Context)this).getExternalFilesDir(null), "Data.txt");
+            if (!traceFile.exists())
+                traceFile.createNewFile();
+            // Adds a line to the trace file
+            BufferedWriter writer = new BufferedWriter(new FileWriter(traceFile, true /*append*/));
+            writer.write(xPos + "\n\n" + yPos + "\n\n" + angle + "\n\n" + speed + "\n\n" + lightDir + "\n\n");
+            writer.close();
+            // Refresh the data so it can seen when the device is plugged in a
+            // computer. You may have to unplug and replug the device to see the
+            // latest changes. This is not necessary if the user should not modify
+            // the files.
+            MediaScannerConnection.scanFile((Context)(this),
+                    new String[] { traceFile.toString() },
+                    null,
+                    null);
+        }
+        catch (IOException e)
+        {
+            Log.e("com.BioticGame", "Unable to write to the Data.txt file.");
+        }
+
+        resetDataVectors();
+    }
+
+    public void resetDataVectors() {
+        mXPosList.clear();
+        mYPosList.clear();
+        mAngleList.clear();
+        mSpeedList.clear();
+        mLightDirList.clear();
+    }
+
+    public double pointToAngle(Point point){
+        if(point.x == 0 && point.y == 0){
+            return 10.0;
+        }else if(point.x == 0){
+            if(point.y > 0) {
+                return Math.PI/2;
+            }else{
+                return 3*Math.PI/2;
+            }
+        }else if(point.y == 0){
+            if(point.x > 0){
+                return 0.0;
+            }else {
+                return Math.PI;
+            }
+        }else {
+            double angle = Math.atan2(point.x, point.y);
+
+            //Case Quadrant I:
+            //Do nothing
+
+            //Case Quadrant II/III:
+            if(point.x < 0){
+                angle += Math.PI;
+            }else if(point.y <0){ //case Quadrant IV:
+                angle = 2*Math.PI + angle;
+            }
+
+            return angle;
+        }
+    }
+
 }

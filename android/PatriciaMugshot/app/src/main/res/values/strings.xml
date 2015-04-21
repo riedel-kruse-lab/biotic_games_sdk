@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PatriciaMugshot</string>
+
+    <string name="hello_world">Hello Patricia!</string>
+    <string name="push_here">Push Here</string>
+    <string name="action_settings">Settings</string>
+</resources>
