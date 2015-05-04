@@ -125,6 +125,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private TextObject mSpeedText;
 
+    private Pattern01 mPattern;
+
+    private boolean endGame = false;
+//    private static Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 0);
+//    private static Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
+    private static Scalar LOWER_HSV_THRESHOLD = new Scalar(100, 100, 100);
+    private static Scalar UPPER_HSV_THRESHOLD = new Scalar(200, 200, 200);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
@@ -174,7 +182,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         // Add the soccer field lines
         SoccerField soccerField = new SoccerField();
-        addGameObject(soccerField);
+        //addGameObject(soccerField);
+
+        //Add guide patterns
+        mPattern = new Pattern01(new Point(mTouchX,mTouchY));
+        addGameObject(mPattern);
+        mPattern.setVisible(false);
+
 
         // Set up the goals
         int goalHeight = height * 4 / 7;
@@ -232,6 +246,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mCurrentDirection = Direction.RIGHT;
         mLeftGoal.setVisible(false);
         mLeftGoal.setPhysical(false);
+
+        //below if for data collection
+        mRightGoal.setVisible(false);
+        mRightGoal.setVisible(false);
 
         // Initialize the number of switches in direction to 0 since none have happened yet.
         mNumDirectionSwitches = 0;
@@ -304,7 +322,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
 
         if (mTutorial == null){
-            trackData(mBall.x(),mBall.y(),pointToAngle(mBall.direction()),mBallSpeed,mLightDir);
+            trackData(mBall.x(),mBall.y(),pointToAngle(mBall.direction()),mBallSpeed,mLightDir,mTimeMillis);
+        }
+
+        if (endGame == true){
+            endGame = false;
+            try {
+                createDataFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            finish();
         }
     }
 
@@ -365,6 +393,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        mTouchX = (int)event.getX();
+        mTouchY = (int)event.getY();
+
         if (mTutorial != null && !mTutorial.shouldDisplayActionButton()) {
             return super.onTouchEvent(event);
         }
@@ -397,7 +428,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private void updateBallLocation(Mat frame, long timeDelta) {
         Point newPosition;
         if (mPassing) {
-            mPassingTime += timeDelta;
+            /*mPassingTime += timeDelta;
 
             if (mPassingTime > PASS_TIME) {
                 stopPassing();
@@ -409,6 +440,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             newPosition.y *= distance;
 
             newPosition = MathUtil.addPoints(newPosition, mBall.position());
+            mBall.setPosition(newPosition);*/
+
+            stopPassing();
+
+            newPosition = assignROI();
             mBall.setPosition(newPosition);
         }
         else {
@@ -485,7 +521,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
 
         // Find all things that look like Euglena in the region of interest.
-        List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi);
+        List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi, UPPER_HSV_THRESHOLD, LOWER_HSV_THRESHOLD);
 
         // Find the location of the Euglena that is closest to the ball.
         return MathUtil.findClosestPoint(ballLocation, euglenaLocations);
@@ -551,7 +587,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     public void onActionButtonPressed(View view) {
-        passOrBounceBall();
+        //passOrBounceBall();
+
+        mPassing = true;
+        mPattern.setPosition(new Point(mTouchX, mTouchY));
+        mPattern.setVisible(true);
     }
 
     public void onTutorialButtonPressed(View view) {
@@ -642,7 +682,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void switchDirections() {
-        if (mTutorial != null && !mTutorial.shouldDrawGoals()) {
+        /*if (mTutorial != null && !mTutorial.shouldDrawGoals()) {
             return;
         }
 
@@ -659,7 +699,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             mCurrentDirection = Direction.RIGHT;
         }
 
-        mNumDirectionSwitches++;
+        mNumDirectionSwitches++;*/
     }
 
     private void playSound(int soundId) {
@@ -693,15 +733,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     List<String> mAngleList = new ArrayList<String>();
     List<String> mSpeedList = new ArrayList<String>();
     List<String> mLightDirList = new ArrayList<String>();
+    List<String> mTimeList = new ArrayList<String>();
     double mLightDir = 0; //four digit double where the 1000's place is left, 100's is right, 10's is up, and 1's is down
 
     //Called every frame, and calls all the other functions necessary to log data
-    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir){
+    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir, Long time){
         updateX(xPos);
         updateY(yPos);
         updateAngle(angle);
         updateSpeed(speed);
         updateLightDir(lightDir);
+        updateTimeList(time);
     }
 
     public void updateX(double xPos){
@@ -724,6 +766,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mLightDirList.add(Double.toString(lightDir));
     }
 
+    public void updateTimeList(Long currentTime) {mTimeList.add(Long.toString(currentTime));}
+
     public String convertListToString(List<String> input){
         String output = "";
         for (String s : input){
@@ -739,7 +783,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         String angle = convertListToString(mAngleList);
         String speed = convertListToString(mSpeedList);
         String lightDir = convertListToString(mLightDirList);
-
+        String time = convertListToString(mTimeList);
 /*        String csv = "data.csv";
 
         //File dir = getExternalFilesDir(null);
@@ -772,7 +816,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 traceFile.createNewFile();
             // Adds a line to the trace file
             BufferedWriter writer = new BufferedWriter(new FileWriter(traceFile, true /*append*/));
-            writer.write(xPos + "\n\n" + yPos + "\n\n" + angle + "\n\n" + speed + "\n\n" + lightDir + "\n\n");
+            writer.write(xPos + "\n\n" + yPos + "\n\n" + angle + "\n\n" + speed + "\n\n" + lightDir + "\n\n" + time + "\n\nEND");
             writer.close();
             // Refresh the data so it can seen when the device is plugged in a
             // computer. You may have to unplug and replug the device to see the
@@ -797,6 +841,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mAngleList.clear();
         mSpeedList.clear();
         mLightDirList.clear();
+        mTimeList.clear();
     }
 
     public double pointToAngle(Point point){
@@ -821,14 +866,34 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             //Do nothing
 
             //Case Quadrant II/III:
-            if(point.x < 0){
+            /*if(point.x < 0){
                 angle += Math.PI;
             }else if(point.y <0){ //case Quadrant IV:
                 angle = 2*Math.PI + angle;
-            }
+            }*/
 
             return angle;
         }
     }
 
+    //Below is all the interface mods for experiment setup
+    //
+
+    public int mTouchX = 0;
+    public int mTouchY = 0;
+
+    private Point assignROI(){
+        return new Point(mTouchX,mTouchY);
+    }
+
+    public void onEndButtonPressed(View view){
+//        try {
+//            createDataFile();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        finish();
+
+        endGame = true;
+    }
 }

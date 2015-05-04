@@ -87,7 +87,7 @@
 
         <Button
             android:id="@+id/action_button"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
@@ -104,6 +104,16 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/end_button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:onClick="onEndButtonPressed"
+            android:text="END"
+            android:textSize="17sp"/>
     </RelativeLayout>
 
 </RelativeLayout>
