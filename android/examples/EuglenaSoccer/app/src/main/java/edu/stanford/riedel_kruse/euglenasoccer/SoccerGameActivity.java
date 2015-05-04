@@ -1,6 +1,9 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -10,12 +13,17 @@ import android.media.MediaScannerConnection;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.opencsv.CSVWriter;
 
 import org.opencv.android.Utils;
@@ -128,10 +136,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private Pattern01 mPattern;
 
     private boolean endGame = false;
-//    private static Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 0);
-//    private static Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
-    private static Scalar LOWER_HSV_THRESHOLD = new Scalar(100, 100, 100);
-    private static Scalar UPPER_HSV_THRESHOLD = new Scalar(200, 200, 200);
+    private static Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 0);
+    private static Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -274,14 +281,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addCollisionCallback(new CollisionCallback(mBall, mLeftGoal) {
             @Override
             public void onCollision() {
-                onGoalScored();
+                //onGoalScored();
             }
         });
 
         addCollisionCallback(new CollisionCallback(mBall, mRightGoal) {
             @Override
             public void onCollision() {
-                onGoalScored();
+                //onGoalScored();
             }
         });
     }
@@ -327,11 +334,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         if (endGame == true){
             endGame = false;
+            //createGraph();
             try {
                 createDataFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             finish();
         }
     }
@@ -894,6 +903,24 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //        }
 //        finish();
 
+
         endGame = true;
+    }
+
+    public void createGraph(){
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                GraphView graph = (GraphView) findViewById(R.id.graph);
+                LineGraphSeries series = new LineGraphSeries(new DataPoint[] {
+                });
+                for (int i = 0; i < mXPosList.size(); i++) {
+                    series.appendData(new DataPoint(Double.parseDouble(mTimeList.get(i)), Double.parseDouble(mSpeedList.get(i))), true, 10000);
+                }
+                graph.addSeries(series);
+            }
+        });
+
     }
 }

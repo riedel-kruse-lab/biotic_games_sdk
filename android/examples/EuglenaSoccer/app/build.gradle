@@ -25,4 +25,5 @@ dependencies {
     compile project(':opencv')
     compile project(':sdk')
     compile project(':opencsv-3.3')
+    compile 'com.jjoe64:graphview:4.0.1'
 }
