@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaScannerConnection;
@@ -20,6 +22,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.DataSet;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.ScatterData;
+import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -38,6 +50,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +91,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
      */
     private static final double PASS_SPEED = 1;
 
-    private static final int NUM_RECENT_POSITIONS = 10;
+    private static final int NUM_RECENT_POSITIONS = 15;
 
     private static final int SOUND_POOL_MAX_STREAMS = 1;
     private static final int SOUND_POOL_SRC_QUALITY = 0;
@@ -136,6 +149,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private Pattern01 mPattern;
 
     private boolean endGame = false;
+    private boolean velocityCalculate = false;
+    private boolean plotGraph = false;
     private static Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 0);
     private static Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
 
@@ -334,7 +349,6 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         if (endGame == true){
             endGame = false;
-            //createGraph();
             try {
                 createDataFile();
             } catch (IOException e) {
@@ -342,6 +356,21 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             }
 
             finish();
+        }
+
+        if (velocityCalculate == true){
+            velocityCalculate = false;
+            avgSpeedInterval();
+            try {
+                createDataFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (plotGraph == true){
+            plotGraph = false;
+            createGraph();
         }
     }
 
@@ -907,20 +936,140 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         endGame = true;
     }
 
+    public void onMeasureVelocityPressed(View view){
+        velocityCalculate = true;
+    }
+
+    private LineChart mChart;
+
     public void createGraph(){
+
+
+        mChart = (LineChart) findViewById(R.id.chart);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChart.setVisibility(View.VISIBLE);
+            }
+        });
+        mChart.setDescription("");
+
+        ArrayList<String> xVals = new ArrayList<String>();
+        for (int i = 0; i < mTimeList.size(); i++) {
+            xVals.add(mTimeList.get(i));
+        }
+
+        ArrayList<Entry> yVals = new ArrayList<Entry>();
+
+        for (int i = 0; i < mSpeedList.size(); i++) {
+            yVals.add(new Entry(Float.parseFloat(mSpeedList.get(i)),i));
+        }
+
+        LineDataSet set = new LineDataSet(yVals, " ");
+
+        ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
+        dataSets.add(set);
+        //mChart.setBackgroundColor(Color.parseColor("#00ff00"));
+        //XAxis xAxis = mChart.getXAxis();
+
+//        set.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+//        set.setColor(ColorTemplate.COLORFUL_COLORS[1]);
+
+        LineData data = new LineData(xVals, dataSets);
+
+        mChart.setData(data);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChart.invalidate();
+            }
+        });
+
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                GraphView graph = (GraphView) findViewById(R.id.graph);
+//                LineGraphSeries series = new LineGraphSeries(new DataPoint[] {
+//                });
+//                for (int i = 0; i < mXPosList.size(); i++) {
+//                    series.appendData(new DataPoint(Double.parseDouble(mTimeList.get(i)), Double.parseDouble(mSpeedList.get(i))), true, 10000);
+//                }
+//                graph.addSeries(series);
+//            }
+//        });
+    }
+
+    public void onPlotPressed(View view){
+        plotGraph = true;
+    }
+
+    private static int INTERVAL_FOR_COMPUTING_AVG_SPD = 60000;
+    private static int NUMBER_OF_INTERVALS = 4;
+    private static int LOWER_SPEED_THRESHOLD = 5;
+
+    public void avgSpeedInterval(){
+        double time = Double.parseDouble(mTimeList.get(0));
+
+        double maxTime = time + INTERVAL_FOR_COMPUTING_AVG_SPD * NUMBER_OF_INTERVALS;
+        if(maxTime > Double.parseDouble(mTimeList.get(mTimeList.size()-1))){
+            maxTime = Double.parseDouble(mTimeList.get(mTimeList.size()-1));
+        }
+
+        double startTime = time;
+        int interval = 0;
+        int index = 0;
+
+        ArrayList<Double> averageList = new ArrayList<Double>();
+        ArrayList<Integer> averageCount = new ArrayList<Integer>();
+
+        for (int i=0; i<NUMBER_OF_INTERVALS; i++){
+            averageList.add(0.);
+            averageCount.add(0);
+        }
+
+        while (time < maxTime){
+            time = Double.parseDouble(mTimeList.get(index));
+
+            if(time>(startTime + (interval+1)*INTERVAL_FOR_COMPUTING_AVG_SPD)){
+                interval++;
+            }
+
+            if (Double.parseDouble(mSpeedList.get(index))>LOWER_SPEED_THRESHOLD){
+                averageList.set(interval,averageList.get(interval)+Double.parseDouble(mSpeedList.get(index)));
+                averageCount.set(interval,averageCount.get(interval)+1);
+            }
+
+            index++;
+        }
+
+        for(int i = 0; i<NUMBER_OF_INTERVALS; i++) {
+            if(averageCount.get(i)>0) {
+                averageList.set(i, averageList.get(i) / averageCount.get(i));
+            }
+        }
+
+        final ArrayList<Double> averageListCopy = averageList;
+
+        final DecimalFormat df = new DecimalFormat("#.00");
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                GraphView graph = (GraphView) findViewById(R.id.graph);
-                LineGraphSeries series = new LineGraphSeries(new DataPoint[] {
-                });
-                for (int i = 0; i < mXPosList.size(); i++) {
-                    series.appendData(new DataPoint(Double.parseDouble(mTimeList.get(i)), Double.parseDouble(mSpeedList.get(i))), true, 10000);
-                }
-                graph.addSeries(series);
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Average Speeds")
+                        .setMessage("Average 1: " + df.format(averageListCopy.get(0)) + " um/s\n Average 2: " + df.format(averageListCopy.get(1)) + " um/s\n Average 3: " + df.format(averageListCopy.get(2)) + " um/s\n Average 4: " + df.format(averageListCopy.get(3)) + " um/s")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
             }
         });
-
     }
 }
