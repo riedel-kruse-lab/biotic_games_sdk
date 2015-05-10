@@ -37,6 +37,11 @@ const int JOYSTICK_UP_THRESHOLD = 900;
 const int JOYSTICK_RIGHT_THRESHOLD = 100;
 const int JOYSTICK_DOWN_THRESHOLD = 100;
 
+//const int JOYSTICK_LEFT_THRESHOLD = 562;
+//const int JOYSTICK_UP_THRESHOLD = 562;
+//const int JOYSTICK_RIGHT_THRESHOLD = 462;
+//const int JOYSTICK_DOWN_THRESHOLD = 462;
+
 SoftwareSerial Bluetooth(PIN_BLUETOOTH_TX, PIN_BLUETOOTH_RX);
 
 void setup() {
@@ -81,16 +86,20 @@ void processJoystick() {
 
   if (vertical > JOYSTICK_UP_THRESHOLD) {
     verticalMessage = 1;
+    //verticalMessage = vertical;
   }
   else if (vertical < JOYSTICK_DOWN_THRESHOLD) {
     verticalMessage = -1;
+    //verticalMessage = vertical;
   }
   
   if (horizontal > JOYSTICK_LEFT_THRESHOLD) {
     horizontalMessage = 1;
+    //horizontalMessage = horizontal;
   }
   else if (horizontal < JOYSTICK_RIGHT_THRESHOLD) {
     horizontalMessage = -1;
+    //horizontalMessage = horizontal;
   }
   
   String joystickState = String(verticalMessage, DEC) + "," + String(horizontalMessage, DEC) + "," + String(select, DEC);
@@ -142,6 +151,20 @@ void parseMessage(String message) {
   else if (horizontal == -1) {
     leftValue = 255;
   }
+  
+//  if(vertical > JOYSTICK_UP_THRESHOLD){
+//    bottomValue = 0.7*(vertical-JOYSTICK_UP_THRESHOLD);
+//  }
+//  else if (vertical < JOYSTICK_DOWN_THRESHOLD){
+//    topValue = 0.7*(JOYSTICK_DOWN_THRESHOLD-vertical);
+//  }
+//  
+//  if (horizontal > JOYSTICK_LEFT_THRESHOLD){
+//    rightValue = 0.7*(horizontal-JOYSTICK_LEFT_THRESHOLD);;
+//  }
+//  else if(horizontal < JOYSTICK_RIGHT_THRESHOLD){
+//    leftValue = 0.7*(JOYSTICK_RIGHT_THRESHOLD-horizontal);;
+//  }
   
   analogWrite(PIN_LED_TOP, topValue);
   analogWrite(PIN_LED_RIGHT, rightValue);

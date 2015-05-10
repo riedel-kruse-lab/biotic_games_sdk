@@ -148,11 +148,20 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private Pattern01 mPattern;
 
+    private int frameCount;
     private boolean endGame = false;
     private boolean velocityCalculate = false;
+    private boolean velocityCalculateTapped = false;
     private boolean plotGraph = false;
+    private boolean isTapped = false;
+    private boolean mStartMeasuringVelocity = false;
+    private boolean mDisplayVelocityMessage = false;
+    private boolean dataCollectionFinished = false;
     private static Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 0);
     private static Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
+
+    final DecimalFormat df = new DecimalFormat("#.00");
+    private Long mVelocityTimer = 1234567890L;
 
 
     @Override
@@ -289,6 +298,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         setScore(0);
         setTime(0);
 
+        // Start counting frames
+        frameCount = 0;
+
         // Initialize recent ball positions array
         mRecentBallPositions = new ArrayList<Point>();
 
@@ -344,7 +356,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
 
         if (mTutorial == null){
-            trackData(mBall.x(),mBall.y(),pointToAngle(mBall.direction()),mBallSpeed,mLightDir,mTimeMillis);
+            trackData(mBall.x(),mBall.y(),pointToAngle(mBall.direction()),mBallSpeed,mLightDir,mTimeMillis,isTapped);
         }
 
         if (endGame == true){
@@ -359,19 +371,57 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
 
         if (velocityCalculate == true){
-            velocityCalculate = false;
-            avgSpeedInterval();
-            try {
-                createDataFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+            //only enter this function the first time
+            if(velocityCalculateTapped) {
+                isTapped = false;
+                velocityCalculate = false;
+                velocityCalculateTapped = false;
+                //reset all velocity measurement stuff
+                avgVelocityMessage();
             }
+
+            //if time to swap conditions, display message
+            if (mDisplayVelocityMessage) {
+                avgVelocitySwapMessage();
+            };
+
+            //calculate avg speed for next two seconds on tap...
+
+            if (isTapped) {
+                mVelocityTimer = mTimeMillis + INTERVAL_FOR_COMPUTING_AVG_SPD_2;
+                mStartMeasuringVelocity = true;
+            }
+
+            if ((mTimeMillis >= mVelocityTimer) && mStartMeasuringVelocity){
+                //This function needs to back-calculate the average velocity over the past 2 seconds
+                //and keep track of the number of different counts. After 5 samples, starts the
+                //next condition. After that, set dataCollectionFinished = true
+                avgSpeedInterval2();
+                mStartMeasuringVelocity = false;
+            }
+
+            if (dataCollectionFinished){
+                dataCollectionFinished = false;
+                velocityCalculate = false;
+                avgVelocityFinishedMessage();
+            }
+
+//            try {
+//                createDataFile();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
 
         if (plotGraph == true){
             plotGraph = false;
             createGraph();
         }
+
+        //every turn needs to reset the isTapped to keep it false as default
+        isTapped = false;
+
+        frameCount++;
     }
 
     @Override
@@ -431,8 +481,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        isTapped = true;
+
+        // - 180 needed in getY to balance offset... offset possibly because different views are calling???
         mTouchX = (int)event.getX();
-        mTouchY = (int)event.getY();
+        mTouchY = (int)event.getY() - 180;
 
         if (mTutorial != null && !mTutorial.shouldDisplayActionButton()) {
             return super.onTouchEvent(event);
@@ -772,16 +825,22 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     List<String> mSpeedList = new ArrayList<String>();
     List<String> mLightDirList = new ArrayList<String>();
     List<String> mTimeList = new ArrayList<String>();
+    List<String> mIsTapped = new ArrayList<String>();
     double mLightDir = 0; //four digit double where the 1000's place is left, 100's is right, 10's is up, and 1's is down
 
+    //These are arraylists that contain the averaged velocity traces for each run
+    List<Double> mAverageVelocity1 = new ArrayList<Double>();
+    List<Double> mAverageVelocity2 = new ArrayList<Double>();
+
     //Called every frame, and calls all the other functions necessary to log data
-    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir, Long time){
+    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir, Long time, boolean tapped){
         updateX(xPos);
         updateY(yPos);
         updateAngle(angle);
         updateSpeed(speed);
         updateLightDir(lightDir);
         updateTimeList(time);
+        updateIsTapped(tapped);
     }
 
     public void updateX(double xPos){
@@ -806,12 +865,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     public void updateTimeList(Long currentTime) {mTimeList.add(Long.toString(currentTime));}
 
+    public void updateIsTapped(boolean tapped) {mIsTapped.add(Boolean.toString(tapped));}
+
     public String convertListToString(List<String> input){
         String output = "";
         for (String s : input){
             output += s + ",";
         }
-
         return output;
     }
 
@@ -822,6 +882,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         String speed = convertListToString(mSpeedList);
         String lightDir = convertListToString(mLightDirList);
         String time = convertListToString(mTimeList);
+        String tapped = convertListToString(mIsTapped);
 /*        String csv = "data.csv";
 
         //File dir = getExternalFilesDir(null);
@@ -854,7 +915,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 traceFile.createNewFile();
             // Adds a line to the trace file
             BufferedWriter writer = new BufferedWriter(new FileWriter(traceFile, true /*append*/));
-            writer.write(xPos + "\n\n" + yPos + "\n\n" + angle + "\n\n" + speed + "\n\n" + lightDir + "\n\n" + time + "\n\nEND");
+            writer.write(xPos + "\n\n" + yPos + "\n\n" + angle + "\n\n" + speed + "\n\n" + lightDir + "\n\n" + time +  "\n\n" + tapped + "\n\nEND");
             writer.close();
             // Refresh the data so it can seen when the device is plugged in a
             // computer. You may have to unplug and replug the device to see the
@@ -880,6 +941,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mSpeedList.clear();
         mLightDirList.clear();
         mTimeList.clear();
+        mIsTapped.clear();
     }
 
     public double pointToAngle(Point point){
@@ -938,6 +1000,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     public void onMeasureVelocityPressed(View view){
         velocityCalculate = true;
+        velocityCalculateTapped = true;
     }
 
     private LineChart mChart;
@@ -1066,6 +1129,213 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    private static int NUMBER_OF_MEASUREMENTS = 5;
+    private static int INTERVAL_FOR_COMPUTING_AVG_SPD_2 = 2000;
+
+    public void avgSpeedInterval2(){
+
+        //Traverse the velocity list backwards adding up the values until you reach 2 seconds before the current time
+        //Divide this average by the number of values counted
+        //Dialog box showing the data and asking if you want to keep it
+            //If yes -> run function that puts this into the list of averages
+            //If no -> do nothing
+        //
+
+        int numValues = 1;
+        double sumValues = 0;
+
+        double time = Double.parseDouble(mTimeList.get(frameCount-1));
+        double minTime = time - INTERVAL_FOR_COMPUTING_AVG_SPD_2;
+
+        int index = frameCount-1;
+
+        while (Double.parseDouble(mTimeList.get(index))>minTime) {
+            sumValues = sumValues + Double.parseDouble(mSpeedList.get(index));
+            numValues++;
+            index--;
+        }
+
+        final double average = sumValues/numValues;
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Do you want to keep this measurement?")
+                        .setMessage("Velocity: " + df.format(average))
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                addNewAverage(average);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    private void addNewAverage(double average){
+        if(mAverageVelocity1.size()<NUMBER_OF_MEASUREMENTS){
+            mAverageVelocity1.add(average);
+            if(mAverageVelocity1.size() == NUMBER_OF_MEASUREMENTS){
+                swapConditionsMessage();
+            }
+        }else if(mAverageVelocity2.size()<NUMBER_OF_MEASUREMENTS){
+            mAverageVelocity2.add(average);
+        }
+
+        if(mAverageVelocity2.size() == NUMBER_OF_MEASUREMENTS){
+            dataCollectionFinished = true;
+        }
+    }
+
+    public void avgVelocityMessage(){
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Average Speed Experiment")
+                        .setMessage("In this experiment, you will calculate the average velocities of Euglena under different conditions. " +
+                                "To start a measurement, tap on a Euglena. This Euglena will be tracked for 2 seconds. " +
+                                "After each measurement, you will be prompted to keep or discard the measurement. " +
+                                "You will repeat this five times per condition. " +
+                                "After five measurements, move on to the next condition.")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                velocityCalculate = true;
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+
+    }
+
+    public void avgVelocitySwapMessage(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Swap conditions!")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+    };
+
+    //Takes an ArrayList of doubles, and returns the mean, maximum, minimum, standard deviation, and standard error of mean
+    public List<Double> calculateStatistics(List<Double> dataList){
+        int n = dataList.size();
+        double sum = 0;
+        double sumDevSquared = 0;
+        double min = 100000;
+        double max = 0;
+
+        for(Double i: dataList){
+            if(i>max){
+                max = i;
+            }
+            if(i<min){
+                min = i;
+            }
+            sum = sum + i;
+        }
+
+        double mean = sum/n;
+
+        for(Double i: dataList){
+            sumDevSquared += Math.pow((mean - i),2);
+        }
+
+        double standDev = Math.sqrt(sumDevSquared/(n-1));
+        double standErrMean = standDev/(Math.sqrt(n));
+
+        List<Double> stats = new ArrayList<Double>();
+
+        stats.add(mean);
+        stats.add(max);
+        stats.add(min);
+        stats.add(standDev);
+        stats.add(standErrMean);
+
+        return stats;
+    }
+
+    public void avgVelocityFinishedMessage(){
+
+        final List<Double> averageVelocity1Copy = mAverageVelocity1;
+        final List<Double> averageVelocity2Copy = mAverageVelocity2;
+        final List<Double> stats1 = calculateStatistics(mAverageVelocity1);
+        final List<Double> stats2 = calculateStatistics(mAverageVelocity2);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Results (um/s)")
+                        .setMessage("\nCondition 1: \n\tVelocities: " + df.format(averageVelocity1Copy.get(0)) + ", " + df.format(averageVelocity1Copy.get(1))
+                                + ", " + df.format(averageVelocity1Copy.get(2)) + ", \n\t\t\t\t\t" + df.format(averageVelocity1Copy.get(3)) + ", " + df.format(averageVelocity1Copy.get(4))
+                                + "\n\tMean: " + df.format(stats1.get(0)) + "\n\tMaximum: " + df.format(stats1.get(1)) + "\n\tMinimum: " + df.format(stats1.get(2)) + "\n\tSD: " + df.format(stats1.get(3)) + "\n\tSEM "
+                                + df.format(stats1.get(4)) + "\n\n"
+                                + "Condition 2: \n\tVelocities: "  + df.format(averageVelocity2Copy.get(0)) + ", " + df.format(averageVelocity2Copy.get(1))
+                                + ", " + df.format(averageVelocity2Copy.get(2)) + ",  \n\t\t\t\t\t" + df.format(averageVelocity2Copy.get(3)) + ", " + df.format(averageVelocity2Copy.get(4))
+                                + "\n\tMean: " + df.format(stats2.get(0)) + "\n\tMaximum: " + df.format(stats2.get(1)) + "\n\tMinimum: " + df.format(stats2.get(2)) + "\n\tSD: " + df.format(stats2.get(3)) + "\n\tSEM "
+                                + df.format(stats2.get(4)))
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                mAverageVelocity1.clear();
+                                mAverageVelocity2.clear();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                mAverageVelocity1.clear();
+                                mAverageVelocity2.clear();
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    public void swapConditionsMessage(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Change conditions!")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
                             }
                         })
                         .show();

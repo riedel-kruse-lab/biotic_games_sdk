@@ -20,7 +20,6 @@ public class Pattern01 extends GameObject {
 
     private Scalar mColor = new Scalar(100,100,100);
 
-    private Point mStartPoint;
 
     class Pattern01Renderable extends Renderable{
 
@@ -30,10 +29,9 @@ public class Pattern01 extends GameObject {
 
         @Override
         public void draw(Mat frame) {
-            mStartPoint = mPosition;
 
-            Point point1 = new Point(mStartPoint.x+mLength1,mStartPoint.y);
-            Core.line(frame, mStartPoint, point1, mColor, 2);
+            Point point1 = new Point(mPosition.x+mLength1,mPosition.y);
+            Core.line(frame, mPosition, point1, mColor, 2);
 
             Point point2 = new Point(point1.x, point1.y - mLength2);
             Core.line(frame, point1, point2, mColor, 2);
