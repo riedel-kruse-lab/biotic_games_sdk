@@ -14,6 +14,7 @@ import android.media.AudioManager;
 import android.media.MediaScannerConnection;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -64,6 +65,11 @@ import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;
 import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.LineObject;
 import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.RectangleObject;
 import edu.stanford.riedel_kruse.bioticgamessdk.gameobjects.TextObject;
+
+import android.support.v4.app.DialogFragment;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 
 /**
  * Created by dchiu on 1/31/15.
@@ -155,12 +161,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private boolean plotGraph = false;
     private boolean isTapped = false;
     private boolean mStartMeasuringVelocity = false;
-    private boolean mDisplayVelocityMessage = false;
     private boolean dataCollectionFinished = false;
     private static Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 0);
     private static Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
 
-    final DecimalFormat df = new DecimalFormat("#.00");
+    final DecimalFormat df = new DecimalFormat("0.00");
+    final DecimalFormat df1 = new DecimalFormat("0.0");
     private Long mVelocityTimer = 1234567890L;
 
 
@@ -380,10 +386,6 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 avgVelocityMessage();
             }
 
-            //if time to swap conditions, display message
-            if (mDisplayVelocityMessage) {
-                avgVelocitySwapMessage();
-            };
 
             //calculate avg speed for next two seconds on tap...
 
@@ -682,7 +684,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         mPassing = true;
         mPattern.setPosition(new Point(mTouchX, mTouchY));
-        mPattern.setVisible(true);
+        //mPattern.setVisible(true);
     }
 
     public void onTutorialButtonPressed(View view) {
@@ -1137,7 +1139,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private static int NUMBER_OF_MEASUREMENTS = 5;
-    private static int INTERVAL_FOR_COMPUTING_AVG_SPD_2 = 2000;
+    private static int INTERVAL_FOR_COMPUTING_AVG_SPD_2 = 3000;
 
     public void avgSpeedInterval2(){
 
@@ -1163,19 +1165,20 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
 
         final double average = sumValues/numValues;
+        final int currentCount = mAverageVelocity1.size() + mAverageVelocity2.size() + 1;
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 new AlertDialog.Builder(SoccerGameActivity.this)
                         .setTitle("Do you want to keep this measurement?")
-                        .setMessage("Velocity: " + df.format(average))
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        .setMessage("Measurement " + currentCount + "\n" + "Velocity: " + df.format(average) + " um/s")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 addNewAverage(average);
                             }
                         })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // do nothing
                             }
@@ -1202,52 +1205,37 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     public void avgVelocityMessage(){
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new AlertDialog.Builder(SoccerGameActivity.this)
-                        .setTitle("Average Speed Experiment")
-                        .setMessage("In this experiment, you will calculate the average velocities of Euglena under different conditions. " +
-                                "To start a measurement, tap on a Euglena. This Euglena will be tracked for 2 seconds. " +
-                                "After each measurement, you will be prompted to keep or discard the measurement. " +
-                                "You will repeat this five times per condition. " +
-                                "After five measurements, move on to the next condition.")
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                velocityCalculate = true;
-                            }
-                        })
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .show();
-            }
-        });
+
+        VelocityDialog dialog = new VelocityDialog();
+        dialog.show(getSupportFragmentManager(), "my_dialog");
+
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                new AlertDialog.Builder(SoccerGameActivity.this)
+//                        .setTitle("Average Speed Experiment")
+//                        .setMessage("In this experiment, you will calculate the average velocities of Euglena under different conditions. " +
+//                                "To start a measurement, tap on a Euglena. This Euglena will be tracked for " + df1.format(INTERVAL_FOR_COMPUTING_AVG_SPD_2 / 1000.0) + " seconds. " +
+//                                "After each measurement, you will be prompted to keep or discard the measurement. " +
+//                                "You will repeat this " + NUMBER_OF_MEASUREMENTS + " times per condition. " +
+//                                "After " + NUMBER_OF_MEASUREMENTS + " measurements, move on to the next condition.")
+//                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                velocityCalculate = true;
+//                            }
+//                        })
+//                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                // do nothing
+//                            }
+//                        })
+//                        .show();
+//            }
+//        });
 
     }
 
-    public void avgVelocitySwapMessage(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new AlertDialog.Builder(SoccerGameActivity.this)
-                        .setTitle("Swap conditions!")
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .show();
-            }
-        });
-    };
+
 
     //Takes an ArrayList of doubles, and returns the mean, maximum, minimum, standard deviation, and standard error of mean
     public List<Double> calculateStatistics(List<Double> dataList){
@@ -1294,26 +1282,48 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         final List<Double> stats1 = calculateStatistics(mAverageVelocity1);
         final List<Double> stats2 = calculateStatistics(mAverageVelocity2);
 
+        int fasterCondition = 0;
+        double fasterSpeed = 0.;
+        double slowerSpeed = 0.;
+        double fasterSEM = 0.;
+        double slowerSEM = 0.;
+
+        if(stats1.get(0) > stats2.get(0)){
+            fasterCondition = 1;
+            fasterSpeed = stats1.get(0);
+            fasterSEM = stats1.get(4);
+            slowerSpeed = stats2.get(0);
+            slowerSEM = stats2.get(4);
+        }else{
+            fasterCondition = 2;
+            fasterSpeed = stats2.get(0);
+            fasterSEM = stats2.get(4);
+            slowerSpeed = stats1.get(0);
+            slowerSEM = stats1.get(4);
+        }
+
+        final int finFasterCondition = fasterCondition;
+        final double finFasterSpeed = fasterSpeed;
+        final double finFasterSEM = fasterSEM;
+        final double finSlowerSpeed = slowerSpeed;
+        final double finSlowerSEM = slowerSEM;
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 new AlertDialog.Builder(SoccerGameActivity.this)
                         .setTitle("Results (um/s)")
-                        .setMessage("\nCondition 1: \n\tVelocities: " + df.format(averageVelocity1Copy.get(0)) + ", " + df.format(averageVelocity1Copy.get(1))
+                        .setMessage("Condition " + finFasterCondition + " is faster at " + df.format(finFasterSpeed) + "\u00B1" + df.format(finFasterSEM) + " vs. " + df.format(finSlowerSpeed) + "\u00B1" + df.format(finSlowerSEM) + " um/s" + "\n"
+                                + "\n" + "Data:" + "\n"
+                                + "\nCondition 1: \n\tVelocities: " + df.format(averageVelocity1Copy.get(0)) + ", " + df.format(averageVelocity1Copy.get(1))
                                 + ", " + df.format(averageVelocity1Copy.get(2)) + ", \n\t\t\t\t\t" + df.format(averageVelocity1Copy.get(3)) + ", " + df.format(averageVelocity1Copy.get(4))
                                 + "\n\tMean: " + df.format(stats1.get(0)) + "\n\tMaximum: " + df.format(stats1.get(1)) + "\n\tMinimum: " + df.format(stats1.get(2)) + "\n\tSD: " + df.format(stats1.get(3)) + "\n\tSEM "
                                 + df.format(stats1.get(4)) + "\n\n"
-                                + "Condition 2: \n\tVelocities: "  + df.format(averageVelocity2Copy.get(0)) + ", " + df.format(averageVelocity2Copy.get(1))
+                                + "Condition 2: \n\tVelocities: " + df.format(averageVelocity2Copy.get(0)) + ", " + df.format(averageVelocity2Copy.get(1))
                                 + ", " + df.format(averageVelocity2Copy.get(2)) + ",  \n\t\t\t\t\t" + df.format(averageVelocity2Copy.get(3)) + ", " + df.format(averageVelocity2Copy.get(4))
                                 + "\n\tMean: " + df.format(stats2.get(0)) + "\n\tMaximum: " + df.format(stats2.get(1)) + "\n\tMinimum: " + df.format(stats2.get(2)) + "\n\tSD: " + df.format(stats2.get(3)) + "\n\tSEM "
                                 + df.format(stats2.get(4)))
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                mAverageVelocity1.clear();
-                                mAverageVelocity2.clear();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 mAverageVelocity1.clear();
                                 mAverageVelocity2.clear();
@@ -1334,12 +1344,35 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         })
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
                         .show();
             }
         });
     }
+
+    public double getMax(double d1, double d2){
+        if(d1>d2){
+            return d1;
+        }
+        else{
+            return d2;
+        }
+    }
+
+    public double getMin(double d1, double d2){
+        if(d1<d2){
+            return d1;
+        }
+        else{
+            return d2;
+        }
+    }
+
+    public String isSignificant(double m1, double m2, double s1, double s2){
+        String msg = "";
+
+        return msg;
+    }
+
 }
+
+//Give clear message at the end for which condition is faster...

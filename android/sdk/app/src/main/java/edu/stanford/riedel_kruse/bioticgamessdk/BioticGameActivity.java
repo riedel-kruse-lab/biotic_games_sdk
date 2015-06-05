@@ -11,6 +11,8 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
+import android.app.FragmentActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,7 @@ import java.util.List;
  * It makes all of the appropriate calls to OpenCV in order to setup a game that uses the camera to
  * track Euglena.
  */
-public abstract class BioticGameActivity extends Activity implements
+public abstract class BioticGameActivity extends FragmentActivity implements
         CameraBridgeViewBase.CvCameraViewListener2
 {
     /**
