@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.media.AudioManager;
@@ -23,9 +24,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.CandleData;
+import com.github.mikephil.charting.data.CandleDataSet;
+import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -53,6 +64,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
@@ -1138,8 +1151,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    private static int NUMBER_OF_MEASUREMENTS = 5;
-    private static int INTERVAL_FOR_COMPUTING_AVG_SPD_2 = 3000;
+    private static int NUMBER_OF_MEASUREMENTS = 3;
+    private static int INTERVAL_FOR_COMPUTING_AVG_SPD_2 = 1000;
 
     public void avgSpeedInterval2(){
 
@@ -1205,33 +1218,29 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     public void avgVelocityMessage(){
 
-
-        VelocityDialog dialog = new VelocityDialog();
-        dialog.show(getSupportFragmentManager(), "my_dialog");
-
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                new AlertDialog.Builder(SoccerGameActivity.this)
-//                        .setTitle("Average Speed Experiment")
-//                        .setMessage("In this experiment, you will calculate the average velocities of Euglena under different conditions. " +
-//                                "To start a measurement, tap on a Euglena. This Euglena will be tracked for " + df1.format(INTERVAL_FOR_COMPUTING_AVG_SPD_2 / 1000.0) + " seconds. " +
-//                                "After each measurement, you will be prompted to keep or discard the measurement. " +
-//                                "You will repeat this " + NUMBER_OF_MEASUREMENTS + " times per condition. " +
-//                                "After " + NUMBER_OF_MEASUREMENTS + " measurements, move on to the next condition.")
-//                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                velocityCalculate = true;
-//                            }
-//                        })
-//                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                // do nothing
-//                            }
-//                        })
-//                        .show();
-//            }
-//        });
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Average Speed Experiment")
+                        .setMessage("In this experiment, you will calculate the average velocities of Euglena under different conditions. " +
+                                "To start a measurement, tap on a Euglena. This Euglena will be tracked for " + df1.format(INTERVAL_FOR_COMPUTING_AVG_SPD_2 / 1000.0) + " seconds. " +
+                                "After each measurement, you will be prompted to keep or discard the measurement. " +
+                                "You will repeat this " + NUMBER_OF_MEASUREMENTS + " times per condition. " +
+                                "After " + NUMBER_OF_MEASUREMENTS + " measurements, move on to the next condition.")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                velocityCalculate = true;
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
 
     }
 
@@ -1308,21 +1317,44 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         final double finSlowerSpeed = slowerSpeed;
         final double finSlowerSEM = slowerSEM;
 
+        final CombinedData comboData = new CombinedData(new String[] {
+                "1", "2"
+        });
+
+        BarData barData = new BarData();
+
+        ArrayList<BarEntry> barEntries = new ArrayList<BarEntry>();
+        barEntries.add(new BarEntry(stats1.get(0).floatValue(), 0));
+        barEntries.add(new BarEntry(stats2.get(0).floatValue(), 1));
+        BarDataSet barSet = new BarDataSet(barEntries, "Means");
+        barSet.setColor(Color.rgb(60, 220, 78));
+        barSet.setValueTextColor(Color.rgb(60, 220, 78));
+        barSet.setValueTextSize(10f);
+        barSet.setDrawValues(false);
+        barData.addDataSet(barSet);
+        barSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+        CandleData candData = new CandleData();
+
+        ArrayList<CandleEntry> candEntries = new ArrayList<CandleEntry>();
+        //stats.get(4) returns SEM. Use stats.get(3) to get standard deviation
+        candEntries.add(new CandleEntry(0, (float) (stats1.get(0) + stats1.get(4)), (float) (stats1.get(0) - stats1.get(4)), stats1.get(0).floatValue(), stats1.get(0).floatValue()));
+        candEntries.add(new CandleEntry(1, (float) (stats2.get(0) + stats2.get(4)), (float) (stats2.get(0) - stats2.get(4)), stats2.get(0).floatValue(), stats2.get(0).floatValue()));
+        CandleDataSet candSet = new CandleDataSet(candEntries, "SEM");
+        candSet.setColor(Color.rgb(80, 80, 80));
+        candSet.setBodySpace(1f);
+        candSet.setValueTextSize(10f);
+        candSet.setDrawValues(false);
+        candData.addDataSet(candSet);
+
+        comboData.setData(barData);
+        comboData.setData(candData);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                new AlertDialog.Builder(SoccerGameActivity.this)
-                        .setTitle("Results (um/s)")
-                        .setMessage("Condition " + finFasterCondition + " is faster at " + df.format(finFasterSpeed) + "\u00B1" + df.format(finFasterSEM) + " vs. " + df.format(finSlowerSpeed) + "\u00B1" + df.format(finSlowerSEM) + " um/s" + "\n"
-                                + "\n" + "Data:" + "\n"
-                                + "\nCondition 1: \n\tVelocities: " + df.format(averageVelocity1Copy.get(0)) + ", " + df.format(averageVelocity1Copy.get(1))
-                                + ", " + df.format(averageVelocity1Copy.get(2)) + ", \n\t\t\t\t\t" + df.format(averageVelocity1Copy.get(3)) + ", " + df.format(averageVelocity1Copy.get(4))
-                                + "\n\tMean: " + df.format(stats1.get(0)) + "\n\tMaximum: " + df.format(stats1.get(1)) + "\n\tMinimum: " + df.format(stats1.get(2)) + "\n\tSD: " + df.format(stats1.get(3)) + "\n\tSEM "
-                                + df.format(stats1.get(4)) + "\n\n"
-                                + "Condition 2: \n\tVelocities: " + df.format(averageVelocity2Copy.get(0)) + ", " + df.format(averageVelocity2Copy.get(1))
-                                + ", " + df.format(averageVelocity2Copy.get(2)) + ",  \n\t\t\t\t\t" + df.format(averageVelocity2Copy.get(3)) + ", " + df.format(averageVelocity2Copy.get(4))
-                                + "\n\tMean: " + df.format(stats2.get(0)) + "\n\tMaximum: " + df.format(stats2.get(1)) + "\n\tMinimum: " + df.format(stats2.get(2)) + "\n\tSD: " + df.format(stats2.get(3)) + "\n\tSEM "
-                                + df.format(stats2.get(4)))
+                AlertDialog dialog = new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setView(getLayoutInflater().inflate(R.layout.velocity_experiment_message, null))
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 mAverageVelocity1.clear();
@@ -1330,8 +1362,79 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                             }
                         })
                         .show();
+
+
+                CombinedChart comboChart = (CombinedChart) dialog.findViewById(R.id.chart_view);
+                comboChart.setDescription("Average Velocities");
+                comboChart.setBackgroundColor(Color.WHITE);
+                comboChart.setDrawGridBackground(false);
+                comboChart.setDrawBarShadow(false);
+
+                comboChart.setDrawOrder(new CombinedChart.DrawOrder[]{
+                        CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.LINE, CombinedChart.DrawOrder.SCATTER
+                });
+
+                YAxis leftAxis = comboChart.getAxisLeft();
+                leftAxis.setDrawGridLines(false);
+
+                XAxis xAxis = comboChart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+
+                comboChart.setData(comboData);
+
+                TextView cond1Mean = (TextView) dialog.findViewById(R.id.textView11);
+                TextView cond1Max = (TextView) dialog.findViewById(R.id.textView12);
+                TextView cond1Min = (TextView) dialog.findViewById(R.id.textView13);
+                TextView cond1Stdev = (TextView) dialog.findViewById(R.id.textView14);
+                TextView cond1SEM = (TextView) dialog.findViewById(R.id.textView15);
+
+                TextView cond2Mean = (TextView) dialog.findViewById(R.id.textView21);
+                TextView cond2Max = (TextView) dialog.findViewById(R.id.textView22);
+                TextView cond2Min = (TextView) dialog.findViewById(R.id.textView23);
+                TextView cond2Stdev = (TextView) dialog.findViewById(R.id.textView24);
+                TextView cond2SEM = (TextView) dialog.findViewById(R.id.textView25);
+
+                cond1Mean.setText(" " + df.format(stats1.get(0)) + " ");
+                cond1Max.setText(" " + df.format(stats1.get(1)) + " ");
+                cond1Min.setText(" " + df.format(stats1.get(2)) + " ");
+                cond1Stdev.setText(" " + df.format(stats1.get(3)) + " ");
+                cond1SEM.setText(" " + df.format(stats1.get(4)) + " ");
+
+                cond2Mean.setText(" " + df.format(stats2.get(0)) + " ");
+                cond2Max.setText(" " + df.format(stats2.get(1)) + " ");
+                cond2Min.setText(" " + df.format(stats2.get(2)) + " ");
+                cond2Stdev.setText(" " + df.format(stats2.get(3)) + " ");
+                cond2SEM.setText(" " + df.format(stats2.get(4)) + " ");
+
             }
         });
+
+
+
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                new AlertDialog.Builder(SoccerGameActivity.this)
+//                        .setTitle("Results (um/s)")
+//                        .setMessage("Condition " + finFasterCondition + " is faster at " + df.format(finFasterSpeed) + "\u00B1" + df.format(finFasterSEM) + " vs. " + df.format(finSlowerSpeed) + "\u00B1" + df.format(finSlowerSEM) + " um/s" + "\n"
+//                                + "\n" + "Data:" + "\n"
+//                                + "\nCondition 1: \n\tVelocities: " + df.format(averageVelocity1Copy.get(0)) + ", " + df.format(averageVelocity1Copy.get(1))
+//                                + ", " + df.format(averageVelocity1Copy.get(2)) + ", \n\t\t\t\t\t" + df.format(averageVelocity1Copy.get(3)) + ", " + df.format(averageVelocity1Copy.get(4))
+//                                + "\n\tMean: " + df.format(stats1.get(0)) + "\n\tMaximum: " + df.format(stats1.get(1)) + "\n\tMinimum: " + df.format(stats1.get(2)) + "\n\tSD: " + df.format(stats1.get(3)) + "\n\tSEM "
+//                                + df.format(stats1.get(4)) + "\n\n"
+//                                + "Condition 2: \n\tVelocities: " + df.format(averageVelocity2Copy.get(0)) + ", " + df.format(averageVelocity2Copy.get(1))
+//                                + ", " + df.format(averageVelocity2Copy.get(2)) + ",  \n\t\t\t\t\t" + df.format(averageVelocity2Copy.get(3)) + ", " + df.format(averageVelocity2Copy.get(4))
+//                                + "\n\tMean: " + df.format(stats2.get(0)) + "\n\tMaximum: " + df.format(stats2.get(1)) + "\n\tMinimum: " + df.format(stats2.get(2)) + "\n\tSD: " + df.format(stats2.get(3)) + "\n\tSEM "
+//                                + df.format(stats2.get(4)))
+//                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                mAverageVelocity1.clear();
+//                                mAverageVelocity2.clear();
+//                            }
+//                        })
+//                        .show();
+//            }
+//        });
     }
 
     public void swapConditionsMessage(){
@@ -1371,6 +1474,19 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         String msg = "";
 
         return msg;
+    }
+
+    public static double Median(List values)
+    {
+        Collections.sort(values);
+
+        double median;
+        if (values.size() % 2 == 0)
+            median = ((double)values.get(values.size()/2) + (double)values.get(values.size()/2 - 1)/2);
+        else
+            median = (double) values.get(values.size()/2);
+
+        return median;
     }
 
 }
