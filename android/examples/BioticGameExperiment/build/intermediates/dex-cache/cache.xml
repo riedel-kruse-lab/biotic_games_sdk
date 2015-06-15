@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\honestykim\Documents\sdk\extras\android\m2repository\com\android\support\support-annotations\22.0.0\support-annotations-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="685d0b2c590447e85284ed84712cb363ba04eff8">
+        <dex dex="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\pre-dexed\debug\support-annotations-22.0.0-56186aea4cf979c18ad699468d078c2d01e30865.jar" />
+    </item>
+    <item
+        jar="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="d84409890828e07d344a3b9b1da545dba9897b51">
+        <dex dex="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\pre-dexed\debug\classes-130afb9f251833c7050603956c55604707905e87.jar" />
+    </item>
+    <item
+        jar="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\libs\internal_impl-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
+        <dex dex="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\pre-dexed\debug\internal_impl-22.0.0-bcbdb7e88fc8f113c4071fccda723c4b0877be83.jar" />
+    </item>
+    <item
+        jar="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\exploded-aar\BioticGameExperiment\opencv\unspecified\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="cc9302dec32acf140126a6b039f0638b49ffe504">
+        <dex dex="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\pre-dexed\debug\classes-d127a6098e8b972c05edf41d09faa9188d7e99c1.jar" />
+    </item>
+    <item
+        jar="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4e86306289ace4aa0cfec44a05ed2b410d36989d">
+        <dex dex="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\pre-dexed\debug\classes-6047355b6a7647ee28fe811cef98cd53da882b06.jar" />
+    </item>
+    <item
+        jar="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\exploded-aar\BioticGameExperiment\sdk\unspecified\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="d5a952d78549f1f03dc21858d3078c30f0556ad8">
+        <dex dex="C:\Users\honestykim\Documents\GitHub\biotic_games_sdk\android\examples\BioticGameExperiment\app\build\intermediates\pre-dexed\debug\classes-453fafdef308209178235115f4eee16f4f5e3e78.jar" />
+    </item>
+
+</items>

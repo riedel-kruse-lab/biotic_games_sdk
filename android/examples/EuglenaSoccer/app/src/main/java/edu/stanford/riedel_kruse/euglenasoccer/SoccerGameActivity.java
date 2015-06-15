@@ -653,4 +653,5 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             }
         });
     }
+
 }

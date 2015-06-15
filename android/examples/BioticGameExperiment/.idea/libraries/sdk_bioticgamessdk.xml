@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="sdk.bioticgamessdk">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/sdk/bioticgamessdk.aar" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
