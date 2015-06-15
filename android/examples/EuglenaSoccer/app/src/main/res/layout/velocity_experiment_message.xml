@@ -16,6 +16,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center_horizontal">
 
             <TextView
@@ -24,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="6"
                 android:gravity="center"
-                android:text="Velocity Statistics (\u00B5m/s)\n"
+                android:text="Velocity Statistics (\u00B5m/s)"
                 android:textSize="18dp"
                 android:textStyle="bold"
                 android:typeface="serif" />
@@ -150,7 +151,7 @@
         <com.github.mikephil.charting.charts.CombinedChart
             android:id="@+id/chart_view"
             android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_height="150dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="40dp"

@@ -1,5 +1,6 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -7,21 +8,27 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaScannerConnection;
 import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
@@ -66,6 +73,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
@@ -157,6 +165,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private int mSoundIdOutOfBounds;
     private int mSoundIdCrowdCheer;
     private int mSoundIdBounceBall;
+    private int mSoundIdWakka;
+    private int mSoundStartSong;
+    private int mSoundEndSong;
+    private int mPlayingSoundFX = 0;
+    private int mPlayingSountrack = 0;
 
     private RectangleObject mLeftLightIndicator;
     private RectangleObject mRightLightIndicator;
@@ -166,6 +179,26 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private TextObject mSpeedText;
 
     private Pattern01 mPattern;
+    private ConsumableBall mConsumableBall1;
+    private ConsumableBall mConsumableBall2;
+    private ConsumableBall mConsumableBall3;
+    private ConsumableBall mConsumableBall4;
+    private ConsumableBall mConsumableBall5;
+    private ConsumableBall mConsumableBall6;
+    private ConsumableBall mConsumableBall7;
+    private ConsumableBall mConsumableBall8;
+    private ConsumableBall mConsumableBall9;
+    private ConsumableBall mConsumableBall10;
+    private ConsumableBall mConsumableBall11;
+    private ConsumableBall mConsumableBall12;
+    private ConsumableBall mConsumableBall13;
+    private ConsumableBall mConsumableBall14;
+
+    private PMan mPMan;
+
+    private int mConsumableBallOffset = 100;
+
+    private int mBallCountScore = 0;
 
     private int frameCount;
     private boolean endGame = false;
@@ -175,13 +208,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private boolean isTapped = false;
     private boolean mStartMeasuringVelocity = false;
     private boolean dataCollectionFinished = false;
-    private static Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 0);
-    private static Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
+    private boolean mFollowLine = false;
+    private Scalar LOWER_HSV_THRESHOLD = new Scalar(30, 30, 0);
+    private Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
 
     final DecimalFormat df = new DecimalFormat("0.00");
     final DecimalFormat df1 = new DecimalFormat("0.0");
     private Long mVelocityTimer = 1234567890L;
 
+    private int mFollowLineIndex = 0;
+
+    private String mInputText = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +230,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mScoreTextView = (TextView) findViewById(R.id.score);
         mTimeTextView = (TextView) findViewById(R.id.time);
 
+
         mSoundPool = new SoundPool(SOUND_POOL_MAX_STREAMS, AudioManager.STREAM_MUSIC,
                 SOUND_POOL_SRC_QUALITY);
         mSoundIdWallBounce = mSoundPool.load(this, R.raw.wall_bounce, SOUND_POOL_PRIORITY);
@@ -200,6 +238,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mSoundIdOutOfBounds = mSoundPool.load(this, R.raw.out_of_bounds, SOUND_POOL_PRIORITY);
         mSoundIdCrowdCheer = mSoundPool.load(this, R.raw.crowd_cheer, SOUND_POOL_PRIORITY);
         mSoundIdBounceBall = mSoundPool.load(this, R.raw.bounce_ball, SOUND_POOL_PRIORITY);
+        mSoundIdWakka = mSoundPool.load(this, R.raw.wakka, SOUND_POOL_PRIORITY);
+        mSoundStartSong = mSoundPool.load(this, R.raw.start_song, SOUND_POOL_PRIORITY);
+        mSoundEndSong = mSoundPool.load(this, R.raw.end_song, SOUND_POOL_PRIORITY);
+
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         connectToJoystick(this, "00:06:66:67:E8:99");
 
@@ -235,10 +278,71 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         //addGameObject(soccerField);
 
         //Add guide patterns
-        mPattern = new Pattern01(new Point(mTouchX,mTouchY));
+        mPattern = new Pattern01(new Point(mTouchX, mTouchY));
         addGameObject(mPattern);
         mPattern.setVisible(false);
 
+        //Add consumable balls
+        mConsumableBall1 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall1);
+        mConsumableBall1.setVisible(false);
+
+        mConsumableBall2 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall2);
+        mConsumableBall2.setVisible(false);
+
+        mConsumableBall3 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall3);
+        mConsumableBall3.setVisible(false);
+
+        mConsumableBall4 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall4);
+        mConsumableBall4.setVisible(false);
+
+        mConsumableBall5 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall5);
+        mConsumableBall5.setVisible(false);
+
+        mConsumableBall6 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall6);
+        mConsumableBall6.setVisible(false);
+
+        mConsumableBall7 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall7);
+        mConsumableBall7.setVisible(false);
+
+        mConsumableBall8 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall8);
+        mConsumableBall8.setVisible(false);
+
+        mConsumableBall9 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall9);
+        mConsumableBall9.setVisible(false);
+
+        mConsumableBall10 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall10);
+        mConsumableBall10.setVisible(false);
+
+        mConsumableBall11 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall11);
+        mConsumableBall11.setVisible(false);
+
+        mConsumableBall12 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall12);
+        mConsumableBall12.setVisible(false);
+
+        mConsumableBall13 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall13);
+        mConsumableBall13.setVisible(false);
+
+        mConsumableBall14 = new ConsumableBall(new Point(mTouchX, mTouchY));
+        addGameObject(mConsumableBall14);
+        mConsumableBall14.setVisible(false);
+
+        //add pman
+        mPMan = new PMan(new Point(mTouchX, mTouchY));
+        addGameObject(mPMan);
+        mPMan.setVisible(false);
 
         // Set up the goals
         int goalHeight = height * 4 / 7;
@@ -337,6 +441,104 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 //onGoalScored();
             }
         });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall1) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall1);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall2) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall2);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall3) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall3);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall4) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall4);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall5) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall5);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall6) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall6);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall7) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall7);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall8) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall8);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall9) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall9);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall10) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall10);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall11) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall11);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall12) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall12);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall13) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall13);
+            }
+        });
+
+        addCollisionCallback(new CollisionCallback(mBall, mConsumableBall14) {
+            @Override
+            public void onCollision() {
+                onBallEaten(mConsumableBall14);
+            }
+        });
     }
 
     @Override
@@ -374,11 +576,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             }
         }
 
-        if (mTutorial == null){
-            trackData(mBall.x(),mBall.y(),pointToAngle(mBall.direction()),mBallSpeed,mLightDir,mTimeMillis,isTapped);
+        if (mTutorial == null) {
+            trackData(mBall.x(), mBall.y(), pointToAngle(mBall.direction()), mBallSpeed, mLightDir, mTimeMillis, isTapped);
         }
 
-        if (endGame == true){
+        if (endGame == true) {
             endGame = false;
             try {
                 createDataFile();
@@ -389,9 +591,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             finish();
         }
 
-        if (velocityCalculate == true){
+        if (velocityCalculate == true) {
             //only enter this function the first time
-            if(velocityCalculateTapped) {
+            if (velocityCalculateTapped) {
                 isTapped = false;
                 velocityCalculate = false;
                 velocityCalculateTapped = false;
@@ -407,7 +609,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mStartMeasuringVelocity = true;
             }
 
-            if ((mTimeMillis >= mVelocityTimer) && mStartMeasuringVelocity){
+            if ((mTimeMillis >= mVelocityTimer) && mStartMeasuringVelocity) {
                 //This function needs to back-calculate the average velocity over the past 2 seconds
                 //and keep track of the number of different counts. After 5 samples, starts the
                 //next condition. After that, set dataCollectionFinished = true
@@ -415,7 +617,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mStartMeasuringVelocity = false;
             }
 
-            if (dataCollectionFinished){
+            if (dataCollectionFinished) {
                 dataCollectionFinished = false;
                 velocityCalculate = false;
                 avgVelocityFinishedMessage();
@@ -428,9 +630,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //            }
         }
 
-        if (plotGraph == true){
+        if (plotGraph == true) {
             plotGraph = false;
             createGraph();
+        }
+
+        if (mFollowLine&&areAllBallsEaten()){
+            mPattern.setVisible(false);
+            clearFollowLineMode();
         }
 
         //every turn needs to reset the isTapped to keep it false as default
@@ -444,16 +651,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         if (direction == JoystickThread.Direction.LEFT) {
             mRightLightIndicator.setVisible(true);
             mLightDir += 1000;
-        }
-        else if (direction == JoystickThread.Direction.RIGHT) {
+        } else if (direction == JoystickThread.Direction.RIGHT) {
             mLeftLightIndicator.setVisible(true);
             mLightDir += 100;
-        }
-        else if (direction == JoystickThread.Direction.TOP) {
+        } else if (direction == JoystickThread.Direction.TOP) {
             mBottomLightIndicator.setVisible(true);
             mLightDir += 10;
-        }
-        else {
+        } else {
             mTopLightIndicator.setVisible(true);
             mLightDir += 1;
         }
@@ -464,16 +668,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         if (direction == JoystickThread.Direction.LEFT) {
             mRightLightIndicator.setVisible(false);
             mLightDir -= 1000;
-        }
-        else if (direction == JoystickThread.Direction.RIGHT) {
+        } else if (direction == JoystickThread.Direction.RIGHT) {
             mLeftLightIndicator.setVisible(false);
             mLightDir -= 100;
-        }
-        else if (direction == JoystickThread.Direction.TOP) {
+        } else if (direction == JoystickThread.Direction.TOP) {
             mBottomLightIndicator.setVisible(false);
             mLightDir -= 10;
-        }
-        else {
+        } else {
             mTopLightIndicator.setVisible(false);
             mLightDir -= 1;
         }
@@ -497,10 +698,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         isTapped = true;
+        mFollowLineIndex = mTimeList.size() - 1;
 
         // - 180 needed in getY to balance offset... offset possibly because different views are calling???
-        mTouchX = (int)event.getX();
-        mTouchY = (int)event.getY() - 180;
+        mTouchX = (int) event.getX();
+        mTouchY = (int) event.getY() - 180;
 
         if (mTutorial != null && !mTutorial.shouldDisplayActionButton()) {
             return super.onTouchEvent(event);
@@ -552,19 +754,20 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
             newPosition = assignROI();
             mBall.setPosition(newPosition);
-        }
-        else {
+        } else {
             newPosition = findClosestEuglenaToBall(frame);
             if (newPosition == null) {
                 newPosition = mBall.position();
             }
             mBall.setPosition(newPosition);
+            mPMan.setPosition(newPosition);
             mRecentBallPositions.add(newPosition);
             if (mRecentBallPositions.size() > NUM_RECENT_POSITIONS) {
                 mRecentBallPositions.remove(0);
             }
             mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
             setBallSpeed(MathUtil.computeAverageSpeed(mRecentBallPositions));
+            mPMan.setDirection(mBall.direction());
         }
 
         if (newPosition == null) {
@@ -576,14 +779,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             if (!mPassing) {
                 onOutOfBounds();
                 playSound(mSoundIdOutOfBounds);
-            }
-            else {
+            } else {
                 Point newDirection = mBall.direction();
                 if (newPosition.x < 0) {
                     newDirection.x *= -1;
                     newPosition.x = 0;
-                }
-                else if (newPosition.x > mFieldWidth) {
+                } else if (newPosition.x > mFieldWidth) {
                     newDirection.x *= -1;
                     newPosition.x = mFieldWidth;
                 }
@@ -591,8 +792,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 if (newPosition.y < 0) {
                     newDirection.y *= -1;
                     newPosition.y = 0;
-                }
-                else if (newPosition.y > mFieldHeight) {
+                } else if (newPosition.y > mFieldHeight) {
                     newDirection.y *= -1;
                     newPosition.y = mFieldHeight;
                 }
@@ -696,8 +896,89 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         //passOrBounceBall();
 
         mPassing = true;
-        mPattern.setPosition(new Point(mTouchX, mTouchY));
-        //mPattern.setVisible(true);
+
+        if (mFollowLine) {
+            mPattern.setPosition(new Point(mTouchX, mTouchY));
+            mPattern.setVisible(true);
+
+            mConsumableBall1.setPosition(new Point(mTouchX + mConsumableBallOffset, mTouchY));
+            mConsumableBall1.setVisible(true);
+            mConsumableBall1.setPhysical(true);
+            mConsumableBall1.setIsEaten(false);
+
+            mConsumableBall2.setPosition(new Point(mTouchX + 2 * mConsumableBallOffset, mTouchY));
+            mConsumableBall2.setVisible(true);
+            mConsumableBall2.setPhysical(true);
+            mConsumableBall2.setIsEaten(false);
+
+            mConsumableBall3.setPosition(new Point(mTouchX + 3 * mConsumableBallOffset, mTouchY));
+            mConsumableBall3.setVisible(true);
+            mConsumableBall3.setPhysical(true);
+            mConsumableBall3.setIsEaten(false);
+
+            mConsumableBall4.setPosition(new Point(mTouchX + 4 * mConsumableBallOffset, mTouchY));
+            mConsumableBall4.setVisible(true);
+            mConsumableBall4.setPhysical(true);
+            mConsumableBall4.setIsEaten(false);
+
+            mConsumableBall5.setPosition(new Point(mTouchX + 5 * mConsumableBallOffset, mTouchY));
+            mConsumableBall5.setVisible(true);
+            mConsumableBall5.setPhysical(true);
+            mConsumableBall5.setIsEaten(false);
+            mConsumableBall5.setIsEaten(false);
+
+            mConsumableBall6.setPosition(new Point(mTouchX + 6 * mConsumableBallOffset, mTouchY));
+            mConsumableBall6.setVisible(true);
+            mConsumableBall6.setPhysical(true);
+            mConsumableBall6.setIsEaten(false);
+
+            mConsumableBall7.setPosition(new Point(mTouchX + 6 * mConsumableBallOffset, mTouchY - mConsumableBallOffset));
+            mConsumableBall7.setVisible(true);
+            mConsumableBall7.setPhysical(true);
+            mConsumableBall7.setIsEaten(false);
+
+            mConsumableBall8.setPosition(new Point(mTouchX + 6 * mConsumableBallOffset, mTouchY - 2 * mConsumableBallOffset));
+            mConsumableBall8.setVisible(true);
+            mConsumableBall8.setPhysical(true);
+            mConsumableBall8.setIsEaten(false);
+
+            mConsumableBall9.setPosition(new Point(mTouchX + 6 * mConsumableBallOffset, mTouchY - 3 * mConsumableBallOffset));
+            mConsumableBall9.setVisible(true);
+            mConsumableBall9.setPhysical(true);
+            mConsumableBall9.setIsEaten(false);
+
+            mConsumableBall10.setPosition(new Point(mTouchX + 5 * mConsumableBallOffset, mTouchY - 3 * mConsumableBallOffset));
+            mConsumableBall10.setVisible(true);
+            mConsumableBall10.setPhysical(true);
+            mConsumableBall10.setIsEaten(false);
+
+            mConsumableBall11.setPosition(new Point(mTouchX + 4 * mConsumableBallOffset, mTouchY - 3 * mConsumableBallOffset));
+            mConsumableBall11.setVisible(true);
+            mConsumableBall11.setPhysical(true);
+            mConsumableBall11.setIsEaten(false);
+
+            mConsumableBall12.setPosition(new Point(mTouchX + 3 * mConsumableBallOffset, mTouchY - 3 * mConsumableBallOffset));
+            mConsumableBall12.setVisible(true);
+            mConsumableBall12.setPhysical(true);
+            mConsumableBall12.setIsEaten(false);
+
+            mConsumableBall13.setPosition(new Point(mTouchX + 2 * mConsumableBallOffset, mTouchY - 3 * mConsumableBallOffset));
+            mConsumableBall13.setVisible(true);
+            mConsumableBall13.setPhysical(true);
+            mConsumableBall13.setIsEaten(false);
+
+            mConsumableBall14.setPosition(new Point(mTouchX + mConsumableBallOffset, mTouchY - 3 * mConsumableBallOffset));
+            mConsumableBall14.setVisible(true);
+            mConsumableBall14.setPhysical(true);
+            mConsumableBall14.setIsEaten(false);
+
+            mBallCountScore = 0;
+
+            mPMan.setPosition(new Point(mTouchX, mTouchY));
+            mPMan.setVisible(true);
+
+            loopSong(mSoundIdWakka);
+        }
     }
 
     public void onTutorialButtonPressed(View view) {
@@ -723,22 +1004,19 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         if (mTutorial.shouldDisplayScores()) {
             scoreText.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             scoreText.setVisibility(View.GONE);
         }
 
         if (mTutorial.shouldDisplayTime()) {
             timeText.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             timeText.setVisibility(View.GONE);
         }
 
         if (mTutorial.shouldDisplayActionButton()) {
             actionButton.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             actionButton.setVisibility(View.GONE);
         }
     }
@@ -754,8 +1032,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             MathUtil.normalizeVector(newDirection);
             mBall.setDirection(newDirection);
             playSound(mSoundIdBounceBall);
-        }
-        else {
+        } else {
             playSound(mSoundIdPassBall);
         }
     }
@@ -811,6 +1088,25 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private void playSound(int soundId) {
         mSoundPool.play(soundId, SOUND_POOL_LEFT_VOLUME, SOUND_POOL_RIGHT_VOLUME,
                 SOUND_POOL_PRIORITY, SOUND_POOL_LOOP, SOUND_POOL_FLOAT_RATE);
+
+    }
+
+    private void loopSound(int soundId){
+        mPlayingSoundFX = mSoundPool.play(soundId, SOUND_POOL_LEFT_VOLUME, SOUND_POOL_RIGHT_VOLUME,
+                SOUND_POOL_PRIORITY, -1, SOUND_POOL_FLOAT_RATE);
+    }
+
+    private void loopSong(int soundId){
+        mPlayingSountrack = mSoundPool.play(soundId, SOUND_POOL_LEFT_VOLUME, SOUND_POOL_RIGHT_VOLUME,
+                SOUND_POOL_PRIORITY, -1, SOUND_POOL_FLOAT_RATE);
+    }
+
+    private void stopSound(){
+        mSoundPool.stop(mPlayingSoundFX);
+    }
+
+    private void stopSong(){
+        mSoundPool.stop(mPlayingSountrack);
     }
 
     private void updateZoomView(Mat frame) {
@@ -848,7 +1144,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     List<Double> mAverageVelocity2 = new ArrayList<Double>();
 
     //Called every frame, and calls all the other functions necessary to log data
-    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir, Long time, boolean tapped){
+    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir, Long time, boolean tapped) {
         updateX(xPos);
         updateY(yPos);
         updateAngle(angle);
@@ -858,33 +1154,37 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         updateIsTapped(tapped);
     }
 
-    public void updateX(double xPos){
+    public void updateX(double xPos) {
         mXPosList.add(Double.toString(xPos));
     }
 
-    public void updateY(double yPos){
+    public void updateY(double yPos) {
         mYPosList.add(Double.toString(yPos));
     }
 
-    public void updateAngle(double angle){
+    public void updateAngle(double angle) {
         mAngleList.add(Double.toString(angle));
     }
 
-    public void updateSpeed(double speed){
+    public void updateSpeed(double speed) {
         mSpeedList.add(Double.toString(speed));
     }
 
-    public void updateLightDir(double lightDir){
+    public void updateLightDir(double lightDir) {
         mLightDirList.add(Double.toString(lightDir));
     }
 
-    public void updateTimeList(Long currentTime) {mTimeList.add(Long.toString(currentTime));}
+    public void updateTimeList(Long currentTime) {
+        mTimeList.add(Long.toString(currentTime));
+    }
 
-    public void updateIsTapped(boolean tapped) {mIsTapped.add(Boolean.toString(tapped));}
+    public void updateIsTapped(boolean tapped) {
+        mIsTapped.add(Boolean.toString(tapped));
+    }
 
-    public String convertListToString(List<String> input){
+    public String convertListToString(List<String> input) {
         String output = "";
-        for (String s : input){
+        for (String s : input) {
             output += s + ",";
         }
         return output;
@@ -920,29 +1220,26 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         //close the writer
         writer.close();*/
 
-        try
-        {
+        try {
             // Creates a trace file in the primary external storage space of the
             // current application.
             // If the file does not exists, it is created.
-            File traceFile = new File(((Context)this).getExternalFilesDir(null), "Data.txt");
+            File traceFile = new File(((Context) this).getExternalFilesDir(null), "Data.txt");
             if (!traceFile.exists())
                 traceFile.createNewFile();
             // Adds a line to the trace file
             BufferedWriter writer = new BufferedWriter(new FileWriter(traceFile, true /*append*/));
-            writer.write(xPos + "\n\n" + yPos + "\n\n" + angle + "\n\n" + speed + "\n\n" + lightDir + "\n\n" + time +  "\n\n" + tapped + "\n\nEND");
+            writer.write(xPos + "\n\n" + yPos + "\n\n" + angle + "\n\n" + speed + "\n\n" + lightDir + "\n\n" + time + "\n\n" + tapped + "\n\nEND");
             writer.close();
             // Refresh the data so it can seen when the device is plugged in a
             // computer. You may have to unplug and replug the device to see the
             // latest changes. This is not necessary if the user should not modify
             // the files.
-            MediaScannerConnection.scanFile((Context)(this),
-                    new String[] { traceFile.toString() },
+            MediaScannerConnection.scanFile((Context) (this),
+                    new String[]{traceFile.toString()},
                     null,
                     null);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             Log.e("com.BioticGame", "Unable to write to the Data.txt file.");
         }
 
@@ -959,22 +1256,22 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mIsTapped.clear();
     }
 
-    public double pointToAngle(Point point){
-        if(point.x == 0 && point.y == 0){
+    public double pointToAngle(Point point) {
+        if (point.x == 0 && point.y == 0) {
             return 10.0;
-        }else if(point.x == 0){
-            if(point.y > 0) {
-                return Math.PI/2;
-            }else{
-                return 3*Math.PI/2;
+        } else if (point.x == 0) {
+            if (point.y > 0) {
+                return Math.PI / 2;
+            } else {
+                return 3 * Math.PI / 2;
             }
-        }else if(point.y == 0){
-            if(point.x > 0){
+        } else if (point.y == 0) {
+            if (point.x > 0) {
                 return 0.0;
-            }else {
+            } else {
                 return Math.PI;
             }
-        }else {
+        } else {
             double angle = Math.atan2(point.x, point.y);
 
             //Case Quadrant I:
@@ -997,11 +1294,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     public int mTouchX = 0;
     public int mTouchY = 0;
 
-    private Point assignROI(){
-        return new Point(mTouchX,mTouchY);
+    private Point assignROI() {
+        return new Point(mTouchX, mTouchY);
     }
 
-    public void onEndButtonPressed(View view){
+    public void onEndButtonPressed(View view) {
 //        try {
 //            createDataFile();
 //        } catch (IOException e) {
@@ -1013,14 +1310,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         endGame = true;
     }
 
-    public void onMeasureVelocityPressed(View view){
+    public void onMeasureVelocityPressed(View view) {
         velocityCalculate = true;
         velocityCalculateTapped = true;
     }
 
     private LineChart mChart;
 
-    public void createGraph(){
+    public void createGraph() {
 
 
         mChart = (LineChart) findViewById(R.id.chart);
@@ -1040,7 +1337,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         ArrayList<Entry> yVals = new ArrayList<Entry>();
 
         for (int i = 0; i < mSpeedList.size(); i++) {
-            yVals.add(new Entry(Float.parseFloat(mSpeedList.get(i)),i));
+            yVals.add(new Entry(Float.parseFloat(mSpeedList.get(i)), i));
         }
 
         LineDataSet set = new LineDataSet(yVals, " ");
@@ -1077,7 +1374,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //        });
     }
 
-    public void onPlotPressed(View view){
+    public void onPlotPressed(View view) {
         plotGraph = true;
     }
 
@@ -1085,12 +1382,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static int NUMBER_OF_INTERVALS = 4;
     private static int LOWER_SPEED_THRESHOLD = 5;
 
-    public void avgSpeedInterval(){
+    public void avgSpeedInterval() {
         double time = Double.parseDouble(mTimeList.get(0));
 
         double maxTime = time + INTERVAL_FOR_COMPUTING_AVG_SPD * NUMBER_OF_INTERVALS;
-        if(maxTime > Double.parseDouble(mTimeList.get(mTimeList.size()-1))){
-            maxTime = Double.parseDouble(mTimeList.get(mTimeList.size()-1));
+        if (maxTime > Double.parseDouble(mTimeList.get(mTimeList.size() - 1))) {
+            maxTime = Double.parseDouble(mTimeList.get(mTimeList.size() - 1));
         }
 
         double startTime = time;
@@ -1100,28 +1397,28 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         ArrayList<Double> averageList = new ArrayList<Double>();
         ArrayList<Integer> averageCount = new ArrayList<Integer>();
 
-        for (int i=0; i<NUMBER_OF_INTERVALS; i++){
+        for (int i = 0; i < NUMBER_OF_INTERVALS; i++) {
             averageList.add(0.);
             averageCount.add(0);
         }
 
-        while (time < maxTime){
+        while (time < maxTime) {
             time = Double.parseDouble(mTimeList.get(index));
 
-            if(time>(startTime + (interval+1)*INTERVAL_FOR_COMPUTING_AVG_SPD)){
+            if (time > (startTime + (interval + 1) * INTERVAL_FOR_COMPUTING_AVG_SPD)) {
                 interval++;
             }
 
-            if (Double.parseDouble(mSpeedList.get(index))>LOWER_SPEED_THRESHOLD){
-                averageList.set(interval,averageList.get(interval)+Double.parseDouble(mSpeedList.get(index)));
-                averageCount.set(interval,averageCount.get(interval)+1);
+            if (Double.parseDouble(mSpeedList.get(index)) > LOWER_SPEED_THRESHOLD) {
+                averageList.set(interval, averageList.get(interval) + Double.parseDouble(mSpeedList.get(index)));
+                averageCount.set(interval, averageCount.get(interval) + 1);
             }
 
             index++;
         }
 
-        for(int i = 0; i<NUMBER_OF_INTERVALS; i++) {
-            if(averageCount.get(i)>0) {
+        for (int i = 0; i < NUMBER_OF_INTERVALS; i++) {
+            if (averageCount.get(i) > 0) {
                 averageList.set(i, averageList.get(i) / averageCount.get(i));
             }
         }
@@ -1151,33 +1448,33 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    private static int NUMBER_OF_MEASUREMENTS = 3;
-    private static int INTERVAL_FOR_COMPUTING_AVG_SPD_2 = 1000;
+    private static int NUMBER_OF_MEASUREMENTS = 5;
+    private static int INTERVAL_FOR_COMPUTING_AVG_SPD_2 = 3000;
 
-    public void avgSpeedInterval2(){
+    public void avgSpeedInterval2() {
 
         //Traverse the velocity list backwards adding up the values until you reach 2 seconds before the current time
         //Divide this average by the number of values counted
         //Dialog box showing the data and asking if you want to keep it
-            //If yes -> run function that puts this into the list of averages
-            //If no -> do nothing
+        //If yes -> run function that puts this into the list of averages
+        //If no -> do nothing
         //
 
         int numValues = 1;
         double sumValues = 0;
 
-        double time = Double.parseDouble(mTimeList.get(frameCount-1));
+        double time = Double.parseDouble(mTimeList.get(frameCount - 1));
         double minTime = time - INTERVAL_FOR_COMPUTING_AVG_SPD_2;
 
-        int index = frameCount-1;
+        int index = frameCount - 1;
 
-        while (Double.parseDouble(mTimeList.get(index))>minTime) {
+        while (Double.parseDouble(mTimeList.get(index)) > minTime) {
             sumValues = sumValues + Double.parseDouble(mSpeedList.get(index));
             numValues++;
             index--;
         }
 
-        final double average = sumValues/numValues;
+        final double average = sumValues / numValues;
         final int currentCount = mAverageVelocity1.size() + mAverageVelocity2.size() + 1;
 
         runOnUiThread(new Runnable() {
@@ -1201,22 +1498,22 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    private void addNewAverage(double average){
-        if(mAverageVelocity1.size()<NUMBER_OF_MEASUREMENTS){
+    private void addNewAverage(double average) {
+        if (mAverageVelocity1.size() < NUMBER_OF_MEASUREMENTS) {
             mAverageVelocity1.add(average);
-            if(mAverageVelocity1.size() == NUMBER_OF_MEASUREMENTS){
+            if (mAverageVelocity1.size() == NUMBER_OF_MEASUREMENTS) {
                 swapConditionsMessage();
             }
-        }else if(mAverageVelocity2.size()<NUMBER_OF_MEASUREMENTS){
+        } else if (mAverageVelocity2.size() < NUMBER_OF_MEASUREMENTS) {
             mAverageVelocity2.add(average);
         }
 
-        if(mAverageVelocity2.size() == NUMBER_OF_MEASUREMENTS){
+        if (mAverageVelocity2.size() == NUMBER_OF_MEASUREMENTS) {
             dataCollectionFinished = true;
         }
     }
 
-    public void avgVelocityMessage(){
+    public void avgVelocityMessage() {
 
         runOnUiThread(new Runnable() {
             @Override
@@ -1245,33 +1542,32 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
 
-
     //Takes an ArrayList of doubles, and returns the mean, maximum, minimum, standard deviation, and standard error of mean
-    public List<Double> calculateStatistics(List<Double> dataList){
+    public List<Double> calculateStatistics(List<Double> dataList) {
         int n = dataList.size();
         double sum = 0;
         double sumDevSquared = 0;
         double min = 100000;
         double max = 0;
 
-        for(Double i: dataList){
-            if(i>max){
+        for (Double i : dataList) {
+            if (i > max) {
                 max = i;
             }
-            if(i<min){
+            if (i < min) {
                 min = i;
             }
             sum = sum + i;
         }
 
-        double mean = sum/n;
+        double mean = sum / n;
 
-        for(Double i: dataList){
-            sumDevSquared += Math.pow((mean - i),2);
+        for (Double i : dataList) {
+            sumDevSquared += Math.pow((mean - i), 2);
         }
 
-        double standDev = Math.sqrt(sumDevSquared/(n-1));
-        double standErrMean = standDev/(Math.sqrt(n));
+        double standDev = Math.sqrt(sumDevSquared / (n - 1));
+        double standErrMean = standDev / (Math.sqrt(n));
 
         List<Double> stats = new ArrayList<Double>();
 
@@ -1284,7 +1580,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         return stats;
     }
 
-    public void avgVelocityFinishedMessage(){
+    public void avgVelocityFinishedMessage() {
 
         final List<Double> averageVelocity1Copy = mAverageVelocity1;
         final List<Double> averageVelocity2Copy = mAverageVelocity2;
@@ -1297,13 +1593,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         double fasterSEM = 0.;
         double slowerSEM = 0.;
 
-        if(stats1.get(0) > stats2.get(0)){
+        if (stats1.get(0) > stats2.get(0)) {
             fasterCondition = 1;
             fasterSpeed = stats1.get(0);
             fasterSEM = stats1.get(4);
             slowerSpeed = stats2.get(0);
             slowerSEM = stats2.get(4);
-        }else{
+        } else {
             fasterCondition = 2;
             fasterSpeed = stats2.get(0);
             fasterSEM = stats2.get(4);
@@ -1317,8 +1613,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         final double finSlowerSpeed = slowerSpeed;
         final double finSlowerSEM = slowerSEM;
 
-        final CombinedData comboData = new CombinedData(new String[] {
-                "1", "2"
+        final CombinedData comboData = new CombinedData(new String[]{
+                "First", "Second"
         });
 
         BarData barData = new BarData();
@@ -1363,9 +1659,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         })
                         .show();
 
-
                 CombinedChart comboChart = (CombinedChart) dialog.findViewById(R.id.chart_view);
-                comboChart.setDescription("Average Velocities");
+                comboChart.setDescription("Avg Velocities");
                 comboChart.setBackgroundColor(Color.WHITE);
                 comboChart.setDrawGridBackground(false);
                 comboChart.setDrawBarShadow(false);
@@ -1408,36 +1703,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
             }
         });
-
-
-
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                new AlertDialog.Builder(SoccerGameActivity.this)
-//                        .setTitle("Results (um/s)")
-//                        .setMessage("Condition " + finFasterCondition + " is faster at " + df.format(finFasterSpeed) + "\u00B1" + df.format(finFasterSEM) + " vs. " + df.format(finSlowerSpeed) + "\u00B1" + df.format(finSlowerSEM) + " um/s" + "\n"
-//                                + "\n" + "Data:" + "\n"
-//                                + "\nCondition 1: \n\tVelocities: " + df.format(averageVelocity1Copy.get(0)) + ", " + df.format(averageVelocity1Copy.get(1))
-//                                + ", " + df.format(averageVelocity1Copy.get(2)) + ", \n\t\t\t\t\t" + df.format(averageVelocity1Copy.get(3)) + ", " + df.format(averageVelocity1Copy.get(4))
-//                                + "\n\tMean: " + df.format(stats1.get(0)) + "\n\tMaximum: " + df.format(stats1.get(1)) + "\n\tMinimum: " + df.format(stats1.get(2)) + "\n\tSD: " + df.format(stats1.get(3)) + "\n\tSEM "
-//                                + df.format(stats1.get(4)) + "\n\n"
-//                                + "Condition 2: \n\tVelocities: " + df.format(averageVelocity2Copy.get(0)) + ", " + df.format(averageVelocity2Copy.get(1))
-//                                + ", " + df.format(averageVelocity2Copy.get(2)) + ",  \n\t\t\t\t\t" + df.format(averageVelocity2Copy.get(3)) + ", " + df.format(averageVelocity2Copy.get(4))
-//                                + "\n\tMean: " + df.format(stats2.get(0)) + "\n\tMaximum: " + df.format(stats2.get(1)) + "\n\tMinimum: " + df.format(stats2.get(2)) + "\n\tSD: " + df.format(stats2.get(3)) + "\n\tSEM "
-//                                + df.format(stats2.get(4)))
-//                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                mAverageVelocity1.clear();
-//                                mAverageVelocity2.clear();
-//                            }
-//                        })
-//                        .show();
-//            }
-//        });
     }
 
-    public void swapConditionsMessage(){
+    public void swapConditionsMessage() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -1452,43 +1720,320 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    public double getMax(double d1, double d2){
-        if(d1>d2){
-            return d1;
-        }
-        else{
-            return d2;
+    public void startFollowLine(View view) {
+        if (mFollowLine) {
+            clearFollowLineMode();
+        } else {
+            playSound(mSoundStartSong);
+            mFollowLine = true;
+            mBall.setVisible(false);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Button button = (Button) findViewById(R.id.line_follow_button);
+                    button.setText("End");
+                }
+            });
+
         }
     }
 
-    public double getMin(double d1, double d2){
-        if(d1<d2){
-            return d1;
+    public void finishFollowLine(){
+
+        int firstIndex = mFollowLineIndex;
+        int lastIndex = mTimeList.size() - 1;
+
+        int xPos = mTouchX;
+        int yPos = mTouchY;
+
+        List<String> subListPosX = new ArrayList<String>(mXPosList.subList(firstIndex, lastIndex));
+        List<String> subListPosY = new ArrayList<String>(mYPosList.subList(firstIndex, lastIndex));
+
+        List<Double> subListPosXDoub = new ArrayList<Double>();
+        List<Double> subListPosYDoub = new ArrayList<Double>();
+        for(String s : subListPosX){
+            subListPosXDoub.add(Double.parseDouble(s));
         }
-        else{
-            return d2;
+        for(String s1 : subListPosY){
+            subListPosYDoub.add(Double.parseDouble(s1));
         }
+
+        double score = calcFollowLineScore(xPos, yPos, subListPosXDoub, subListPosYDoub, firstIndex, lastIndex);
+        followLineMessage(xPos, yPos, subListPosXDoub, subListPosYDoub, score);
     }
 
-    public String isSignificant(double m1, double m2, double s1, double s2){
-        String msg = "";
+    public double calcFollowLineScore(int xPos, int yPos, List<Double> listPosX, List<Double> listPosY, int firstIndex, int lastIndex){
 
-        return msg;
+//        //these values are taken from Pattern01.java. Change here if changed in Pattern01.java
+//        int mLength1 = 600;
+//        int mLength2 = 300;
+//        int mLength3 = 500;
+//
+//        double dev = 0.;
+//
+//        int scoreMultiplier = 100000000;
+//
+//        for(int i = 0; i < listPosX.size(); i++)
+//        {
+//            //bin data into seperate conditions...
+//
+//            if(listPosY.get(i) > (yPos + mLength2/2))
+//            {
+//                if(listPosX.get(i) < (xPos + mLength1 - mLength2/2)){
+//                    //condition 1
+//                    dev += Math.pow(yPos - listPosY.get(i), 2);
+//                }else {
+//                    //condition 2
+//                    dev += Math.pow(xPos + mLength1 - listPosX.get(i), 2);
+//                }
+//            }else
+//            {
+//                if(listPosX.get(i) < (xPos + mLength1 - mLength2/2)){
+//                    //condition 3
+//                    dev += Math.pow(yPos - mLength2 - listPosY.get(i), 2);
+//                }else{
+//                    //condition 2
+//                    dev += Math.pow(xPos + mLength1 - listPosX.get(i), 2);
+//                }
+//            }
+//        }
+//        dev = dev/listPosX.size();
+//
+//        return scoreMultiplier/dev;
+
+        return (Double.parseDouble(mTimeList.get(lastIndex)) - Double.parseDouble(mTimeList.get(firstIndex)))/1000.;
     }
 
-    public static double Median(List values)
-    {
-        Collections.sort(values);
+    public void followLineMessage(int xPos, int yPos, List<Double> listPosX, List<Double> listPosY, double score){
+        //show message here
 
-        double median;
-        if (values.size() % 2 == 0)
-            median = ((double)values.get(values.size()/2) + (double)values.get(values.size()/2 - 1)/2);
-        else
-            median = (double) values.get(values.size()/2);
+        final int xPosFin = xPos;
+        final int yPosFin = yPos;
+        final List<Double> listPosXFin = new ArrayList<Double>(listPosX);
+        final List<Double> listPosYFin = new ArrayList<Double>(listPosY);
+        final double scoreFin = score;
 
-        return median;
+        runOnUiThread(new Runnable() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void run() {
+                AlertDialog dialog = new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setView(getLayoutInflater().inflate(R.layout.follow_the_line_message, null))
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
+
+                TextView textView = (TextView) dialog.findViewById(R.id.line_score_view);
+                textView.setText("Time: " + df.format(scoreFin) + " seconds\nBalls eaten: " + mBallCountScore);
+                mBallCountScore = 0;
+
+                Paint paint = new Paint();
+                paint.setColor(Color.parseColor("#CD5C5C"));
+                Paint paint2 = new Paint();
+                paint2.setColor(Color.BLACK);
+                Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bg);
+                for(int i=0; i < listPosXFin.size(); i++){
+                    canvas.drawCircle(listPosXFin.get(i).floatValue()/3.3f, listPosYFin.get(i).floatValue()/1.5f, 2, paint);
+                }
+                canvas.drawLine(xPosFin/3.3f, yPosFin/1.5f, (xPosFin + 600)/3.3f, yPosFin/1.5f, paint2);
+                canvas.drawLine((xPosFin + 600)/3.3f, yPosFin/1.5f, (xPosFin + 600)/3.3f, (yPosFin - 300)/1.5f, paint2);
+                canvas.drawLine((xPosFin + 600)/3.3f, (yPosFin - 300)/1.5f, (xPosFin + 100)/3.3f, (yPosFin - 300)/1.5f, paint2);
+                View ll = (View) dialog.findViewById(R.id.line_results_view);
+                ll.setBackground(new BitmapDrawable(getResources(), bg));
+            }
+        });
     }
 
+    public void onBallEaten(ConsumableBall ball){
+        ball.setVisible(false);
+        ball.setPhysical(false);
+        ball.setIsEaten(true);
+    }
+
+    public void resetAllConsumableBalls(){
+        mConsumableBall1.setVisible(false);
+        mConsumableBall1.setPhysical(false);
+        mConsumableBall1.setIsEaten(false);
+        mConsumableBall2.setVisible(false);
+        mConsumableBall2.setPhysical(false);
+        mConsumableBall2.setIsEaten(false);
+        mConsumableBall3.setVisible(false);
+        mConsumableBall3.setPhysical(false);
+        mConsumableBall3.setIsEaten(false);
+        mConsumableBall4.setVisible(false);
+        mConsumableBall4.setPhysical(false);
+        mConsumableBall4.setIsEaten(false);
+        mConsumableBall5.setVisible(false);
+        mConsumableBall5.setPhysical(false);
+        mConsumableBall5.setIsEaten(false);
+        mConsumableBall6.setVisible(false);
+        mConsumableBall6.setPhysical(false);
+        mConsumableBall6.setIsEaten(false);
+        mConsumableBall7.setVisible(false);
+        mConsumableBall7.setPhysical(false);
+        mConsumableBall7.setIsEaten(false);
+        mConsumableBall8.setVisible(false);
+        mConsumableBall8.setPhysical(false);
+        mConsumableBall8.setIsEaten(false);
+        mConsumableBall9.setVisible(false);
+        mConsumableBall9.setPhysical(false);
+        mConsumableBall9.setIsEaten(false);
+        mConsumableBall10.setVisible(false);
+        mConsumableBall10.setPhysical(false);
+        mConsumableBall10.setIsEaten(false);
+        mConsumableBall11.setVisible(false);
+        mConsumableBall11.setPhysical(false);
+        mConsumableBall11.setIsEaten(false);
+        mConsumableBall12.setVisible(false);
+        mConsumableBall12.setPhysical(false);
+        mConsumableBall12.setIsEaten(false);
+        mConsumableBall13.setVisible(false);
+        mConsumableBall13.setPhysical(false);
+        mConsumableBall13.setIsEaten(false);
+        mConsumableBall14.setVisible(false);
+        mConsumableBall14.setPhysical(false);
+        mConsumableBall14.setIsEaten(false);
+    }
+
+    public boolean areAllBallsEaten(){
+        return (mConsumableBall1.isEaten()&&mConsumableBall2.isEaten()&&mConsumableBall3.isEaten()&&mConsumableBall4.isEaten()&&mConsumableBall5.isEaten()&&
+                mConsumableBall6.isEaten()&&mConsumableBall7.isEaten()&&mConsumableBall8.isEaten()&&mConsumableBall9.isEaten()&&mConsumableBall10.isEaten()&&
+                mConsumableBall11.isEaten()&&mConsumableBall12.isEaten()&&mConsumableBall13.isEaten()&&mConsumableBall14.isEaten());
+    }
+
+    public void clearFollowLineMode(){
+        mBallCountScore = getNumBallsConsumed();
+        resetAllConsumableBalls();
+        mBall.setVisible(true);
+        mPattern.setVisible(false);
+        mPMan.setVisible(false);
+        mFollowLine = false;
+        stopSong();
+        playSound(mSoundEndSong);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Button button = (Button) findViewById(R.id.line_follow_button);
+                button.setText("PacEuglena");
+            }
+        });
+        finishFollowLine();
+    }
+
+    public void onEditHSVPressed(View view){
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setView(input)
+                        .setTitle("Change HSV")
+                        .setMessage("Default high: 96, 200, 255\nDefault low: 50, 50, 0")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                mInputText = input.getText().toString();
+                                String[] ar = mInputText.split(",");
+                                UPPER_HSV_THRESHOLD = new Scalar(Double.parseDouble(ar[0]), Double.parseDouble(ar[0]), Double.parseDouble(ar[0]));
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                                dialog.cancel();
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    public void onEditHSVPressed2(View view){
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setView(input)
+                        .setTitle("Change HSV")
+                        .setMessage("Default high: 96, 200, 255\nDefault low: 50, 50, 0")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                mInputText = input.getText().toString();
+                                String[] ar=mInputText.split(",");
+                                LOWER_HSV_THRESHOLD = new Scalar(Double.parseDouble(ar[0]),Double.parseDouble(ar[0]),Double.parseDouble(ar[0]));
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                                dialog.cancel();
+                            }
+                        })
+                        .show();
+            }
+        });
+
+
+    }
+
+    public int getNumBallsConsumed(){
+        int count = 0;
+
+        if(mConsumableBall1.isEaten()){
+            count++;
+        }
+        if(mConsumableBall2.isEaten()){
+            count++;
+        }
+        if(mConsumableBall3.isEaten()){
+            count++;
+        }
+        if(mConsumableBall4.isEaten()){
+            count++;
+        }
+        if(mConsumableBall5.isEaten()){
+            count++;
+        }
+        if(mConsumableBall6.isEaten()){
+            count++;
+        }
+        if(mConsumableBall7.isEaten()){
+            count++;
+        }
+        if(mConsumableBall8.isEaten()){
+            count++;
+        }
+        if(mConsumableBall9.isEaten()){
+            count++;
+        }
+        if(mConsumableBall10.isEaten()){
+            count++;
+        }
+        if(mConsumableBall11.isEaten()){
+            count++;
+        }
+        if(mConsumableBall12.isEaten()){
+            count++;
+        }
+        if(mConsumableBall13.isEaten()){
+            count++;
+        }
+        if(mConsumableBall14.isEaten()){
+            count++;
+        }
+
+        return count;
+    }
 }
-
 //Give clear message at the end for which condition is faster...
