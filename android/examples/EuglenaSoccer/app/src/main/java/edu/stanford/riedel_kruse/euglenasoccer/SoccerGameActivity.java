@@ -643,7 +643,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 isTapped = false;
                 mTraceEuglena = false;
                 mTraceEuglenaTapped = false;
-                //reset all velocity measurement stuff
+                mIntervalTimer = 1234567890L;
+                mTraceExpMidIndex = 0;
+                mTraceExpEndIndex = 0;
+                mTraceExpStartIndex = 0;
                 traceExpMessage();
             }
 
@@ -661,7 +664,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mStartMeasuring = false;
             }
 
-            if(mTimeMillis >= mIntervalTimer + TIME_BEFORE_LIGHT_STIMULUS){
+            if(mTimeMillis >= mIntervalTimer + TIME_BEFORE_LIGHT_STIMULUS*2){
                 dataCollectionFinished = true;
                 mTraceExpEndIndex = mTimeList.size();
             }
@@ -2125,19 +2128,34 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 Paint paint = new Paint();
                 paint.setColor(Color.parseColor("#CD5C5C"));
                 Paint paint2 = new Paint();
-                paint2.setColor(Color.BLACK);
+                paint2.setColor(Color.WHITE);
                 Paint paint3 = new Paint();
-                paint3.setColor(Color.BLUE);
+                paint3.setColor(Color.GREEN);
+                Paint paint4 = new Paint();
+                paint4.setColor(Color.RED);
+                Paint paint5 = new Paint();
+                paint5.setColor(Color.YELLOW);
                 Bitmap bg = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
+
+                canvas.drawRect(0, 0, 640, 360, paint2);
 
                 for(int i=1; i < listPosXFin.size(); i++){
                     canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paint);
                 }
 
                 canvas.drawCircle(listPosXFin.get(0).floatValue()/2f, listPosYFin.get(0).floatValue()/2f, 5, paint3);
-                canvas.drawCircle(listPosXFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, listPosYFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, 5, paint3);
-                canvas.drawCircle(listPosXFin.get(listPosXFin.size()-1).floatValue()/2f, listPosYFin.get(listPosXFin.size()-1).floatValue()/2f, 5, paint3);
+                canvas.drawCircle(listPosXFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, listPosYFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, 5, paint5);
+                canvas.drawCircle(listPosXFin.get(listPosXFin.size() - 1).floatValue() / 2f, listPosYFin.get(listPosXFin.size()-1).floatValue()/2f, 5, paint4);
+
+                canvas.drawLine(450, 300, 530, 300, paint);
+
+//                canvas.drawLine(0, 0, 639, 0, paint);
+//                canvas.drawLine(639, 0, 639, 359, paint);
+//                canvas.drawLine(639, 359, 0, 359, paint);
+//                canvas.drawLine(0, 359, 0, 0, paint);
+
+
 
                 View ll = (View) dialog.findViewById(R.id.line_results_view);
                 ll.setBackground(new BitmapDrawable(getResources(), bg));

@@ -17,8 +17,8 @@
             android:layout_gravity="center_horizontal"
             android:text="Euglena Trace"
             android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_margin="10dp"
+            android:textSize="15sp"
+            android:layout_margin="5sp"
             android:typeface="serif"/>
 
         <TextView
@@ -28,16 +28,16 @@
             android:layout_gravity="center_horizontal"
             android:text="ERR"
             android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_margin="10dp"
+            android:textSize="10sp"
+            android:layout_margin="2dp"
             android:typeface="serif"/>
 
         <View
             android:id = "@+id/line_results_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="390dp"
+            android:layout_height="240dp"
             android:layout_gravity="center_horizontal"
-            android:layout_margin="20dp"/>
+            android:layout_margin="10dp"/>
     </LinearLayout>
 
 </ScrollView>
