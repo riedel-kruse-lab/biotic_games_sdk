@@ -1,11 +1,19 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -292,6 +300,19 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mRightGoal.setVisible(mTutorial.shouldDrawGoals());
             }
         }
+
+        /*
+        Data tracking stuff start
+         */
+        if (mTutorial == null) {
+            trackData(mBall.x(), mBall.y(), pointToAngle(mBall.direction()), mBallSpeed, mLightDir, mTimeMillis, mBoolIsTapped);
+        }
+
+        mBoolIsTapped = false;
+
+        /*
+        Data tracking stuff end
+         */
     }
 
     @Override
@@ -480,11 +501,20 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         displayMessage(mResources.getString(R.string.goal));
 
         if (mScore >= GAME_OVER_SCORE) {
-            finish();
+//            endGame();
 
-            Intent intent = new Intent(this, HighScoreActivity.class);
-            intent.putExtra(EXTRA_TIME, (int) mTimeMillis / MILLIS_PER_SEC);
-            startActivity(intent);
+            /*
+            Code to display trace before ending game
+             */
+
+            List<Double> xPosList = createTraceList(mXPosList);
+            List<Double> yPosList = createTraceList(mYPosList);
+
+            followLineMessage(xPosList, yPosList);
+
+            /*
+            End code to display trace before ending game
+             */
         }
     }
 
@@ -654,4 +684,188 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
+    public void endGame(){
+        finish();
+
+        Intent intent = new Intent(this, HighScoreActivity.class);
+        intent.putExtra(EXTRA_TIME, (int) mTimeMillis / MILLIS_PER_SEC);
+        startActivity(intent);
+    }
+
+    /*
+    All Data logging stuff is here...
+     */
+
+    List<String> mXPosList = new ArrayList<String>();
+    List<String> mYPosList = new ArrayList<String>();
+    List<String> mAngleList = new ArrayList<String>();
+    List<String> mSpeedList = new ArrayList<String>();
+    List<String> mLightDirList = new ArrayList<String>();
+    List<String> mTimeList = new ArrayList<String>();
+    List<String> mIsTapped = new ArrayList<String>();
+    double mLightDir = 0; //four digit double where the 1000's place is left, 100's is right, 10's is up, and 1's is down
+
+    //These are arraylists that contain the averaged velocity traces for each run
+    List<Double> mAverageVelocity1 = new ArrayList<Double>();
+    List<Double> mAverageVelocity2 = new ArrayList<Double>();
+
+    private Boolean mBoolIsTapped = false;
+
+    //Called every frame, and calls all the other functions necessary to log data
+    public void trackData(double xPos, double yPos, double angle, double speed, double lightDir, Long time, boolean tapped) {
+        updateX(xPos);
+        updateY(yPos);
+        updateAngle(angle);
+        updateSpeed(speed);
+        updateLightDir(lightDir);
+        updateTimeList(time);
+        updateIsTapped(tapped);
+    }
+
+    public void updateX(double xPos) {
+        mXPosList.add(Double.toString(xPos));
+    }
+
+    public void updateY(double yPos) {
+        mYPosList.add(Double.toString(yPos));
+    }
+
+    public void updateAngle(double angle) {
+        mAngleList.add(Double.toString(angle));
+    }
+
+    public void updateSpeed(double speed) {
+        mSpeedList.add(Double.toString(speed));
+    }
+
+    public void updateLightDir(double lightDir) {
+        mLightDirList.add(Double.toString(lightDir));
+    }
+
+    public void updateTimeList(Long currentTime) {
+        mTimeList.add(Long.toString(currentTime));
+    }
+
+    public void updateIsTapped(boolean tapped) {
+        mIsTapped.add(Boolean.toString(tapped));
+    }
+
+    public String convertListToString(List<String> input) {
+        String output = "";
+        for (String s : input) {
+            output += s + ",";
+        }
+        return output;
+    }
+
+    public void resetDataVectors() {
+        mXPosList.clear();
+        mYPosList.clear();
+        mAngleList.clear();
+        mSpeedList.clear();
+        mLightDirList.clear();
+        mTimeList.clear();
+        mIsTapped.clear();
+    }
+
+    public double pointToAngle(Point point) {
+        if (point.x == 0 && point.y == 0) {
+            return 10.0;
+        } else if (point.x == 0) {
+            if (point.y > 0) {
+                return Math.PI / 2;
+            } else {
+                return 3 * Math.PI / 2;
+            }
+        } else if (point.y == 0) {
+            if (point.x > 0) {
+                return 0.0;
+            } else {
+                return Math.PI;
+            }
+        } else {
+            double angle = Math.atan2(point.x, point.y);
+
+            //Case Quadrant I:
+            //Do nothing
+
+            //Case Quadrant II/III:
+            /*if(point.x < 0){
+                angle += Math.PI;
+            }else if(point.y <0){ //case Quadrant IV:
+                angle = 2*Math.PI + angle;
+            }*/
+
+            return angle;
+        }
+    }
+
+
+    /*
+    Data tracking stuff end
+     */
+
+
+    /*
+    Follow line stuff starts here
+     */
+
+
+
+    public List<Double> createTraceList(List<String> list){
+        int numPointToDraw = 200;
+        List<Double> returnList = new ArrayList<Double>();
+
+        if (list.size() < numPointToDraw) {
+            for (int i = 0; i < list.size(); i++) {
+                returnList.add(Double.parseDouble(list.get(i)));
+            }
+        }else{
+            int startIndex = list.size() - numPointToDraw;
+            for (int i = startIndex; i < list.size(); i++) {
+                returnList.add(Double.parseDouble(list.get(i)));
+            }
+        }
+
+        return returnList;
+    }
+
+    public void followLineMessage(List<Double> listPosX, List<Double> listPosY){
+        //show message here
+
+        final List<Double> listPosXFin = new ArrayList<Double>(listPosX);
+        final List<Double> listPosYFin = new ArrayList<Double>(listPosY);
+
+        runOnUiThread(new Runnable() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void run() {
+                AlertDialog dialog = new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setView(getLayoutInflater().inflate(R.layout.euglena_trace, null))
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                endGame();
+                            }
+                        })
+                        .show();
+
+                Paint paint = new Paint();
+                paint.setColor(Color.parseColor("#CD5C5C"));
+                Paint paint2 = new Paint();
+                paint2.setColor(Color.BLACK);
+                Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bg);
+                for(int i=0; i < listPosXFin.size(); i++){
+                    canvas.drawCircle(listPosXFin.get(i).floatValue()/3.3f, listPosYFin.get(i).floatValue()/1.5f, 2, paint);
+                }
+                View ll = (View) dialog.findViewById(R.id.trace_view);
+                ll.setBackground(new BitmapDrawable(getResources(), bg));
+            }
+        });
+    }
+
+
+    /*
+    Follow line stuff end
+     */
 }
