@@ -23,7 +23,7 @@ public class SoccerBall extends GameObject {
     private static final int OUTLINE_THICKNESS = 5;
     private static final Scalar PENTAGONS_COLOR = new Scalar(150, 150, 150);
 
-    private static final int TRACKING_CIRCLE_RADIUS = RADIUS * 2;
+    private static final int TRACKING_CIRCLE_RADIUS = RADIUS * 3;
     private static final Scalar TRACKING_CIRCLE_COLOR = new Scalar(255, 0, 0);
     private static final int TRACKING_CIRCLE_THICKNESS = 3;
 
@@ -105,7 +105,6 @@ public class SoccerBall extends GameObject {
     public void setDirectionVisible(boolean directionVisible) {
         mDrawDirection = directionVisible;
     }
-
 
     public Point direction() {
         return mDirection.clone();

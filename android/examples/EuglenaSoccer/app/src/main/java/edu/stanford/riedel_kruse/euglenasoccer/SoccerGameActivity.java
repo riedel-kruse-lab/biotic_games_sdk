@@ -55,7 +55,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private static final int GAME_OVER_SCORE = 5;
 
-    private static final int PASS_TIME = 400;
+    private static final int PASS_TIME = 800;
     /**
      * How fast the ball moves when passed in pixels/ms.
      */
@@ -452,10 +452,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         // Create a region of interest based on the location of the ball.
         Rect roi = new Rect();
-        roi.x = Math.max((int) ballLocation.x - SoccerBall.RADIUS, 0);
-        roi.y = Math.max((int) ballLocation.y - SoccerBall.RADIUS, 0);
-        roi.width = Math.min(SoccerBall.RADIUS * 2, mFieldWidth - roi.x);
-        roi.height = Math.min(SoccerBall.RADIUS * 2, mFieldHeight - roi.y);
+        roi.x = Math.max((int) ballLocation.x - SoccerBall.RADIUS*2, 0);
+        roi.y = Math.max((int) ballLocation.y - SoccerBall.RADIUS*2, 0);
+        roi.width = Math.min(SoccerBall.RADIUS * 4, mFieldWidth - roi.x);
+        roi.height = Math.min(SoccerBall.RADIUS * 4, mFieldHeight - roi.y);
 
         return roi;
     }
@@ -468,7 +468,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
 
         // Find all things that look like Euglena in the region of interest.
-        List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi);
+        List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi, new Scalar(96, 200, 255), new Scalar(30, 30, 0));
 
         // Find the location of the Euglena that is closest to the ball.
         return MathUtil.findClosestPoint(ballLocation, euglenaLocations);
