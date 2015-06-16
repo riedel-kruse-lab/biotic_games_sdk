@@ -22,6 +22,7 @@ import org.opencv.core.Scalar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
 import edu.stanford.riedel_kruse.bioticgamessdk.CameraView;
@@ -72,22 +73,21 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private Tutorial mTutorial;
 
+    private Boolean mRightIsCorrect = false;
+
     private enum Direction {
         LEFT,
         RIGHT
     }
 
     private SoccerBall mBall;
-    private LeftGoal mLeftGoal;
-    private RightGoal mRightGoal;
+    private QuestionBox mAnswerL;
+    private QuestionBox mAnswerR;
 
     private int mFieldWidth;
     private int mFieldHeight;
     private int mScore;
     private long mTimeMillis;
-    private int mNumDirectionSwitches;
-
-    private Direction mCurrentDirection;
 
     private boolean mPassing;
     private int mPassingTime;
@@ -162,21 +162,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mFieldWidth = width;
         mFieldHeight = height;
 
-        // Add the soccer field lines
-        SoccerField soccerField = new SoccerField();
-        addGameObject(soccerField);
+        mAnswerL = new QuestionBox(new Point(0,0), width/10, height, "Yes", COLOR_RED);
+        mAnswerR = new QuestionBox(new Point(9*width/10,0), width/10, height, "No", COLOR_RED);
 
-        // Set up the goals
-        int goalHeight = height * 4 / 7;
-        int goalWidth = 10;
-        int goalY = (height - goalHeight) / 2;
-        int goalOffset = SoccerField.PADDING + SoccerField.LINE_THICKNESS;
-        mLeftGoal = new LeftGoal(new Point(goalOffset, goalY), goalWidth, goalHeight,
-                COLOR_RED);
-        mRightGoal = new RightGoal(new Point(width - goalWidth - goalOffset, goalY),
-                goalWidth, goalHeight, COLOR_RED);
-        addGameObject(mLeftGoal);
-        addGameObject(mRightGoal);
+        addGameObject(mAnswerL);
+        addGameObject(mAnswerR);
 
         LineObject scaleLine = new LineObject(mFieldWidth - 300,
                 mFieldHeight - SoccerField.PADDING * 2 - 50, mFieldWidth - 150,
@@ -218,13 +208,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mBottomLightIndicator.setVisible(false);
         addGameObject(mBottomLightIndicator);
 
-        // Set the current direction to right and hide the left goal.
-        mCurrentDirection = Direction.RIGHT;
-        mLeftGoal.setVisible(false);
-        mLeftGoal.setPhysical(false);
+        // Hide the questionboxes.
 
-        // Initialize the number of switches in direction to 0 since none have happened yet.
-        mNumDirectionSwitches = 0;
+        mAnswerL.setVisible(false);
+        mAnswerL.setPhysical(false);
+        mAnswerR.setVisible(false);
+        mAnswerR.setPhysical(false);
 
         // Add the soccer ball
         mBall = new SoccerBall(new Point(width / 2, height / 2));
@@ -243,17 +232,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mRecentBallPositions = new ArrayList<Point>();
 
         // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
-        addCollisionCallback(new CollisionCallback(mBall, mLeftGoal) {
+        addCollisionCallback(new CollisionCallback(mBall, mAnswerL) {
             @Override
             public void onCollision() {
-                onGoalScored();
+                onGoalScoredL();
             }
         });
 
-        addCollisionCallback(new CollisionCallback(mBall, mRightGoal) {
+        addCollisionCallback(new CollisionCallback(mBall, mAnswerR) {
             @Override
             public void onCollision() {
-                onGoalScored();
+                onGoalScoredR();
             }
         });
     }
@@ -272,9 +261,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         // Decide whether or not it's time to switch directions. Need to add 1 otherwise direction
         // will switch before the first time MILLIS_PER_DIRECTION milliseconds have passed.
-        if (mTimeMillis > (mNumDirectionSwitches + 1) * MILLIS_PER_DIRECTION) {
-            switchDirections();
-        }
+//        if (mTimeMillis > (mNumDirectionSwitches + 1) * MILLIS_PER_DIRECTION) {
+//            switchDirections();
+//        }
 
         if (mTutorial == null || mTutorial.shouldUpdateZoomView()) {
             updateZoomView(frame);
@@ -288,9 +277,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         if (mTutorial != null) {
             mBall.setVisible(mTutorial.shouldDrawBall());
             mBall.setDirectionVisible(mTutorial.shouldDrawDirection());
-            if (mNumDirectionSwitches == 0) {
-                mRightGoal.setVisible(mTutorial.shouldDrawGoals());
-            }
+        }
+
+        if (mTutorial == null){
+            showQuestion();
         }
     }
 
@@ -347,9 +337,24 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             return super.onTouchEvent(event);
         }
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                simulateButtonPress((Button) findViewById(R.id.action_button));
+        mBall.setPosition(new Point(event.getX() - 30, event.getY() - 180));
+
+        mAnswerL.setVisible(true);
+        mAnswerR.setVisible(true);
+        mAnswerL.setPhysical(true);
+        mAnswerR.setPhysical(true);
+
+        Random rand = new Random();
+        Double rDoub = rand.nextDouble();
+
+        if(rDoub < 0.5){
+            mRightIsCorrect = true;
+            mAnswerR.setText("No");
+            mAnswerL.setText("Yes");
+        }else{
+            mRightIsCorrect = false;
+            mAnswerR.setText("Yes");
+            mAnswerL.setText("No");
         }
 
         return super.onTouchEvent(event);
@@ -469,24 +474,48 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         return MathUtil.findClosestPoint(ballLocation, euglenaLocations);
     }
 
-    private void onGoalScored() {
+    private void onGoalScoredL() {
         resetBall();
 
-        // Increase the score
-        setScore(mScore + 1);
+        if(!mRightIsCorrect)   {
+            // Increase the score
+            setScore(mScore + 1);
 
-        playSound(mSoundIdCrowdCheer);
+            playSound(mSoundIdCrowdCheer);
 
-        displayMessage(mResources.getString(R.string.goal));
+            displayCenterMessage("Correct!");
 
-        if (mScore >= GAME_OVER_SCORE) {
-            finish();
+            if (mScore >= GAME_OVER_SCORE) {
+                finish();
 
-            Intent intent = new Intent(this, HighScoreActivity.class);
-            intent.putExtra(EXTRA_TIME, (int) mTimeMillis / MILLIS_PER_SEC);
-            startActivity(intent);
+                Intent intent = new Intent(this, HighScoreActivity.class);
+                intent.putExtra(EXTRA_TIME, (int) mTimeMillis / MILLIS_PER_SEC);
+                startActivity(intent);
+            }
         }
     }
+
+    private void onGoalScoredR() {
+        resetBall();
+
+        if(mRightIsCorrect)   {
+            // Increase the score
+            setScore(mScore + 1);
+
+            playSound(mSoundIdCrowdCheer);
+
+            displayCenterMessage("Correct!");
+
+            if (mScore >= GAME_OVER_SCORE) {
+                finish();
+
+                Intent intent = new Intent(this, HighScoreActivity.class);
+                intent.putExtra(EXTRA_TIME, (int) mTimeMillis / MILLIS_PER_SEC);
+                startActivity(intent);
+            }
+        }
+    }
+
 
     private void onOutOfBounds() {
         resetBall();
@@ -611,25 +640,16 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    private void switchDirections() {
-        if (mTutorial != null && !mTutorial.shouldDrawGoals()) {
-            return;
-        }
+    private void displayCenterMessage(final String message) {
+        mMessageTime = 0;
 
-        mLeftGoal.setPhysical(!mLeftGoal.isPhysical());
-        mLeftGoal.setVisible(!mLeftGoal.isVisible());
-
-        mRightGoal.setPhysical(!mRightGoal.isPhysical());
-        mRightGoal.setVisible(!mRightGoal.isVisible());
-
-        if (mCurrentDirection == Direction.RIGHT) {
-            mCurrentDirection = Direction.LEFT;
-        }
-        else {
-            mCurrentDirection = Direction.RIGHT;
-        }
-
-        mNumDirectionSwitches++;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView messageView = (TextView) findViewById(R.id.center_message);
+                messageView.setText(message);
+            }
+        });
     }
 
     private void playSound(int soundId) {
@@ -650,6 +670,16 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             public void run() {
                 ImageView zoomView = (ImageView) findViewById(R.id.zoom_view);
                 zoomView.setImageBitmap(zoomBitmap);
+            }
+        });
+    }
+
+    public void showQuestion(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView messageView = (TextView) findViewById(R.id.question);
+                messageView.setText("Are Euglena bacteria?");
             }
         });
     }
