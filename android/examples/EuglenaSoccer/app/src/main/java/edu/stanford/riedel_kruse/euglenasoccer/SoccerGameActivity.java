@@ -1835,12 +1835,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 paint2.setColor(Color.BLACK);
                 Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
-                for(int i=0; i < listPosXFin.size(); i++){
-                    canvas.drawCircle(listPosXFin.get(i).floatValue()/3.3f, listPosYFin.get(i).floatValue()/1.5f, 2, paint);
+                for (int i = 0; i < listPosXFin.size(); i++) {
+                    canvas.drawCircle(listPosXFin.get(i).floatValue() / 3.3f, listPosYFin.get(i).floatValue() / 1.5f, 2, paint);
                 }
-                canvas.drawLine(xPosFin/3.3f, yPosFin/1.5f, (xPosFin + 600)/3.3f, yPosFin/1.5f, paint2);
-                canvas.drawLine((xPosFin + 600)/3.3f, yPosFin/1.5f, (xPosFin + 600)/3.3f, (yPosFin - 300)/1.5f, paint2);
-                canvas.drawLine((xPosFin + 600)/3.3f, (yPosFin - 300)/1.5f, (xPosFin + 100)/3.3f, (yPosFin - 300)/1.5f, paint2);
+                canvas.drawLine(xPosFin / 3.3f, yPosFin / 1.5f, (xPosFin + 600) / 3.3f, yPosFin / 1.5f, paint2);
+                canvas.drawLine((xPosFin + 600) / 3.3f, yPosFin / 1.5f, (xPosFin + 600) / 3.3f, (yPosFin - 300) / 1.5f, paint2);
+                canvas.drawLine((xPosFin + 600) / 3.3f, (yPosFin - 300) / 1.5f, (xPosFin + 100) / 3.3f, (yPosFin - 300) / 1.5f, paint2);
                 View ll = (View) dialog.findViewById(R.id.line_results_view);
                 ll.setBackground(new BitmapDrawable(getResources(), bg));
             }
@@ -2035,5 +2035,57 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         return count;
     }
+
+    /*
+    Below is code for the trace generating experiment
+     */
+
+    final private double TIME_BEFORE_LIGHT_STIMULUS = 2.;
+
+    public void onTraceGeneratorPressed(View view){
+        //Display message explaining the steps
+            //First, need to direct light and select Euglena
+            //Second, need to change light direction after noise...
+            //After set amount of time, the trace is automatically saved and the activity ends
+
+    }
+
+    public void traceMessage(List<Double> listX, List<Double> listY){
+
+        final List<Double> listPosXFin = new ArrayList<>();
+        final List<Double> listPosYFin = new ArrayList<>();
+
+        runOnUiThread(new Runnable() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void run() {
+                AlertDialog dialog = new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setView(getLayoutInflater().inflate(R.layout.follow_the_line_message, null))
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
+
+                TextView textView = (TextView) dialog.findViewById(R.id.line_score_view);
+                textView.setText("Time: ");
+                Paint paint = new Paint();
+                paint.setColor(Color.parseColor("#CD5C5C"));
+                Paint paint2 = new Paint();
+                paint2.setColor(Color.BLACK);
+                Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bg);
+                for(int i=0; i < listPosXFin.size(); i++){
+                    canvas.drawCircle(listPosXFin.get(i).floatValue()/3.3f, listPosYFin.get(i).floatValue()/1.5f, 2, paint);
+                }
+                View ll = (View) dialog.findViewById(R.id.line_results_view);
+                ll.setBackground(new BitmapDrawable(getResources(), bg));
+            }
+        });
+    }
+
+    /*
+    End code for trace generating experiment
+     */
 }
 //Give clear message at the end for which condition is faster...
