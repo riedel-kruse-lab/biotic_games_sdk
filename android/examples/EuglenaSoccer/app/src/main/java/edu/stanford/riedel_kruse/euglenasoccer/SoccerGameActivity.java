@@ -168,6 +168,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private int mSoundIdWakka;
     private int mSoundStartSong;
     private int mSoundEndSong;
+    private int mJumpSound;
     private int mPlayingSoundFX = 0;
     private int mPlayingSountrack = 0;
 
@@ -204,9 +205,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private boolean endGame = false;
     private boolean velocityCalculate = false;
     private boolean velocityCalculateTapped = false;
+    private boolean mTraceEuglena = false;
+    private boolean mTraceEuglenaTapped = false;
     private boolean plotGraph = false;
     private boolean isTapped = false;
-    private boolean mStartMeasuringVelocity = false;
+    private boolean mStartMeasuring = false;
     private boolean dataCollectionFinished = false;
     private boolean mFollowLine = false;
     private Scalar LOWER_HSV_THRESHOLD = new Scalar(30, 30, 0);
@@ -214,9 +217,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     final DecimalFormat df = new DecimalFormat("0.00");
     final DecimalFormat df1 = new DecimalFormat("0.0");
-    private Long mVelocityTimer = 1234567890L;
+    private Long mIntervalTimer = 1234567890L;
 
     private int mFollowLineIndex = 0;
+    private int mTraceExpStartIndex = 0;
+    private int mTraceExpMidIndex = 0;
+    private int mTraceExpEndIndex = 0;
 
     private String mInputText = "";
 
@@ -241,6 +247,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mSoundIdWakka = mSoundPool.load(this, R.raw.wakka, SOUND_POOL_PRIORITY);
         mSoundStartSong = mSoundPool.load(this, R.raw.start_song, SOUND_POOL_PRIORITY);
         mSoundEndSong = mSoundPool.load(this, R.raw.end_song, SOUND_POOL_PRIORITY);
+        mJumpSound = mSoundPool.load(this, R.raw.jump_sound, SOUND_POOL_PRIORITY);
 
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -605,22 +612,66 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             //calculate avg speed for next two seconds on tap...
 
             if (isTapped) {
-                mVelocityTimer = mTimeMillis + INTERVAL_FOR_COMPUTING_AVG_SPD_2;
-                mStartMeasuringVelocity = true;
+                mIntervalTimer = mTimeMillis + INTERVAL_FOR_COMPUTING_AVG_SPD_2;
+                mStartMeasuring = true;
             }
 
-            if ((mTimeMillis >= mVelocityTimer) && mStartMeasuringVelocity) {
+            if ((mTimeMillis >= mIntervalTimer) && mStartMeasuring) {
                 //This function needs to back-calculate the average velocity over the past 2 seconds
                 //and keep track of the number of different counts. After 5 samples, starts the
                 //next condition. After that, set dataCollectionFinished = true
                 avgSpeedInterval2();
-                mStartMeasuringVelocity = false;
+                mStartMeasuring = false;
             }
 
             if (dataCollectionFinished) {
                 dataCollectionFinished = false;
                 velocityCalculate = false;
                 avgVelocityFinishedMessage();
+            }
+
+//            try {
+//                createDataFile();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+        }
+
+        if (mTraceEuglena == true) {
+            //only enter this function the first time
+            if (mTraceEuglenaTapped) {
+                isTapped = false;
+                mTraceEuglena = false;
+                mTraceEuglenaTapped = false;
+                //reset all velocity measurement stuff
+                traceExpMessage();
+            }
+
+            //calculate avg speed for next two seconds on tap...
+
+            if (isTapped) {
+                mIntervalTimer = mTimeMillis + TIME_BEFORE_LIGHT_STIMULUS;
+                mTraceExpStartIndex = mTimeList.size();
+                mStartMeasuring = true;
+            }
+
+            if ((mTimeMillis >= mIntervalTimer) && mStartMeasuring) {
+                playSound(mJumpSound);
+                mTraceExpMidIndex = mTimeList.size();
+                mStartMeasuring = false;
+            }
+
+            if(mTimeMillis >= mIntervalTimer + TIME_BEFORE_LIGHT_STIMULUS){
+                dataCollectionFinished = true;
+                mTraceExpEndIndex = mTimeList.size();
+            }
+
+            if (dataCollectionFinished) {
+                dataCollectionFinished = false;
+                mTraceEuglena = false;
+                List<Double> listX = new ArrayList<>(convertStringListToDouble(mXPosList, mTraceExpStartIndex, mTraceExpEndIndex));
+                List<Double> listY = new ArrayList<>(convertStringListToDouble(mYPosList, mTraceExpStartIndex, mTraceExpEndIndex));
+                traceFinishedMessage(listX, listY);
             }
 
 //            try {
@@ -2040,20 +2091,22 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     Below is code for the trace generating experiment
      */
 
-    final private double TIME_BEFORE_LIGHT_STIMULUS = 2.;
+    final private int TIME_BEFORE_LIGHT_STIMULUS = 2000;
 
     public void onTraceGeneratorPressed(View view){
         //Display message explaining the steps
             //First, need to direct light and select Euglena
             //Second, need to change light direction after noise...
             //After set amount of time, the trace is automatically saved and the activity ends
+        mTraceEuglena = true;
+        mTraceEuglenaTapped = true;
 
     }
 
-    public void traceMessage(List<Double> listX, List<Double> listY){
+    public void traceFinishedMessage(List<Double> listX, List<Double> listY){
 
-        final List<Double> listPosXFin = new ArrayList<>();
-        final List<Double> listPosYFin = new ArrayList<>();
+        final List<Double> listPosXFin = new ArrayList<>(listX);
+        final List<Double> listPosYFin = new ArrayList<>(listY);
 
         runOnUiThread(new Runnable() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -2073,17 +2126,58 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 paint.setColor(Color.parseColor("#CD5C5C"));
                 Paint paint2 = new Paint();
                 paint2.setColor(Color.BLACK);
-                Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
+                Paint paint3 = new Paint();
+                paint3.setColor(Color.BLUE);
+                Bitmap bg = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
-                for(int i=0; i < listPosXFin.size(); i++){
-                    canvas.drawCircle(listPosXFin.get(i).floatValue()/3.3f, listPosYFin.get(i).floatValue()/1.5f, 2, paint);
+
+                for(int i=1; i < listPosXFin.size(); i++){
+                    canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paint);
                 }
+
+                canvas.drawCircle(listPosXFin.get(0).floatValue()/2f, listPosYFin.get(0).floatValue()/2f, 5, paint3);
+                canvas.drawCircle(listPosXFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, listPosYFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, 5, paint3);
+                canvas.drawCircle(listPosXFin.get(listPosXFin.size()-1).floatValue()/2f, listPosYFin.get(listPosXFin.size()-1).floatValue()/2f, 5, paint3);
+
                 View ll = (View) dialog.findViewById(R.id.line_results_view);
                 ll.setBackground(new BitmapDrawable(getResources(), bg));
             }
         });
     }
 
+    public void traceExpMessage(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SoccerGameActivity.this)
+                        .setTitle("Euglena Trace Experiment")
+                        .setMessage("In this experiment, you will obtain the trace of a swimming Euglena. Apply constant light stimulus and " +
+                                "select a responsive organism. After " + df1.format(TIME_BEFORE_LIGHT_STIMULUS / 1000.0) + " seconds, a beep will sound. " +
+                                "Change the direction of the light stimulus when you hear the beep.")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                mTraceEuglena = true;
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    public List<Double> convertStringListToDouble(List<String> list, int startIndex, int endIndex){
+        List<Double> returnList = new ArrayList<>();
+
+        for(int i = startIndex; i < endIndex; i++){
+            returnList.add(Double.parseDouble(list.get(i)));
+        }
+
+        return returnList;
+    }
     /*
     End code for trace generating experiment
      */
