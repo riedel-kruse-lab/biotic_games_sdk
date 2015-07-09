@@ -63,9 +63,11 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -201,6 +203,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private int mBallCountScore = 0;
 
+    private BoxedRegion mBoxedRegion;
+
     private int frameCount;
     private boolean endGame = false;
     private boolean velocityCalculate = false;
@@ -273,7 +277,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         CameraView cameraView = getCameraView();
 
         Camera.Parameters params = cameraView.getCameraParameters();
-        params.setZoom(params.getMaxZoom() / 2);
+        params.setZoom((int)(params.getMaxZoom() / 3.3));
+//        params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_FLUORESCENT);
+//        params.setAutoWhiteBalanceLock(true);
         cameraView.setCameraParameters(params);
 
         // Store image width and height for future use
@@ -283,6 +289,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         // Add the soccer field lines
         SoccerField soccerField = new SoccerField();
         //addGameObject(soccerField);
+
+        //Add boxed tapping region
+        mBoxedRegion = new BoxedRegion(new Point(0,0));
+        addGameObject(mBoxedRegion);
+        mBoxedRegion.setVisible(false);
 
         //Add guide patterns
         mPattern = new Pattern01(new Point(mTouchX, mTouchY));
@@ -664,9 +675,16 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mStartMeasuring = false;
             }
 
-            if(mTimeMillis >= mIntervalTimer + TIME_BEFORE_LIGHT_STIMULUS*2){
+            if(mTimeMillis >= mIntervalTimer + TIME_AFTER_LIGHT_STIMULUS){
                 dataCollectionFinished = true;
                 mTraceExpEndIndex = mTimeList.size();
+
+                Double humanReactionOffsetTime = Double.parseDouble(mTimeList.get(mTraceExpMidIndex)) + HUMAN_REACTION_TIME;
+                int tempMidIndex = 0;
+                for(int i = mTraceExpMidIndex; humanReactionOffsetTime > Double.parseDouble(mTimeList.get(i)); i++){
+                    tempMidIndex = i;
+                }
+                mTraceExpMidIndex = tempMidIndex;
             }
 
             if (dataCollectionFinished) {
@@ -1030,6 +1048,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
             mPMan.setPosition(new Point(mTouchX, mTouchY));
             mPMan.setVisible(true);
+            mBoxedRegion.setVisible(false);
 
             loopSong(mSoundIdWakka);
         }
@@ -1166,6 +1185,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private void updateZoomView(Mat frame) {
         Rect roi = roiForBall();
         Mat zoomMat = new Mat(frame, roi);
+
+//        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
+//        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
+
         final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
                 Bitmap.Config.ARGB_8888);
 
@@ -1780,6 +1803,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         } else {
             playSound(mSoundStartSong);
             mFollowLine = true;
+            mBoxedRegion.setVisible(true);
             mBall.setVisible(false);
             runOnUiThread(new Runnable() {
                 @Override
@@ -2037,8 +2061,6 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         .show();
             }
         });
-
-
     }
 
     public int getNumBallsConsumed(){
@@ -2094,7 +2116,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     Below is code for the trace generating experiment
      */
 
-    final private int TIME_BEFORE_LIGHT_STIMULUS = 2000;
+    final private int TIME_BEFORE_LIGHT_STIMULUS = 2750;
+    final private int TIME_AFTER_LIGHT_STIMULUS = 5000;
+    final private int HUMAN_REACTION_TIME = 250;
 
     public void onTraceGeneratorPressed(View view){
         //Display message explaining the steps
@@ -2124,44 +2148,66 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         .show();
 
                 TextView textView = (TextView) dialog.findViewById(R.id.line_score_view);
-                textView.setText("Time: ");
+                textView.setVisibility(View.GONE);
                 Paint paint = new Paint();
-                paint.setColor(Color.parseColor("#CD5C5C"));
+                paint.setColor(Color.BLACK);
                 Paint paint2 = new Paint();
-                paint2.setColor(Color.WHITE);
+                paint2.setColor(Color.LTGRAY);
                 Paint paint3 = new Paint();
                 paint3.setColor(Color.GREEN);
                 Paint paint4 = new Paint();
                 paint4.setColor(Color.RED);
                 Paint paint5 = new Paint();
                 paint5.setColor(Color.YELLOW);
+                Paint paintBlue = new Paint();
+                paintBlue.setColor(Color.BLUE);
                 Bitmap bg = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
 
                 canvas.drawRect(0, 0, 640, 360, paint2);
 
-                for(int i=1; i < listPosXFin.size(); i++){
-                    canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paint);
+                for(int i=0; i < mTraceExpMidIndex - mTraceExpStartIndex; i++){
+                    canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paint5);
                 }
 
-                canvas.drawCircle(listPosXFin.get(0).floatValue()/2f, listPosYFin.get(0).floatValue()/2f, 5, paint3);
-                canvas.drawCircle(listPosXFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, listPosYFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, 5, paint5);
-                canvas.drawCircle(listPosXFin.get(listPosXFin.size() - 1).floatValue() / 2f, listPosYFin.get(listPosXFin.size()-1).floatValue()/2f, 5, paint4);
+                for(int i=mTraceExpMidIndex- mTraceExpStartIndex; i < mTraceExpEndIndex- mTraceExpStartIndex; i++){
+                    canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paintBlue);
+                }
+
+//                canvas.drawCircle(listPosXFin.get(0).floatValue()/2f, listPosYFin.get(0).floatValue()/2f, 5, paint3);
+//                canvas.drawCircle(listPosXFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, listPosYFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, 5, paint5);
+//                canvas.drawCircle(listPosXFin.get(listPosXFin.size() - 1).floatValue() / 2f, listPosYFin.get(listPosXFin.size() - 1).floatValue() / 2f, 5, paint4);
 
                 canvas.drawLine(450, 300, 530, 300, paint);
+                canvas.drawText("100um", 470, 320, paint);
 
-//                canvas.drawLine(0, 0, 639, 0, paint);
-//                canvas.drawLine(639, 0, 639, 359, paint);
-//                canvas.drawLine(639, 359, 0, 359, paint);
-//                canvas.drawLine(0, 359, 0, 0, paint);
+//                canvas.drawText("Start", 590, 20, paint3);
+//                canvas.drawText("Turn", 590, 40, paint5);
+//                canvas.drawText("Stop", 590, 60, paint4);
+
+                View view = (View) dialog.findViewById(R.id.line_results_view);
+                view.setBackground(new BitmapDrawable(getResources(), bg));
 
 
+                //Code to save file image...
 
-                View ll = (View) dialog.findViewById(R.id.line_results_view);
-                ll.setBackground(new BitmapDrawable(getResources(), bg));
+//                view.setDrawingCacheEnabled(true);
+//                Bitmap b = view.getDrawingCache();
+//
+//                saveTraceImage(b);
             }
         });
     }
+
+//    public void saveTraceImage(Bitmap b){
+//        File traceFile = new File(((Context) this).getExternalFilesDir(null), "trace.jpg");
+//
+//        try {
+//            b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream("/data/trace.jpg"));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void traceExpMessage(){
         runOnUiThread(new Runnable() {
@@ -2169,9 +2215,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             public void run() {
                 new AlertDialog.Builder(SoccerGameActivity.this)
                         .setTitle("Euglena Trace Experiment")
-                        .setMessage("In this experiment, you will obtain the trace of a swimming Euglena. Apply constant light stimulus and " +
-                                "select a responsive organism. After " + df1.format(TIME_BEFORE_LIGHT_STIMULUS / 1000.0) + " seconds, a beep will sound. " +
-                                "Change the direction of the light stimulus when you hear the beep.")
+                        .setMessage("1) Apply constant light stimulus and tap to select a responsive organism.\n\n2) Change the direction of the light stimulus when you hear the beep.")
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 mTraceEuglena = true;
@@ -2196,8 +2240,42 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         return returnList;
     }
+
+    public void createTraceDataFile(int indexStart, int indexEnd, String title) throws IOException {
+        List<String> xList = new ArrayList<>();
+        List<String> yList = new ArrayList<>();
+
+        xList = mXPosList.subList(indexStart, indexEnd);
+        yList = mYPosList.subList(indexStart, indexEnd);
+
+        String xPos = convertListToString(xList);
+        String yPos = convertListToString(yList);
+
+        try {
+            // Creates a trace file in the primary external storage space of the
+            // current application.
+            // If the file does not exists, it is created.
+            File traceFile = new File(((Context) this).getExternalFilesDir(null), title + ".txt");
+            if (!traceFile.exists())
+                traceFile.createNewFile();
+            // Adds a line to the trace file
+            BufferedWriter writer = new BufferedWriter(new FileWriter(traceFile, true /*append*/));
+            writer.write(xPos + "\n\n" + yPos + "\n\nEND");
+            writer.close();
+            // Refresh the data so it can seen when the device is plugged in a
+            // computer. You may have to unplug and replug the device to see the
+            // latest changes. This is not necessary if the user should not modify
+            // the files.
+            MediaScannerConnection.scanFile((Context) (this),
+                    new String[]{traceFile.toString()},
+                    null,
+                    null);
+        } catch (IOException e) {
+            Log.e("com.BioticGame", "Unable to write to the Data.txt file.");
+        }
+    }
+
     /*
     End code for trace generating experiment
      */
 }
-//Give clear message at the end for which condition is faster...
