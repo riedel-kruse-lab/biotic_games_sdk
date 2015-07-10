@@ -1615,9 +1615,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         .show();
             }
         });
-
     }
-
 
     //Takes an ArrayList of doubles, and returns the mean, maximum, minimum, standard deviation, and standard error of mean
     public List<Double> calculateStatistics(List<Double> dataList) {
