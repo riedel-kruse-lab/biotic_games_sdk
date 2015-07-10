@@ -1,12 +1,9 @@
-package edu.stanford.riedel_kruse.euglenasoccer;
+package edu.stanford.riedel_kruse.paceuglena;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-
-import java.util.ArrayList;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.GameObject;
 import edu.stanford.riedel_kruse.bioticgamessdk.MathUtil;

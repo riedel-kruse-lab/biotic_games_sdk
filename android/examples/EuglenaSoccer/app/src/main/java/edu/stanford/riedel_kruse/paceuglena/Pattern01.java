@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.euglenasoccer;
+package edu.stanford.riedel_kruse.paceuglena;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;

@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.euglenasoccer;
+package edu.stanford.riedel_kruse.paceuglena;
 
 /**
  * Created by dchiu on 12/7/14.

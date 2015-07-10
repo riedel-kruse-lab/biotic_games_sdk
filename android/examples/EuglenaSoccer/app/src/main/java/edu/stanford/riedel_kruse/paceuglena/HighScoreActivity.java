@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.euglenasoccer;
+package edu.stanford.riedel_kruse.paceuglena;
 
 import android.app.Activity;
 import android.content.Intent;
