@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "edu.stanford.riedel_kruse.euglenasoccer"
+        applicationId "edu.stanford.riedel_kruse.paceuglena"
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
