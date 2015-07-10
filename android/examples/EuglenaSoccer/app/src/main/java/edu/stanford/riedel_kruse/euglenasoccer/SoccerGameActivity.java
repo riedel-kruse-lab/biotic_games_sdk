@@ -94,6 +94,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private int mScore;
     private long mTimeMillis;
     private int mNumDirectionSwitches;
+    private boolean mGameEnded = false;
+    private int mCenterMessageTime;
 
     private Direction mCurrentDirection;
 
@@ -242,6 +244,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mPassingTime = 0;
 
         mMessageTime = 0;
+        mCenterMessageTime = 0;
 
         // Initialize score and time
         setScore(0);
@@ -289,8 +292,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
 
         mMessageTime += timeDelta;
+        mCenterMessageTime += timeDelta;
         if (mMessageTime > MILLIS_PER_MESSAGE) {
             displayMessage("");
+        }
+
+        if(mCenterMessageTime > MILLIS_PER_MESSAGE) {
+            displayCenteredMessage("");
         }
 
         if (mTutorial != null) {
@@ -313,6 +321,24 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         /*
         Data tracking stuff end
          */
+
+        if (!mGameEnded && mTimeMillis >= 119900) {
+            mGameEnded = true;
+            endGame();
+
+            /*
+            Code to display trace before ending game
+             */
+
+//            List<Double> xPosList = createTraceList(mXPosList);
+//            List<Double> yPosList = createTraceList(mYPosList);
+//
+//            followLineMessage(xPosList, yPosList);
+
+            /*
+            End code to display trace before ending game
+             */
+        }
     }
 
     @Override
@@ -498,24 +524,26 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         playSound(mSoundIdCrowdCheer);
 
-        displayMessage(mResources.getString(R.string.goal));
+//        displayMessage(mResources.getString(R.string.goal));
 
-        if (mScore >= GAME_OVER_SCORE) {
-//            endGame();
+        displayCenteredMessage("GOAL!!!");
 
-            /*
-            Code to display trace before ending game
-             */
-
-            List<Double> xPosList = createTraceList(mXPosList);
-            List<Double> yPosList = createTraceList(mYPosList);
-
-            followLineMessage(xPosList, yPosList);
-
-            /*
-            End code to display trace before ending game
-             */
-        }
+//        if (mScore >= GAME_OVER_SCORE) {
+////            endGame();
+//
+//            /*
+//            Code to display trace before ending game
+//             */
+//
+//            List<Double> xPosList = createTraceList(mXPosList);
+//            List<Double> yPosList = createTraceList(mYPosList);
+//
+//            followLineMessage(xPosList, yPosList);
+//
+//            /*
+//            End code to display trace before ending game
+//             */
+//        }
     }
 
     private void onOutOfBounds() {
@@ -642,6 +670,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void switchDirections() {
+
+        displayCenteredMessage("SWAP!");
+
         if (mTutorial != null && !mTutorial.shouldDrawGoals()) {
             return;
         }
@@ -864,8 +895,40 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-
     /*
     Follow line stuff end
      */
+
+    private void displayCenteredMessage(final String message){
+
+        mCenterMessageTime = 0;
+        final double duration = 3000;
+        final double time = mTimeMillis;
+
+        runOnUiThread(new Runnable() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void run() {
+                TextView tv = (TextView) findViewById(R.id.centered_message);
+                tv.setVisibility(View.VISIBLE);
+                tv.setText(message);
+
+//                while(mTimeMillis < time + duration){
+//                    if(mTimeMillis < time + 6*duration/6) {
+//                        tv.setText("GOAL!!");
+//                    }else if(mTimeMillis < time + 5*duration/6) {
+//                        tv.setText("GOAL! ");
+//                    }else if(mTimeMillis < time + 4*duration/6) {
+//                        tv.setText("GOAL  ");
+//                    }else if(mTimeMillis < time + 3*duration/6) {
+//                        tv.setText("GOA   ");
+//                    }else if(mTimeMillis < time + 2*duration/6) {
+//                        tv.setText("GO    ");
+//                    }else if(mTimeMillis < time + 1*duration/6) {
+//                        tv.setText("G     ");
+//                    }
+//                }
+            }
+        });
+    }
 }

@@ -54,6 +54,18 @@
         </LinearLayout>
     </LinearLayout>
 
+    <TextView
+        android:layout_width="450dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:id="@+id/centered_message"
+        android:text="ERROR"
+        android:textColor="#ffff00"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:visibility="invisible"/>
+
     <RelativeLayout
         android:layout_width="450dp"
         android:layout_height="wrap_content"
@@ -93,7 +105,7 @@
             android:layout_centerHorizontal="true"
             android:onClick="onActionButtonPressed"
             android:soundEffectsEnabled="false"
-            android:text="@string/bounce"
+            android:text="Tap"
             android:textSize="17sp"/>
 
         <TextView
