@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:textSize="35sp"
         android:gravity="center_horizontal"
-        android:text="PacEuglena"
+        android:text="Euglena Scientist"
         android:textStyle="bold"/>
 
     <LinearLayout
@@ -26,7 +26,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="bottom"
-            android:src="@drawable/pac_man1"/>
+            android:src="@drawable/test_tube"/>
     </LinearLayout>
 
     <Button

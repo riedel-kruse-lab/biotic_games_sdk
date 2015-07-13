@@ -90,7 +90,8 @@
             android:textSize="17sp"
             android:layout_gravity="center_horizontal"
             android:onClick="startFollowLine"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/plot_button"

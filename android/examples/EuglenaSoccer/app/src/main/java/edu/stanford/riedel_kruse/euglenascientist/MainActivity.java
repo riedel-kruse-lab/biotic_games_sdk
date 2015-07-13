@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.paceuglena;
+package edu.stanford.riedel_kruse.euglenascientist;
 
 import android.app.Activity;
 import android.app.AlertDialog;

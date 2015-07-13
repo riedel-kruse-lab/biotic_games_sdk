@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.paceuglena;
+package edu.stanford.riedel_kruse.euglenascientist;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

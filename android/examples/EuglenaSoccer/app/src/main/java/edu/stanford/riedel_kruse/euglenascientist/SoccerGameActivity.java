@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.paceuglena;
+package edu.stanford.riedel_kruse.euglenascientist;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -250,7 +250,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         CameraView cameraView = getCameraView();
 
         Camera.Parameters params = cameraView.getCameraParameters();
-        params.setZoom((int)(params.getMaxZoom() / 3.3));
+        params.setZoom((int) (params.getMaxZoom() / 3.3));
 //        params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_FLUORESCENT);
 //        params.setAutoWhiteBalanceLock(true);
         cameraView.setCameraParameters(params);
@@ -264,7 +264,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         //addGameObject(soccerField);
 
         //Add boxed tapping region
-        mBoxedRegion = new BoxedRegion(new Point(0,0));
+        mBoxedRegion = new BoxedRegion(new Point(0, 0));
         addGameObject(mBoxedRegion);
         mBoxedRegion.setVisible(false);
 
@@ -648,13 +648,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mStartMeasuring = false;
             }
 
-            if(mTimeMillis >= mIntervalTimer + TIME_AFTER_LIGHT_STIMULUS){
+            if (mTimeMillis >= mIntervalTimer + TIME_AFTER_LIGHT_STIMULUS) {
                 dataCollectionFinished = true;
                 mTraceExpEndIndex = mTimeList.size();
 
                 Double humanReactionOffsetTime = Double.parseDouble(mTimeList.get(mTraceExpMidIndex)) + HUMAN_REACTION_TIME;
                 int tempMidIndex = 0;
-                for(int i = mTraceExpMidIndex; humanReactionOffsetTime > Double.parseDouble(mTimeList.get(i)); i++){
+                for (int i = mTraceExpMidIndex; humanReactionOffsetTime > Double.parseDouble(mTimeList.get(i)); i++) {
                     tempMidIndex = i;
                 }
                 mTraceExpMidIndex = tempMidIndex;
@@ -680,7 +680,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             createGraph();
         }
 
-        if (mFollowLine&&areAllBallsEaten()){
+        if (mFollowLine && areAllBallsEaten()) {
             mPattern.setVisible(false);
             clearFollowLineMode();
         }
@@ -1137,21 +1137,21 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     }
 
-    private void loopSound(int soundId){
+    private void loopSound(int soundId) {
         mPlayingSoundFX = mSoundPool.play(soundId, SOUND_POOL_LEFT_VOLUME, SOUND_POOL_RIGHT_VOLUME,
                 SOUND_POOL_PRIORITY, -1, SOUND_POOL_FLOAT_RATE);
     }
 
-    private void loopSong(int soundId){
+    private void loopSong(int soundId) {
         mPlayingSountrack = mSoundPool.play(soundId, SOUND_POOL_LEFT_VOLUME, SOUND_POOL_RIGHT_VOLUME,
                 SOUND_POOL_PRIORITY, -1, SOUND_POOL_FLOAT_RATE);
     }
 
-    private void stopSound(){
+    private void stopSound() {
         mSoundPool.stop(mPlayingSoundFX);
     }
 
-    private void stopSong(){
+    private void stopSong() {
         mSoundPool.stop(mPlayingSountrack);
     }
 
@@ -1787,7 +1787,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
     }
 
-    public void finishFollowLine(){
+    public void finishFollowLine() {
 
         int firstIndex = mFollowLineIndex;
         int lastIndex = mTimeList.size() - 1;
@@ -1800,10 +1800,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         List<Double> subListPosXDoub = new ArrayList<Double>();
         List<Double> subListPosYDoub = new ArrayList<Double>();
-        for(String s : subListPosX){
+        for (String s : subListPosX) {
             subListPosXDoub.add(Double.parseDouble(s));
         }
-        for(String s1 : subListPosY){
+        for (String s1 : subListPosY) {
             subListPosYDoub.add(Double.parseDouble(s1));
         }
 
@@ -1811,7 +1811,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         followLineMessage(xPos, yPos, subListPosXDoub, subListPosYDoub, score);
     }
 
-    public double calcFollowLineScore(int xPos, int yPos, List<Double> listPosX, List<Double> listPosY, int firstIndex, int lastIndex){
+    public double calcFollowLineScore(int xPos, int yPos, List<Double> listPosX, List<Double> listPosY, int firstIndex, int lastIndex) {
 
 //        //these values are taken from Pattern01.java. Change here if changed in Pattern01.java
 //        int mLength1 = 600;
@@ -1850,10 +1850,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //
 //        return scoreMultiplier/dev;
 
-        return (Double.parseDouble(mTimeList.get(lastIndex)) - Double.parseDouble(mTimeList.get(firstIndex)))/1000.;
+        return (Double.parseDouble(mTimeList.get(lastIndex)) - Double.parseDouble(mTimeList.get(firstIndex))) / 1000.;
     }
 
-    public void followLineMessage(int xPos, int yPos, List<Double> listPosX, List<Double> listPosY, double score){
+    public void followLineMessage(int xPos, int yPos, List<Double> listPosX, List<Double> listPosY, double score) {
         //show message here
 
         final int xPosFin = xPos;
@@ -1896,13 +1896,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    public void onBallEaten(ConsumableBall ball){
+    public void onBallEaten(ConsumableBall ball) {
         ball.setVisible(false);
         ball.setPhysical(false);
         ball.setIsEaten(true);
     }
 
-    public void resetAllConsumableBalls(){
+    public void resetAllConsumableBalls() {
         mConsumableBall1.setVisible(false);
         mConsumableBall1.setPhysical(false);
         mConsumableBall1.setIsEaten(false);
@@ -1947,13 +1947,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mConsumableBall14.setIsEaten(false);
     }
 
-    public boolean areAllBallsEaten(){
-        return (mConsumableBall1.isEaten()&&mConsumableBall2.isEaten()&&mConsumableBall3.isEaten()&&mConsumableBall4.isEaten()&&mConsumableBall5.isEaten()&&
-                mConsumableBall6.isEaten()&&mConsumableBall7.isEaten()&&mConsumableBall8.isEaten()&&mConsumableBall9.isEaten()&&mConsumableBall10.isEaten()&&
-                mConsumableBall11.isEaten()&&mConsumableBall12.isEaten()&&mConsumableBall13.isEaten()&&mConsumableBall14.isEaten());
+    public boolean areAllBallsEaten() {
+        return (mConsumableBall1.isEaten() && mConsumableBall2.isEaten() && mConsumableBall3.isEaten() && mConsumableBall4.isEaten() && mConsumableBall5.isEaten() &&
+                mConsumableBall6.isEaten() && mConsumableBall7.isEaten() && mConsumableBall8.isEaten() && mConsumableBall9.isEaten() && mConsumableBall10.isEaten() &&
+                mConsumableBall11.isEaten() && mConsumableBall12.isEaten() && mConsumableBall13.isEaten() && mConsumableBall14.isEaten());
     }
 
-    public void clearFollowLineMode(){
+    public void clearFollowLineMode() {
         mBallCountScore = getNumBallsConsumed();
         resetAllConsumableBalls();
         mBall.setVisible(true);
@@ -1972,7 +1972,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         finishFollowLine();
     }
 
-    public void onEditHSVPressed(View view){
+    public void onEditHSVPressed(View view) {
 
         // Set up the input
         final EditText input = new EditText(this);
@@ -2003,7 +2003,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    public void onEditHSVPressed2(View view){
+    public void onEditHSVPressed2(View view) {
 
         // Set up the input
         final EditText input = new EditText(this);
@@ -2019,8 +2019,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 mInputText = input.getText().toString();
-                                String[] ar=mInputText.split(",");
-                                LOWER_HSV_THRESHOLD = new Scalar(Double.parseDouble(ar[0]),Double.parseDouble(ar[0]),Double.parseDouble(ar[0]));
+                                String[] ar = mInputText.split(",");
+                                LOWER_HSV_THRESHOLD = new Scalar(Double.parseDouble(ar[0]), Double.parseDouble(ar[0]), Double.parseDouble(ar[0]));
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -2034,49 +2034,49 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    public int getNumBallsConsumed(){
+    public int getNumBallsConsumed() {
         int count = 0;
 
-        if(mConsumableBall1.isEaten()){
+        if (mConsumableBall1.isEaten()) {
             count++;
         }
-        if(mConsumableBall2.isEaten()){
+        if (mConsumableBall2.isEaten()) {
             count++;
         }
-        if(mConsumableBall3.isEaten()){
+        if (mConsumableBall3.isEaten()) {
             count++;
         }
-        if(mConsumableBall4.isEaten()){
+        if (mConsumableBall4.isEaten()) {
             count++;
         }
-        if(mConsumableBall5.isEaten()){
+        if (mConsumableBall5.isEaten()) {
             count++;
         }
-        if(mConsumableBall6.isEaten()){
+        if (mConsumableBall6.isEaten()) {
             count++;
         }
-        if(mConsumableBall7.isEaten()){
+        if (mConsumableBall7.isEaten()) {
             count++;
         }
-        if(mConsumableBall8.isEaten()){
+        if (mConsumableBall8.isEaten()) {
             count++;
         }
-        if(mConsumableBall9.isEaten()){
+        if (mConsumableBall9.isEaten()) {
             count++;
         }
-        if(mConsumableBall10.isEaten()){
+        if (mConsumableBall10.isEaten()) {
             count++;
         }
-        if(mConsumableBall11.isEaten()){
+        if (mConsumableBall11.isEaten()) {
             count++;
         }
-        if(mConsumableBall12.isEaten()){
+        if (mConsumableBall12.isEaten()) {
             count++;
         }
-        if(mConsumableBall13.isEaten()){
+        if (mConsumableBall13.isEaten()) {
             count++;
         }
-        if(mConsumableBall14.isEaten()){
+        if (mConsumableBall14.isEaten()) {
             count++;
         }
 
@@ -2091,17 +2091,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     final private int TIME_AFTER_LIGHT_STIMULUS = 5000;
     final private int HUMAN_REACTION_TIME = 250;
 
-    public void onTraceGeneratorPressed(View view){
+    public void onTraceGeneratorPressed(View view) {
         //Display message explaining the steps
-            //First, need to direct light and select Euglena
-            //Second, need to change light direction after noise...
-            //After set amount of time, the trace is automatically saved and the activity ends
+        //First, need to direct light and select Euglena
+        //Second, need to change light direction after noise...
+        //After set amount of time, the trace is automatically saved and the activity ends
         mTraceEuglena = true;
         mTraceEuglenaTapped = true;
 
     }
 
-    public void traceFinishedMessage(List<Double> listX, List<Double> listY){
+    public void traceFinishedMessage(List<Double> listX, List<Double> listY) {
 
         final List<Double> listPosXFin = new ArrayList<>(listX);
         final List<Double> listPosYFin = new ArrayList<>(listY);
@@ -2137,12 +2137,12 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
                 canvas.drawRect(0, 0, 640, 360, paint2);
 
-                for(int i=0; i < mTraceExpMidIndex - mTraceExpStartIndex; i++){
-                    canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paint5);
+                for (int i = 0; i < mTraceExpMidIndex - mTraceExpStartIndex; i++) {
+                    canvas.drawCircle(listPosXFin.get(i).floatValue() / 2f, listPosYFin.get(i).floatValue() / 2f, 2, paint5);
                 }
 
-                for(int i=mTraceExpMidIndex- mTraceExpStartIndex; i < mTraceExpEndIndex- mTraceExpStartIndex; i++){
-                    canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paintBlue);
+                for (int i = mTraceExpMidIndex - mTraceExpStartIndex; i < mTraceExpEndIndex - mTraceExpStartIndex; i++) {
+                    canvas.drawCircle(listPosXFin.get(i).floatValue() / 2f, listPosYFin.get(i).floatValue() / 2f, 2, paintBlue);
                 }
 
 //                canvas.drawCircle(listPosXFin.get(0).floatValue()/2f, listPosYFin.get(0).floatValue()/2f, 5, paint3);
@@ -2180,7 +2180,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //        }
 //    }
 
-    public void traceExpMessage(){
+    public void traceExpMessage() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -2202,10 +2202,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         });
     }
 
-    public List<Double> convertStringListToDouble(List<String> list, int startIndex, int endIndex){
+    public List<Double> convertStringListToDouble(List<String> list, int startIndex, int endIndex) {
         List<Double> returnList = new ArrayList<>();
 
-        for(int i = startIndex; i < endIndex; i++){
+        for (int i = startIndex; i < endIndex; i++) {
             returnList.add(Double.parseDouble(list.get(i)));
         }
 

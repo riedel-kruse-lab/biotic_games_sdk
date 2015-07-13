@@ -1,4 +1,4 @@
-package edu.stanford.riedel_kruse.paceuglena;
+package edu.stanford.riedel_kruse.euglenascientist;
 
 /**
  * Created by dchiu on 12/7/14.
