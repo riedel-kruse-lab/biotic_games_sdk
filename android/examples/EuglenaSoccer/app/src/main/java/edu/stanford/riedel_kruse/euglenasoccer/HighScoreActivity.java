@@ -92,7 +92,7 @@ public class HighScoreActivity extends Activity {
         if (time != -1) {
 
             for (int i = 0; i < times.size(); i++) {
-                if (time < times.get(i)) {
+                if (time > times.get(i)) {
                     times.add(i, time);
                     mNewHighScoreIndex = i;
                     break;
@@ -112,7 +112,7 @@ public class HighScoreActivity extends Activity {
                 initialsEditText.setVisibility(View.VISIBLE);
             }
 
-            resultsString += "You took " + time + " seconds to score 5 goals!";
+            resultsString += "You scored " + time + " goals!";
 
             TextView resultsTextView = (TextView) findViewById(R.id.results);
             resultsTextView.setText(resultsString);

@@ -165,7 +165,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         CameraView cameraView = getCameraView();
 
         Camera.Parameters params = cameraView.getCameraParameters();
-        params.setZoom(params.getMaxZoom() / 2);
+        params.setZoom((int) (params.getMaxZoom() / 3.3));
         cameraView.setCameraParameters(params);
 
         // Store image width and height for future use
@@ -719,7 +719,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         finish();
 
         Intent intent = new Intent(this, HighScoreActivity.class);
-        intent.putExtra(EXTRA_TIME, (int) mTimeMillis / MILLIS_PER_SEC);
+        intent.putExtra(EXTRA_TIME, mScore);
         startActivity(intent);
     }
 
