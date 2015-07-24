@@ -47,6 +47,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -1159,8 +1160,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
         Mat zoomMat = new Mat(frame, roi);
 
-//        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
-//        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
+        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
+        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
 
         final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
                 Bitmap.Config.ARGB_8888);
@@ -2087,8 +2088,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     Below is code for the trace generating experiment
      */
 
-    final private int TIME_BEFORE_LIGHT_STIMULUS = 2750;
-    final private int TIME_AFTER_LIGHT_STIMULUS = 5000;
+    final private int TIME_BEFORE_LIGHT_STIMULUS = 1750;
+    final private int TIME_AFTER_LIGHT_STIMULUS = 4000;
     final private int HUMAN_REACTION_TIME = 250;
 
     public void onTraceGeneratorPressed(View view) {
