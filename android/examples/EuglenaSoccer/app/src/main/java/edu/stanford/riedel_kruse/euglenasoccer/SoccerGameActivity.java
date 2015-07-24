@@ -27,6 +27,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static final float SOUND_POOL_FLOAT_RATE = 1.0f;
 
     private Tutorial mTutorial;
+
+    private Scalar LOWER_HSV_THRESHOLD = new Scalar(30, 30, 0);
+    private Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
 
     private enum Direction {
         LEFT,
@@ -510,7 +514,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
 
         // Find all things that look like Euglena in the region of interest.
-        List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi);
+        List<Point> euglenaLocations = ImageProcessing.findEuglenaInRoi(frame, roi, UPPER_HSV_THRESHOLD, LOWER_HSV_THRESHOLD);
 
         // Find the location of the Euglena that is closest to the ball.
         return MathUtil.findClosestPoint(ballLocation, euglenaLocations);
@@ -701,6 +705,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private void updateZoomView(Mat frame) {
         Rect roi = roiForBall();
         Mat zoomMat = new Mat(frame, roi);
+
+        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
+        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
+
         final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
                 Bitmap.Config.ARGB_8888);
 
