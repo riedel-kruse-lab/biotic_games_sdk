@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -55,6 +56,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import edu.stanford.riedel_kruse.bioticgamessdk.BioticGameActivity;
@@ -94,7 +96,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
      */
     private static final double PASS_SPEED = 1;
 
-    private static final int NUM_RECENT_POSITIONS = 15;
+    private static final int NUM_RECENT_POSITIONS = 30;
 
     private static final int SOUND_POOL_MAX_STREAMS = 1;
     private static final int SOUND_POOL_SRC_QUALITY = 0;
@@ -934,7 +936,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void setBallSpeed(double newSpeed) {
-        mBallSpeed = newSpeed;
+        mBallSpeed = (mBallSpeed + newSpeed)/2;
         mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed));
     }
 
@@ -1160,8 +1162,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
         Mat zoomMat = new Mat(frame, roi);
 
-        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
-        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
+//        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
+//        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
 
         final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
                 Bitmap.Config.ARGB_8888);
@@ -1571,7 +1573,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             public void run() {
                 new AlertDialog.Builder(SoccerGameActivity.this)
                         .setTitle("Average Speed Experiment")
-                        .setMessage("In this experiment, you will calculate the average velocities of Euglena under different conditions. " +
+                        .setMessage("In this experiment, you will calculate the average speeds of Euglena under different conditions. " +
                                 "To start a measurement, tap on a Euglena. This Euglena will be tracked for " + df1.format(INTERVAL_FOR_COMPUTING_AVG_SPD_2 / 1000.0) + " seconds. " +
                                 "After each measurement, you will be prompted to keep or discard the measurement. " +
                                 "You will repeat this " + NUMBER_OF_MEASUREMENTS + " times per condition. " +
@@ -1636,6 +1638,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         final List<Double> stats1 = calculateStatistics(mAverageVelocity1);
         final List<Double> stats2 = calculateStatistics(mAverageVelocity2);
 
+        Collections.sort(averageVelocity1Copy);
+        Collections.sort(averageVelocity2Copy);
+
         int fasterCondition = 0;
         double fasterSpeed = 0.;
         double slowerSpeed = 0.;
@@ -1663,37 +1668,71 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         final double finSlowerSEM = slowerSEM;
 
         final CombinedData comboData = new CombinedData(new String[]{
-                "First", "Second"
+                "1", "2", "3", "4", "5"
         });
 
-        BarData barData = new BarData();
+        final CombinedData comboData2 = new CombinedData(new String[]{
+                "1", "2", "3", "4", "5"
+        });
+
+        ArrayList <BarDataSet> barData = new ArrayList<BarDataSet>();
 
         ArrayList<BarEntry> barEntries = new ArrayList<BarEntry>();
-        barEntries.add(new BarEntry(stats1.get(0).floatValue(), 0));
-        barEntries.add(new BarEntry(stats2.get(0).floatValue(), 1));
-        BarDataSet barSet = new BarDataSet(barEntries, "Means");
+        barEntries.add(new BarEntry(averageVelocity1Copy.get(0).floatValue(), 0));
+        barEntries.add(new BarEntry(averageVelocity1Copy.get(1).floatValue(), 1));
+        barEntries.add(new BarEntry(averageVelocity1Copy.get(2).floatValue(), 2));
+        barEntries.add(new BarEntry(averageVelocity1Copy.get(3).floatValue(), 3));
+        barEntries.add(new BarEntry(averageVelocity1Copy.get(4).floatValue(), 4));
+
+        BarDataSet barSet = new BarDataSet(barEntries, "Condition 1");
         barSet.setColor(Color.rgb(60, 220, 78));
         barSet.setValueTextColor(Color.rgb(60, 220, 78));
         barSet.setValueTextSize(10f);
         barSet.setDrawValues(false);
-        barData.addDataSet(barSet);
+
+        barData.add(barSet);
         barSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-        CandleData candData = new CandleData();
+        BarData barData2 = new BarData();
 
-        ArrayList<CandleEntry> candEntries = new ArrayList<CandleEntry>();
-        //stats.get(4) returns SEM. Use stats.get(3) to get standard deviation
-        candEntries.add(new CandleEntry(0, (float) (stats1.get(0) + stats1.get(4)), (float) (stats1.get(0) - stats1.get(4)), stats1.get(0).floatValue(), stats1.get(0).floatValue()));
-        candEntries.add(new CandleEntry(1, (float) (stats2.get(0) + stats2.get(4)), (float) (stats2.get(0) - stats2.get(4)), stats2.get(0).floatValue(), stats2.get(0).floatValue()));
-        CandleDataSet candSet = new CandleDataSet(candEntries, "SEM");
-        candSet.setColor(Color.rgb(80, 80, 80));
-        candSet.setBodySpace(1f);
-        candSet.setValueTextSize(10f);
-        candSet.setDrawValues(false);
-        candData.addDataSet(candSet);
+        ArrayList<BarEntry> barEntries2 = new ArrayList<BarEntry>();
+        barEntries2.add(new BarEntry(averageVelocity2Copy.get(0).floatValue(), 0));
+        barEntries2.add(new BarEntry(averageVelocity2Copy.get(1).floatValue(), 1));
+        barEntries2.add(new BarEntry(averageVelocity2Copy.get(2).floatValue(), 2));
+        barEntries2.add(new BarEntry(averageVelocity2Copy.get(3).floatValue(), 3));
+        barEntries2.add(new BarEntry(averageVelocity2Copy.get(4).floatValue(), 4));
+        BarDataSet barSet2 = new BarDataSet(barEntries2, "Condition 2");
+        barSet2.setColor(Color.rgb(220, 90, 78));
+        barSet2.setValueTextColor(Color.rgb(220, 90, 78));
+        barSet2.setValueTextSize(10f);
+        barSet2.setDrawValues(false);
+//        barData2.addDataSet(barSet2);
+        barSet2.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-        comboData.setData(barData);
-        comboData.setData(candData);
+        barData.add(barSet2);
+
+
+        final BarData bData = new BarData(new String[]{
+                "1", "2", "3", "4", "5"
+        }, barData);
+//        comboData.setData(barData);
+//        comboData2.setData(barData2);
+
+//        CandleData candData = new CandleData();
+
+//        ArrayList<CandleEntry> candEntries = new ArrayList<CandleEntry>();
+//        //stats.get(4) returns SEM. Use stats.get(3) to get standard deviation
+//        candEntries.add(new CandleEntry(0, (float) (stats1.get(0) + stats1.get(4)), (float) (stats1.get(0) - stats1.get(4)), stats1.get(0).floatValue(), stats1.get(0).floatValue()));
+//        candEntries.add(new CandleEntry(1, (float) (stats2.get(0) + stats2.get(4)), (float) (stats2.get(0) - stats2.get(4)), stats2.get(0).floatValue(), stats2.get(0).floatValue()));
+//        CandleDataSet candSet = new CandleDataSet(candEntries, "SEM");
+//        candSet.setColor(Color.rgb(80, 80, 80));
+//        candSet.setBodySpace(1f);
+//        candSet.setValueTextSize(10f);
+//        candSet.setDrawValues(false);
+//        candData.addDataSet(candSet);
+
+//        comboData.setData(barData);
+//        comboData.setData(candData);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -1708,15 +1747,15 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         })
                         .show();
 
-                CombinedChart comboChart = (CombinedChart) dialog.findViewById(R.id.chart_view);
+                BarChart comboChart = (BarChart) dialog.findViewById(R.id.chart_view);
                 comboChart.setDescription("Avg Velocities");
                 comboChart.setBackgroundColor(Color.WHITE);
                 comboChart.setDrawGridBackground(false);
                 comboChart.setDrawBarShadow(false);
 
-                comboChart.setDrawOrder(new CombinedChart.DrawOrder[]{
-                        CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.LINE, CombinedChart.DrawOrder.SCATTER
-                });
+//                comboChart.setDrawOrder(new CombinedChart.DrawOrder[]{
+//                        CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.LINE, CombinedChart.DrawOrder.SCATTER
+//                });
 
                 YAxis leftAxis = comboChart.getAxisLeft();
                 leftAxis.setDrawGridLines(false);
@@ -1724,7 +1763,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 XAxis xAxis = comboChart.getXAxis();
                 xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
-                comboChart.setData(comboData);
+                comboChart.setData(bData);
 
                 TextView cond1Mean = (TextView) dialog.findViewById(R.id.textView11);
                 TextView cond1Max = (TextView) dialog.findViewById(R.id.textView12);
@@ -1749,7 +1788,6 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 cond2Min.setText(" " + df.format(stats2.get(2)) + " ");
                 cond2Stdev.setText(" " + df.format(stats2.get(3)) + " ");
                 cond2SEM.setText(" " + df.format(stats2.get(4)) + " ");
-
             }
         });
     }
