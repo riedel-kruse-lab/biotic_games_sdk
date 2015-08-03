@@ -1638,8 +1638,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         final List<Double> stats1 = calculateStatistics(mAverageVelocity1);
         final List<Double> stats2 = calculateStatistics(mAverageVelocity2);
 
-        Collections.sort(averageVelocity1Copy);
-        Collections.sort(averageVelocity2Copy);
+//        Collections.sort(averageVelocity1Copy);
+//        Collections.sort(averageVelocity2Copy);
 
         int fasterCondition = 0;
         double fasterSpeed = 0.;
@@ -1711,10 +1711,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         barData.add(barSet2);
 
-
         final BarData bData = new BarData(new String[]{
                 "1", "2", "3", "4", "5"
-        }, barData);
+        }, barSet);
+
+        final BarData bData2 = new BarData(new String[]{
+                "1", "2", "3", "4", "5"
+        }, barSet2);
+
 //        comboData.setData(barData);
 //        comboData2.setData(barData2);
 
@@ -1747,7 +1751,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         })
                         .show();
 
-                BarChart comboChart = (BarChart) dialog.findViewById(R.id.chart_view);
+                BarChart comboChart = (BarChart) dialog.findViewById(R.id.chart_view_left);
                 comboChart.setDescription("Avg Velocities");
                 comboChart.setBackgroundColor(Color.WHITE);
                 comboChart.setDrawGridBackground(false);
@@ -1757,13 +1761,34 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //                        CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.LINE, CombinedChart.DrawOrder.SCATTER
 //                });
 
-                YAxis leftAxis = comboChart.getAxisLeft();
-                leftAxis.setDrawGridLines(false);
+                YAxis yAxis = comboChart.getAxisLeft();
+                yAxis.setDrawGridLines(false);
+                yAxis.setAxisMaxValue(80);
 
                 XAxis xAxis = comboChart.getXAxis();
                 xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
 
                 comboChart.setData(bData);
+
+                BarChart comboChart2 = (BarChart) dialog.findViewById(R.id.chart_view_right);
+                comboChart2.setDescription("Avg Velocities 2");
+                comboChart2.setBackgroundColor(Color.WHITE);
+                comboChart2.setDrawGridBackground(false);
+                comboChart2.setDrawBarShadow(false);
+
+//                comboChart2.setDrawOrder(new CombinedChart.DrawOrder[]{
+//                        CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.LINE, CombinedChart.DrawOrder.SCATTER
+//                });
+
+                YAxis yAxis2 = comboChart2.getAxisLeft();
+                yAxis2.setDrawGridLines(false);
+                yAxis2.setAxisMaxValue(80);
+
+                XAxis xAxis2 = comboChart2.getXAxis();
+                xAxis2.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+
+                comboChart2.setData(bData2);
+
 
                 TextView cond1Mean = (TextView) dialog.findViewById(R.id.textView11);
                 TextView cond1Max = (TextView) dialog.findViewById(R.id.textView12);

@@ -53,6 +53,11 @@
                     android:text="@string/tutorial_button_next"/>
             </LinearLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></LinearLayout>
     </LinearLayout>
 
     <RelativeLayout

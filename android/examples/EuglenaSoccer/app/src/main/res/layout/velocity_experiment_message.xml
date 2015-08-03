@@ -148,15 +148,32 @@
                 android:text="ERR" />
         </TableRow>
 
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/chart_view"
-            android:layout_width="200dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:layout_marginBottom="20dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/chart_view_left"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"/>
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/chart_view_right"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"/>
+        </LinearLayout>
+
+
 
     </TableLayout>
 
