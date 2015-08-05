@@ -67,11 +67,7 @@
                 android:textStyle="bold"
                 android:typeface="serif" />
 
-            <TextView
-                android:id="@+id/textView05"
-                android:text=" SEM "
-                android:textStyle="bold"
-                android:typeface="serif" />
+
         </TableRow>
 
         <TableRow
@@ -105,10 +101,7 @@
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
-            <TextView
-                android:id="@+id/textView15"
-                android:gravity="center_horizontal"
-                android:text="ERR" />
+
         </TableRow>
 
         <TableRow
@@ -142,35 +135,74 @@
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
-            <TextView
-                android:id="@+id/textView25"
-                android:gravity="center_horizontal"
-                android:text="ERR" />
+
         </TableRow>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="5dp">
 
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/chart_view_left"
+            <RelativeLayout
                 android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:layout_weight="1"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"/>
+                android:layout_weight="1">
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/chart_view_left"
+                    android:layout_width="fill_parent"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="15dp"/>
+                <edu.stanford.riedel_kruse.euglenascientist.VerticalTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Speed (\u00B5m/s)"
+                    android:textSize="10sp"
+                    android:gravity="center"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:text="Measurement #"
+                    android:textSize="10sp"
+                    android:gravity="center"
+                    android:layout_margin="5dp"/>
+            </RelativeLayout>
 
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/chart_view_right"
+            <RelativeLayout
                 android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:layout_weight="1"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"/>
+                android:layout_weight="1">
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/chart_view_right"
+                    android:layout_width="fill_parent"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="15dp"/>
+                <edu.stanford.riedel_kruse.euglenascientist.VerticalTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Speed (\u00B5m/s)"
+                    android:textSize="10sp"
+                    android:gravity="center"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:text="Measurement #"
+                    android:textSize="10sp"
+                    android:gravity="center"
+                    android:layout_margin="5dp"/>
+            </RelativeLayout>
         </LinearLayout>
 
 

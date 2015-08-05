@@ -30,5 +30,5 @@ dependencies {
     compile project(':sdk')
     compile project(':opencsv-3.3')
     compile 'com.jjoe64:graphview:4.0.1'
-    compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.1.3'
 }

@@ -1,6 +1,7 @@
 package edu.stanford.riedel_kruse.euglenascientist;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -1633,19 +1635,25 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     public void avgVelocityFinishedMessage() {
 
+        //convert to Final in case we need to call from uithread
         final List<Double> averageVelocity1Copy = mAverageVelocity1;
         final List<Double> averageVelocity2Copy = mAverageVelocity2;
         final List<Double> stats1 = calculateStatistics(mAverageVelocity1);
         final List<Double> stats2 = calculateStatistics(mAverageVelocity2);
 
+
+        //Use these lines if you want to sort the velocities in increasing order
 //        Collections.sort(averageVelocity1Copy);
 //        Collections.sort(averageVelocity2Copy);
 
+
+        //These lines find the faster condition
         int fasterCondition = 0;
         double fasterSpeed = 0.;
         double slowerSpeed = 0.;
         double fasterSEM = 0.;
         double slowerSEM = 0.;
+
 
         if (stats1.get(0) > stats2.get(0)) {
             fasterCondition = 1;
@@ -1667,6 +1675,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         final double finSlowerSpeed = slowerSpeed;
         final double finSlowerSEM = slowerSEM;
 
+
+        //If the final chart type is ComboChart, use these
         final CombinedData comboData = new CombinedData(new String[]{
                 "1", "2", "3", "4", "5"
         });
@@ -1675,6 +1685,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 "1", "2", "3", "4", "5"
         });
 
+
+        //Filling in data for the first bar chart
         ArrayList <BarDataSet> barData = new ArrayList<BarDataSet>();
 
         ArrayList<BarEntry> barEntries = new ArrayList<BarEntry>();
@@ -1693,6 +1705,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         barData.add(barSet);
         barSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
+
+        //Filling in data for the second bar chart
         BarData barData2 = new BarData();
 
         ArrayList<BarEntry> barEntries2 = new ArrayList<BarEntry>();
@@ -1711,6 +1725,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         barData.add(barSet2);
 
+        //Create final bardata type to put into the uithread
         final BarData bData = new BarData(new String[]{
                 "1", "2", "3", "4", "5"
         }, barSet);
@@ -1719,6 +1734,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 "1", "2", "3", "4", "5"
         }, barSet2);
 
+        //These lines add a pseudo error bar...
 //        comboData.setData(barData);
 //        comboData2.setData(barData2);
 
@@ -1751,68 +1767,85 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         })
                         .show();
 
+
+                //Set up the first bar chart
+
                 BarChart comboChart = (BarChart) dialog.findViewById(R.id.chart_view_left);
-                comboChart.setDescription("Avg Velocities");
+                comboChart.setDescription("");
                 comboChart.setBackgroundColor(Color.WHITE);
                 comboChart.setDrawGridBackground(false);
                 comboChart.setDrawBarShadow(false);
 
+                //This line determines which order to draw the components of the graphs
 //                comboChart.setDrawOrder(new CombinedChart.DrawOrder[]{
 //                        CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.LINE, CombinedChart.DrawOrder.SCATTER
 //                });
 
                 YAxis yAxis = comboChart.getAxisLeft();
-                yAxis.setDrawGridLines(false);
-                yAxis.setAxisMaxValue(80);
+                yAxis.setDrawGridLines(true);
+                yAxis.setAxisMaxValue(100);
+                yAxis.setLabelCount(5, true);
+                YAxis yAxisR = comboChart.getAxisRight();
+                yAxisR.setEnabled(false);
 
                 XAxis xAxis = comboChart.getXAxis();
-                xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setSpaceBetweenLabels(1);
 
                 comboChart.setData(bData);
+                Legend l = comboChart.getLegend();
+                l.setEnabled(false);
+
+
+                //Set up the second bar chart
 
                 BarChart comboChart2 = (BarChart) dialog.findViewById(R.id.chart_view_right);
-                comboChart2.setDescription("Avg Velocities 2");
+                comboChart2.setDescription("");
                 comboChart2.setBackgroundColor(Color.WHITE);
                 comboChart2.setDrawGridBackground(false);
                 comboChart2.setDrawBarShadow(false);
 
+                //This line determines which order to draw the components of the graphs
 //                comboChart2.setDrawOrder(new CombinedChart.DrawOrder[]{
 //                        CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.LINE, CombinedChart.DrawOrder.SCATTER
 //                });
 
                 YAxis yAxis2 = comboChart2.getAxisLeft();
-                yAxis2.setDrawGridLines(false);
-                yAxis2.setAxisMaxValue(80);
+                yAxis2.setDrawGridLines(true);
+                yAxis2.setAxisMaxValue(100);
+                yAxis2.setLabelCount(5, true);
+                YAxis yAxis2R = comboChart2.getAxisRight();
+                yAxis2R.setEnabled(false);
 
                 XAxis xAxis2 = comboChart2.getXAxis();
-                xAxis2.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+                xAxis2.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis2.setSpaceBetweenLabels(1);
 
                 comboChart2.setData(bData2);
+                Legend l2 = comboChart2.getLegend();
+                l2.setEnabled(false);
 
+                //Fill in data table
 
                 TextView cond1Mean = (TextView) dialog.findViewById(R.id.textView11);
                 TextView cond1Max = (TextView) dialog.findViewById(R.id.textView12);
                 TextView cond1Min = (TextView) dialog.findViewById(R.id.textView13);
                 TextView cond1Stdev = (TextView) dialog.findViewById(R.id.textView14);
-                TextView cond1SEM = (TextView) dialog.findViewById(R.id.textView15);
 
                 TextView cond2Mean = (TextView) dialog.findViewById(R.id.textView21);
                 TextView cond2Max = (TextView) dialog.findViewById(R.id.textView22);
                 TextView cond2Min = (TextView) dialog.findViewById(R.id.textView23);
                 TextView cond2Stdev = (TextView) dialog.findViewById(R.id.textView24);
-                TextView cond2SEM = (TextView) dialog.findViewById(R.id.textView25);
 
-                cond1Mean.setText(" " + df.format(stats1.get(0)) + " ");
-                cond1Max.setText(" " + df.format(stats1.get(1)) + " ");
-                cond1Min.setText(" " + df.format(stats1.get(2)) + " ");
-                cond1Stdev.setText(" " + df.format(stats1.get(3)) + " ");
-                cond1SEM.setText(" " + df.format(stats1.get(4)) + " ");
+                cond1Mean.setText(" " + df1.format(stats1.get(0)) + " ");
+                cond1Max.setText(" " + df1.format(stats1.get(1)) + " ");
+                cond1Min.setText(" " + df1.format(stats1.get(2)) + " ");
+                cond1Stdev.setText(" " + df1.format(stats1.get(3)) + " ");
 
-                cond2Mean.setText(" " + df.format(stats2.get(0)) + " ");
-                cond2Max.setText(" " + df.format(stats2.get(1)) + " ");
-                cond2Min.setText(" " + df.format(stats2.get(2)) + " ");
-                cond2Stdev.setText(" " + df.format(stats2.get(3)) + " ");
-                cond2SEM.setText(" " + df.format(stats2.get(4)) + " ");
+                cond2Mean.setText(" " + df1.format(stats2.get(0)) + " ");
+                cond2Max.setText(" " + df1.format(stats2.get(1)) + " ");
+                cond2Min.setText(" " + df1.format(stats2.get(2)) + " ");
+                cond2Stdev.setText(" " + df1.format(stats2.get(3)) + " ");
             }
         });
     }
@@ -2313,4 +2346,19 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     /*
     End code for trace generating experiment
      */
+
+    /*
+    Code for taking screenshot
+     */
+
+//    public static Bitmap screenshot(Activity activity){
+//        View view = activity.getWindow().getDecorView();
+//        view.setDrawingCacheEnabled(true);
+//        view.buildDrawingCache();
+//
+//        Bitmap bitmap = view.getDrawingCache();
+//        Rect rect = new Rect();
+////        activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
+//
+//    }
 }
