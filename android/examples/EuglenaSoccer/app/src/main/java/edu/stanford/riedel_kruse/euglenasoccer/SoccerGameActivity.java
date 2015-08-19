@@ -122,6 +122,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private int mSoundIdCrowdCheer;
     private int mSoundIdBounceBall;
 
+    private int mTouchX;
+    private int mTouchY;
+
     private RectangleObject mLeftLightIndicator;
     private RectangleObject mRightLightIndicator;
     private RectangleObject mTopLightIndicator;
@@ -398,15 +401,32 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             return super.onTouchEvent(event);
         }
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                simulateButtonPress((Button) findViewById(R.id.action_button));
+        // - 180 needed in getY to balance offset... offset possibly because different views are calling???
+        mTouchX = (int) event.getX();
+        mTouchY = (int) event.getY() - 180;
+
+        if(mCurrentDirection == Direction.RIGHT){
+            if(mTouchX < mFieldWidth/4) {
+                mBall.setPosition(new Point(mTouchX, mTouchY));
+            }
+        }else{
+            if(mTouchX > mFieldWidth*3/4) {
+                mBall.setPosition(new Point(mTouchX, mTouchY));
+            }
         }
+
+
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                simulateButtonPress((Button) findViewById(R.id.action_button));
+//        }
+
 
         return super.onTouchEvent(event);
     }
 
     private void simulateButtonPress(final Button button) {
+
         // Run the button's onClick functionality.
         button.performClick();
 
@@ -583,7 +603,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     public void onActionButtonPressed(View view) {
-        passOrBounceBall();
+        if(!mPassing){
+            passOrBounceBall();
+        }
     }
 
     public void onTutorialButtonPressed(View view) {
