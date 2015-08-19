@@ -99,6 +99,16 @@
             android:visibility="gone"/>
 
         <Button
+            android:id="@+id/grid_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Grid"
+            android:textSize="17sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:onClick="toggleGrid" />
+
+        <Button
             android:id="@+id/plot_button"
             android:layout_width="100dp"
             android:layout_height="wrap_content"

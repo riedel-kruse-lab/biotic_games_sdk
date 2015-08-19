@@ -183,6 +183,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private BoxedRegion mBoxedRegion;
 
+    private GridOverlay mGridOverlay;
+    private Boolean gridOn = false;
+
     private int frameCount;
     private boolean endGame = false;
     private boolean velocityCalculate = false;
@@ -267,6 +270,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         // Add the soccer field lines
         SoccerField soccerField = new SoccerField();
         //addGameObject(soccerField);
+
+        mGridOverlay = new GridOverlay();
+        addGameObject(mGridOverlay);
+        mGridOverlay.setVisible(false);
 
         //Add boxed tapping region
         mBoxedRegion = new BoxedRegion(new Point(0, 0));
@@ -1785,6 +1792,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 yAxis.setDrawGridLines(true);
                 yAxis.setAxisMaxValue(100);
                 yAxis.setLabelCount(5, true);
+                yAxis.setValueFormatter(new MyValueFormatter());
                 YAxis yAxisR = comboChart.getAxisRight();
                 yAxisR.setEnabled(false);
 
@@ -1814,6 +1822,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 yAxis2.setDrawGridLines(true);
                 yAxis2.setAxisMaxValue(100);
                 yAxis2.setLabelCount(5, true);
+                yAxis2.setValueFormatter(new MyValueFormatter());
                 YAxis yAxis2R = comboChart2.getAxisRight();
                 yAxis2R.setEnabled(false);
 
@@ -2346,6 +2355,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     /*
     End code for trace generating experiment
      */
+
+    public void toggleGrid(View view){
+        if(gridOn){
+            mGridOverlay.setVisible(false);
+            gridOn = false;
+        }
+        else{
+            mGridOverlay.setVisible(true);
+            gridOn = true;
+        }
+    }
 
     /*
     Code for taking screenshot
