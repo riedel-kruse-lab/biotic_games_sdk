@@ -22,6 +22,7 @@ public class MainActivity extends Activity
     public void startGame(View view)
     {
         Intent intent = new Intent(this, SoccerGameActivity.class);
+        intent.setPackage("edu.stanford.riedel_kruse.euglenascientist");
         startActivity(intent);
     }
 

@@ -103,7 +103,6 @@ public class SoccerBall extends GameObject {
         mDrawDirection = directionVisible;
     }
 
-
     public Point direction() {
         return mDirection.clone();
     }

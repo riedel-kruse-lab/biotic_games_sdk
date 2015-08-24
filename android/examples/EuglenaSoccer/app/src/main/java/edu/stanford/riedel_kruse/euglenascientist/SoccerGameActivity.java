@@ -211,6 +211,15 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private String mInputText = "";
 
+    public int mScaleFactor = 60;
+
+    private boolean mIsSettingScale = false;
+    private boolean setScalePoint1Tapped = false;
+    private boolean setScalePoint2Tapped = false;
+    private Point mSetScalePoint1;
+    private Point mSetScalePoint2;
+    private ScaleBar scaleLine;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
@@ -271,7 +280,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         SoccerField soccerField = new SoccerField();
         //addGameObject(soccerField);
 
-        mGridOverlay = new GridOverlay();
+        mGridOverlay = new GridOverlay(mScaleFactor);
         addGameObject(mGridOverlay);
         mGridOverlay.setVisible(false);
 
@@ -359,15 +368,19 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addGameObject(mLeftGoal);
         addGameObject(mRightGoal);
 
-        LineObject scaleLine = new LineObject(mFieldWidth - 300,
-                mFieldHeight - SoccerField.PADDING * 2 - 50, mFieldWidth - 150,
-                mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
+//        LineObject scaleLine = new LineObject(mFieldWidth - 300,
+//                mFieldHeight - SoccerField.PADDING * 2 - 50, mFieldWidth - 300 + mScaleFactor * 2,
+//                mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
+
+        scaleLine = new ScaleBar(new Point(mScaleFactor*((mFieldWidth * 3/4)/mScaleFactor),
+                mFieldHeight - SoccerField.PADDING * 2 - 50), mScaleFactor, COLOR_LIGHT_BLUE, 3);
+
         addGameObject(scaleLine);
 
-        TextObject scaleText = new TextObject(mFieldWidth - 312.5,
-                mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
-                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
-        addGameObject(scaleText);
+//        TextObject scaleText = new TextObject(mScaleFactor*((mFieldWidth * 3/4)/mScaleFactor),
+//                mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
+//                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+//        addGameObject(scaleText);
 
         mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
                 String.format(mResources.getString(R.string.speed), mBallSpeed),
@@ -604,7 +617,6 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 avgVelocityMessage();
             }
 
-
             //calculate avg speed for next two seconds on tap...
 
             if (isTapped) {
@@ -754,20 +766,30 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        isTapped = true;
-        mFollowLineIndex = mTimeList.size() - 1;
+        //each tap triggers three motion events. Therefore, only want to run once per tap...
+        final int action = event.getAction();
 
-        // - 180 needed in getY to balance offset... offset possibly because different views are calling???
-        mTouchX = (int) event.getX();
-        mTouchY = (int) event.getY() - 180;
+        if(action == MotionEvent.ACTION_DOWN) {
+            // - 180 needed in getY to balance offset... offset possibly because different views are calling???
+            mTouchX = (int) event.getX();
+            mTouchY = (int) event.getY() - 180;
 
-        if (mTutorial != null && !mTutorial.shouldDisplayActionButton()) {
-            return super.onTouchEvent(event);
-        }
+            if (mIsSettingScale) {
+                collectTwoPointsForScale();
+            } else {
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                simulateButtonPress((Button) findViewById(R.id.action_button));
+                isTapped = true;
+                mFollowLineIndex = mTimeList.size() - 1;
+
+                if (mTutorial != null && !mTutorial.shouldDisplayActionButton()) {
+                    return super.onTouchEvent(event);
+                }
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        simulateButtonPress((Button) findViewById(R.id.action_button));
+                }
+            }
         }
 
         return super.onTouchEvent(event);
@@ -823,7 +845,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mRecentBallPositions.remove(0);
             }
             mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
-            setBallSpeed(MathUtil.computeAverageSpeed(mRecentBallPositions));
+            setBallSpeed((60.0/mScaleFactor)*MathUtil.computeAverageSpeed(mRecentBallPositions));
             mPMan.setDirection(mBall.direction());
         }
 
@@ -1990,6 +2012,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 paint2.setColor(Color.BLACK);
                 Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
+
                 for (int i = 0; i < listPosXFin.size(); i++) {
                     canvas.drawCircle(listPosXFin.get(i).floatValue() / 3.3f, listPosYFin.get(i).floatValue() / 1.5f, 2, paint);
                 }
@@ -2229,34 +2252,61 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 Paint paint = new Paint();
                 paint.setColor(Color.BLACK);
                 Paint paint2 = new Paint();
-                paint2.setColor(Color.LTGRAY);
+                paint2.setColor(Color.WHITE);
                 Paint paint3 = new Paint();
                 paint3.setColor(Color.GREEN);
                 Paint paint4 = new Paint();
                 paint4.setColor(Color.RED);
                 Paint paint5 = new Paint();
                 paint5.setColor(Color.YELLOW);
-                Paint paintBlue = new Paint();
-                paintBlue.setColor(Color.BLUE);
+                Paint paint6 = new Paint();
+                paint6.setColor(Color.BLUE);
+                Paint paint7 = new Paint();
+                paint7.setColor(Color.LTGRAY);
                 Bitmap bg = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
 
                 canvas.drawRect(0, 0, 640, 360, paint2);
 
+                //draw gridline
+
+                int width = canvas.getWidth();
+                int height = canvas.getHeight();
+                int widthCount = 0;
+                int heightCount = 0;
+
+                double ratio = width / (double) mFieldWidth;
+
+                if(gridOn) {
+                    while (widthCount < width) {
+                        canvas.drawLine(widthCount, 0, widthCount, height, paint7);
+
+                        widthCount += ratio * mScaleFactor;
+                    }
+
+                    while (heightCount < height) {
+                        canvas.drawLine(0, heightCount, width, heightCount, paint7);
+
+                        heightCount += ratio * mScaleFactor;
+                    }
+                }
+
+                //draw trace
+
                 for (int i = 0; i < mTraceExpMidIndex - mTraceExpStartIndex; i++) {
-                    canvas.drawCircle(listPosXFin.get(i).floatValue() / 2f, listPosYFin.get(i).floatValue() / 2f, 2, paint5);
+                    canvas.drawCircle(listPosXFin.get(i).floatValue() / 2f, listPosYFin.get(i).floatValue() / 2f, 2, paint3);
                 }
 
                 for (int i = mTraceExpMidIndex - mTraceExpStartIndex; i < mTraceExpEndIndex - mTraceExpStartIndex; i++) {
-                    canvas.drawCircle(listPosXFin.get(i).floatValue() / 2f, listPosYFin.get(i).floatValue() / 2f, 2, paintBlue);
+                    canvas.drawCircle(listPosXFin.get(i).floatValue() / 2f, listPosYFin.get(i).floatValue() / 2f, 2, paint6);
                 }
 
 //                canvas.drawCircle(listPosXFin.get(0).floatValue()/2f, listPosYFin.get(0).floatValue()/2f, 5, paint3);
 //                canvas.drawCircle(listPosXFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, listPosYFin.get((mTraceExpEndIndex-mTraceExpStartIndex)/2).floatValue()/2f, 5, paint5);
 //                canvas.drawCircle(listPosXFin.get(listPosXFin.size() - 1).floatValue() / 2f, listPosYFin.get(listPosXFin.size() - 1).floatValue() / 2f, 5, paint4);
 
-                canvas.drawLine(450, 300, 530, 300, paint);
-                canvas.drawText("100um", 470, 320, paint);
+                canvas.drawLine(450, 320, (float) (450 + ratio * 2 * mScaleFactor), 320, paint);
+                canvas.drawText("100um", 470, 340, paint);
 
 //                canvas.drawText("Start", 590, 20, paint3);
 //                canvas.drawText("Turn", 590, 40, paint5);
@@ -2364,6 +2414,33 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         else{
             mGridOverlay.setVisible(true);
             gridOn = true;
+        }
+    }
+
+    public void setScale(View view){
+        mIsSettingScale = true;
+        setScalePoint1Tapped = false;
+        setScalePoint2Tapped = false;
+    }
+
+    public void collectTwoPointsForScale(){
+        if(setScalePoint1Tapped == false){
+            setScalePoint1Tapped = true;
+            mSetScalePoint1 = new Point(mTouchX, mTouchY);
+        }else if(setScalePoint2Tapped == false){
+            setScalePoint2Tapped = true;
+            mSetScalePoint2 = new Point(mTouchX, mTouchY);
+
+            mScaleFactor = (int) Math.sqrt((mSetScalePoint2.x-mSetScalePoint1.x)*(mSetScalePoint2.x-mSetScalePoint1.x)
+                    + (mSetScalePoint2.y-mSetScalePoint1.y)*(mSetScalePoint2.y-mSetScalePoint1.y))/2;
+
+//            scaleLine = new LineObject(mScaleFactor * 12,
+//                    mFieldHeight - SoccerField.PADDING * 2 - 50, mScaleFactor * 12 + mScaleFactor * 2,
+//                    mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
+            scaleLine.setScaleSize(mScaleFactor, mFieldWidth);
+            mGridOverlay.setScaleSize(mScaleFactor);
+
+            mIsSettingScale = false;
         }
     }
 

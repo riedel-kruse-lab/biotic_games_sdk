@@ -67,7 +67,6 @@
                 android:textStyle="bold"
                 android:typeface="serif" />
 
-
         </TableRow>
 
         <TableRow
@@ -100,7 +99,6 @@
                 android:id="@+id/textView14"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
-
 
         </TableRow>
 

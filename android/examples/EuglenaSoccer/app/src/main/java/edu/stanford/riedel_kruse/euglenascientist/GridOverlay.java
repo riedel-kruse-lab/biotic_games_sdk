@@ -14,11 +14,11 @@ import edu.stanford.riedel_kruse.bioticgamessdk.physicalbodies.RectangleBody;
  * Created by honestykim on 8/18/2015.
  */
 public class GridOverlay extends GameObject {
-    private int mWidth;
-    private int mHeight;
+
+    private int mScaleSize;
 
     class GridOverlayRenderable extends Renderable {
-        private Scalar mColor;
+        private Scalar mColor = new Scalar(50,50,50);
 
         public GridOverlayRenderable(GameObject gameObject) {
             super(gameObject);
@@ -29,7 +29,6 @@ public class GridOverlay extends GameObject {
         @Override
         public void draw(Mat frame) {
 
-            int size = 100;
             int lineThickness = 2;
             int frameWidth = frame.cols();
             int frameHeight = frame.rows();
@@ -39,23 +38,29 @@ public class GridOverlay extends GameObject {
             while(frameWidthCount < frameWidth){
                 Point startPoint = new Point(frameWidthCount,0);
                 Point endPoint = new Point(frameWidthCount,frameHeight);
-                Core.line(frame, startPoint, endPoint, new Scalar(50,50,50), lineThickness);
+                Core.line(frame, startPoint, endPoint, mColor, lineThickness);
 
-                frameWidthCount += size;
+                frameWidthCount += mScaleSize;
             }
 
             while(frameHeightCount < frameHeight){
                 Point startPoint = new Point(0,frameHeightCount);
                 Point endPoint = new Point(frameWidth,frameHeightCount);
-                Core.line(frame, startPoint, endPoint, new Scalar(50,50,50), lineThickness);
+                Core.line(frame, startPoint, endPoint, mColor, lineThickness);
 
-                frameHeightCount += size;
+                frameHeightCount += mScaleSize;
             }
         }
     }
-    public GridOverlay() {
+    public GridOverlay(int scaleSize) {
         super(new Point(0,0));
 
+        mScaleSize = scaleSize;
+
         mRenderable = new GridOverlayRenderable(this);
+    }
+
+    public void setScaleSize(int scale){
+        mScaleSize = scale;
     }
 }
