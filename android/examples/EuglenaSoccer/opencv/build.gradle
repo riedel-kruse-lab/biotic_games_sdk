@@ -9,7 +9,7 @@ android {
         targetSdkVersion 8
 
         ndk {
-            moduleName "OpenCVLibrary-2.4.9"
+            moduleName "OpenCVLibrary-3.0.0"
         }
     }
 

@@ -43,6 +43,8 @@ public class RightGoal extends GameObject {
             Point bottomBottomRight = MathUtil.addPoints(bottomTopLeft,
                     new Point(mHeight / 8, mWidth));
             Core.rectangle(frame, bottomTopLeft, bottomBottomRight, mColor, -1);
+
+            Core.line(frame, new Point(frame.width()/4,0), new Point(frame.width()/4,frame.height()), mColor, 1);
         }
     }
 

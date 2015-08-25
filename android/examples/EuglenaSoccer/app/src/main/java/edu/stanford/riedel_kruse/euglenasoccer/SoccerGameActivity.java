@@ -861,16 +861,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }
     }
 
-
     /*
     Data tracking stuff end
      */
 
-
     /*
     Follow line stuff starts here
      */
-
 
 
     public List<Double> createTraceList(List<String> list){
