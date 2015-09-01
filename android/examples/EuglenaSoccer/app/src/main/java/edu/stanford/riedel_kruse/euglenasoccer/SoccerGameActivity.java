@@ -63,13 +63,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private static final int GAME_OVER_SCORE = 5;
 
-    private static final int PASS_TIME = 400;
+    private static final int PASS_TIME = 800;
     /**
      * How fast the ball moves when passed in pixels/ms.
      */
     private static final double PASS_SPEED = 1;
 
-    private static final int NUM_RECENT_POSITIONS = 10;
+    private static final int NUM_RECENT_POSITIONS = 20;
 
     private static final int SOUND_POOL_MAX_STREAMS = 1;
     private static final int SOUND_POOL_SRC_QUALITY = 0;
@@ -101,7 +101,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private boolean mGameEnded = false;
     private int mCenterMessageTime;
 
-    private Direction mCurrentDirection;
+    private Direction mGoalDirection;
 
     private boolean mPassing;
     private int mPassingTime;
@@ -131,6 +131,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private RectangleObject mBottomLightIndicator;
 
     private TextObject mSpeedText;
+
+    private List<Point> mPreviousDirections;
+    private Point mCurrentDirection;
+    private int mSizePreviousDirections = 5;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,7 +241,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addGameObject(mBottomLightIndicator);
 
         // Set the current direction to right and hide the left goal.
-        mCurrentDirection = Direction.RIGHT;
+        mGoalDirection = Direction.RIGHT;
         mLeftGoal.setVisible(false);
         mLeftGoal.setPhysical(false);
 
@@ -246,6 +251,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         // Add the soccer ball
         mBall = new SoccerBall(new Point(width / 2, height / 2));
         addGameObject(mBall);
+        mBall.setWidthHeight(mFieldWidth, mFieldHeight);
 
         mPassing = false;
         mPassingTime = 0;
@@ -259,6 +265,15 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         // Initialize recent ball positions array
         mRecentBallPositions = new ArrayList<Point>();
+
+        // Initialize recent ball directions array
+        mPreviousDirections = new ArrayList<Point>();
+
+        //Track mSizePreviousDirections previous directions...
+        Point dummyPoint = new Point(0,0);
+        for(int i=0; i<mSizePreviousDirections; i++){
+            mPreviousDirections.add(dummyPoint);
+        }
 
         // TODO: Consider refactoring SDK so that these two callbacks can be combined into one.
         addCollisionCallback(new CollisionCallback(mBall, mLeftGoal) {
@@ -405,13 +420,15 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mTouchX = (int) event.getX();
         mTouchY = (int) event.getY() - 180;
 
-        if(mCurrentDirection == Direction.RIGHT){
-            if(mTouchX < mFieldWidth/4) {
+        if(mGoalDirection == Direction.RIGHT){
+            if(mTouchX < mFieldWidth/2) {
                 mBall.setPosition(new Point(mTouchX, mTouchY));
+                mRecentBallPositions.clear();
             }
         }else{
-            if(mTouchX > mFieldWidth*3/4) {
+            if(mTouchX > mFieldWidth/2) {
                 mBall.setPosition(new Point(mTouchX, mTouchY));
+                mRecentBallPositions.clear();
             }
         }
 
@@ -453,7 +470,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             }
 
             int distance = (int) (timeDelta * PASS_SPEED);
-            newPosition = mBall.direction();
+            newPosition = new Point(mPreviousDirections.get(0).x, mPreviousDirections.get(0).y);
+            mBall.setDirection(new Point(newPosition.x, newPosition.y));
             newPosition.x *= distance;
             newPosition.y *= distance;
 
@@ -470,7 +488,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             if (mRecentBallPositions.size() > NUM_RECENT_POSITIONS) {
                 mRecentBallPositions.remove(0);
             }
-            mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
+//            Point newDirection = MathUtil.computeAverageDirection(mRecentBallPositions);
+            Point newDirection = computeAverageDirection(mRecentBallPositions);
+            mBall.setDirection(newDirection);
+            updatePreviousDirectionList(mBall.direction());
             setBallSpeed(MathUtil.computeAverageSpeed(mRecentBallPositions));
         }
 
@@ -506,6 +527,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
                 mBall.setPosition(newPosition);
                 mBall.setDirection(newDirection);
+                mPreviousDirections.set(0,newDirection);
 
                 playSound(mSoundIdWallBounce);
             }
@@ -653,15 +675,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private void passOrBounceBall() {
         mPassing = true;
+        mBall.setBallPathVisible(false);
 
         // If the ball is not moving, then instead of passing in the direction of the ball, we
         // "bounce" the ball by choosing a random direction for the ball to move in.
         // Logically, a bounce is considered the same as a pass, but in a random starting direction.
         if (mBallSpeed == 0) {
-            Point newDirection = new Point(Math.random() - 0.5, Math.random() - 0.5);
-            MathUtil.normalizeVector(newDirection);
-            mBall.setDirection(newDirection);
-            playSound(mSoundIdBounceBall);
+//            Point newDirection = new Point(Math.random() - 0.5, Math.random() - 0.5);
+//            MathUtil.normalizeVector(newDirection);
+//            mBall.setDirection(newDirection);
+//            playSound(mSoundIdBounceBall);
+            //Change to, if ball is not moving, nothing happens
         }
         else {
             playSound(mSoundIdPassBall);
@@ -674,6 +698,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mBall.setDirection(new Point(0, 0));
         mRecentBallPositions.clear();
         setBallSpeed(0);
+        mBall.setBallPathVisible(true);
     }
 
     private void resetBall() {
@@ -709,11 +734,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         mRightGoal.setPhysical(!mRightGoal.isPhysical());
         mRightGoal.setVisible(!mRightGoal.isVisible());
 
-        if (mCurrentDirection == Direction.RIGHT) {
-            mCurrentDirection = Direction.LEFT;
+        if (mGoalDirection == Direction.RIGHT) {
+            mGoalDirection = Direction.LEFT;
         }
         else {
-            mCurrentDirection = Direction.RIGHT;
+            mGoalDirection = Direction.RIGHT;
         }
 
         mNumDirectionSwitches++;
@@ -957,5 +982,93 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //                }
             }
         });
+    }
+
+    private void updatePreviousDirectionList(Point direction){
+        Point noDirection = new Point(0,0);
+
+        if(direction.equals(noDirection)){
+//            mPreviousDirections.clear();
+        }else{
+            if(mPreviousDirections.contains(noDirection)){
+                int i = 0;
+                while(!mPreviousDirections.get(i).equals(noDirection)){
+                    i++;
+                }
+                mPreviousDirections.set(i, direction);
+            }else{
+                for(int i=0; i<mSizePreviousDirections - 1; i++) {
+                    mPreviousDirections.set(i, mPreviousDirections.get(i+1));
+                }
+                mPreviousDirections.set(mSizePreviousDirections-1, direction);
+            }
+        }
+//        mPreviousDirections.set(0,direction);
+    }
+
+    public static void normalizeVector(Point vector) {
+        double magnitude = computeVectorMagnitude(vector);
+        if(magnitude != 0.0D) {
+            vector.x /= magnitude;
+            vector.y /= magnitude;
+        }
+
+    }
+
+    public static double computeVectorMagnitude(Point vector) {
+        return Math.sqrt(Math.pow(vector.x, 2.0D) + Math.pow(vector.y, 2.0D));
+    }
+
+    public static Point computeAverageDirection(List<Point> points) {
+        Point averageDirection = computeAverageVelocity(points);
+        if(averageDirection.x*averageDirection.x + averageDirection.y*averageDirection.y < 1){
+            averageDirection = new Point(0,0);
+        }else {
+            normalizeVector(averageDirection);
+        }
+        return averageDirection;
+    }
+
+    public static Point computeAverageVelocity(List<Point> points) {
+        List<Double> weightList = new ArrayList<>();
+        weightList.add(0.021);
+        weightList.add(0.031);
+        weightList.add(0.044);
+        weightList.add(0.059);
+        weightList.add(0.076);
+        weightList.add(0.096);
+        weightList.add(0.115);
+        weightList.add(0.133);
+        weightList.add(0.147);
+        weightList.add(0.156);
+        weightList.add(0.156);
+        weightList.add(0.147);
+        weightList.add(0.133);
+        weightList.add(0.115);
+        weightList.add(0.096);
+        weightList.add(0.076);
+        weightList.add(0.059);
+        weightList.add(0.044);
+        weightList.add(0.031);
+        weightList.add(0.021);
+
+        int numPoints = points.size();
+        if(numPoints <= 1) {
+            return new Point(0.0D, 0.0D);
+        } else {
+            Point averageVelocity = new Point();
+
+            for(int i = 0; i < numPoints - 1; ++i) {
+                Point previous = (Point)points.get(i);
+                Point next = (Point)points.get(i + 1);
+                Point direction = new Point(next.x - previous.x, next.y - previous.y);
+                averageVelocity.x += direction.x;
+                averageVelocity.y += direction.y;
+            }
+
+            averageVelocity.x /= (double)numPoints;
+            averageVelocity.y /= (double)numPoints;
+            return averageVelocity;
+        }
     }
 }

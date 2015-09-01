@@ -1,5 +1,7 @@
 package edu.stanford.riedel_kruse.euglenasoccer;
 
+import android.graphics.Color;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -29,6 +31,16 @@ public class SoccerBall extends GameObject {
 
     private Point mDirection;
     private boolean mDrawDirection;
+    private boolean mBallPath;
+
+    private int mPassDistance = 800;
+    private int mDashSpacing = 10;
+
+    private int mFieldWidth;
+    private int mFieldHeight;
+
+    private boolean mBouncedOnceX = false;
+    private boolean mBouncedOnceY = false;
 
     class SoccerBallRenderable extends Renderable {
 
@@ -50,6 +62,32 @@ public class SoccerBall extends GameObject {
             ballPosition.x *= TRACKING_CIRCLE_RADIUS;
             ballPosition.y *= TRACKING_CIRCLE_RADIUS;
             ballPosition = MathUtil.addPoints(ballPosition, drawPosition);
+
+
+            //Draw Passing Path
+            Point tempPoint = new Point(ballPosition.x, ballPosition.y);
+            Point passingDirection = new Point(mDirection.x, mDirection.y);
+
+            if(mBallPath){
+                for(int i=0; i<mPassDistance; i+= 2*mDashSpacing){
+
+                    if(!mBouncedOnceX && (passingDirection.x * i + ballPosition.x > mFieldWidth || passingDirection.x * i + ballPosition.x < 0)){
+                        passingDirection.x *= -1;
+                        mBouncedOnceX = true;
+                    }
+                    if(!mBouncedOnceY && (passingDirection.y * i + ballPosition.y > mFieldHeight || passingDirection.y * i + ballPosition.y < 0)){
+                        passingDirection.y *= -1;
+                        mBouncedOnceY = true;
+                    }
+
+                    Core.line(frame, tempPoint, new Point(passingDirection.x * mDashSpacing + tempPoint.x,passingDirection.y * mDashSpacing + tempPoint.y), TRACKING_CIRCLE_COLOR, 3);
+                    tempPoint= new Point(passingDirection.x * 2 * mDashSpacing + tempPoint.x,passingDirection.y * 2 * mDashSpacing + tempPoint.y);
+
+                    if(i+2*mDashSpacing >= mPassDistance){
+                        Core.circle(frame, new Point(passingDirection.x * mDashSpacing + tempPoint.x,passingDirection.y * mDashSpacing + tempPoint.y), 20, COLOR, -1);
+                    }
+                }
+            }
 
             // Draws the black outline of the ball.
             Core.circle(frame, ballPosition, RADIUS, OUTLINE_COLOR,
@@ -90,6 +128,9 @@ public class SoccerBall extends GameObject {
                     new Point(ballPosition.x + 8, ballPosition.y + 27),
                     new Point(ballPosition.x - 8, ballPosition.y + 27)));
             Core.fillPoly(frame, pentagons, PENTAGONS_COLOR);
+
+            mBouncedOnceX = false;
+            mBouncedOnceY = false;
         }
     }
 
@@ -98,14 +139,20 @@ public class SoccerBall extends GameObject {
         mRenderable = new SoccerBallRenderable(this);
         mPhysicalBody = new CircleBody(this, TRACKING_CIRCLE_RADIUS);
         mDirection = new Point(0, 0);
+        mFieldHeight = 0;
+        mFieldHeight = 0;
 
         mDrawDirection = true;
+        mBallPath = true;
     }
 
     public void setDirectionVisible(boolean directionVisible) {
         mDrawDirection = directionVisible;
     }
 
+    public void setBallPathVisible(boolean ballPathVisible) {
+        mBallPath = ballPathVisible;
+    }
 
     public Point direction() {
         return mDirection.clone();
@@ -113,5 +160,10 @@ public class SoccerBall extends GameObject {
 
     public void setDirection(Point direction) {
         mDirection = direction;
+    }
+
+    public void setWidthHeight(int width, int height){
+        mFieldHeight = height;
+        mFieldWidth = width;
     }
 }

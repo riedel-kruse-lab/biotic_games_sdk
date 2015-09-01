@@ -42,7 +42,7 @@ public class LeftGoal extends GameObject {
                     new Point(mHeight / 8, mWidth));
             Core.rectangle(frame, bottomTopLeft, bottomBottomRight, mColor, -1);
 
-            Core.line(frame, new Point(3 * frame.width() / 4, 0), new Point(3 * frame.width() / 4, frame.height()), mColor, 1);
+            Core.line(frame, new Point(frame.width() / 2, 0), new Point(frame.width() / 2, frame.height()), mColor, 1);
 
         }
     }
