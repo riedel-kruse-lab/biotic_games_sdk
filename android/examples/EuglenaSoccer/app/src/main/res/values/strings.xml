@@ -12,7 +12,7 @@
     <string name="out_of_bounds">Out of bounds!</string>
     <string name="goal">Goal!</string>
     <string name="scale">100 um</string>
-    <string name="speed">%1$.0f um/sec</string>
+    <string name="speed">%1$.3f mm/sec</string>
 
     <string name="tutorial_button_next">Next</string>
     <string name="tutorial_button_finish">Finish</string>

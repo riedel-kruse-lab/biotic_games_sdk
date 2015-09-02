@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="6"
                 android:gravity="center"
-                android:text="Speed Statistics (\u00B5m/s)"
+                android:text="Speed Statistics (mm/s)"
                 android:textSize="18dp"
                 android:textStyle="bold"
                 android:typeface="serif" />
@@ -47,25 +47,33 @@
                 android:id="@+id/TextView01"
                 android:text=" Mean "
                 android:textStyle="bold"
-                android:typeface="serif" />
+                android:typeface="serif"
+                android:layout_gravity="center"
+                android:layout_width="60dp"/>
 
             <TextView
                 android:id="@+id/TextView02"
-                android:text=" Max "
+                android:text=" Min "
                 android:textStyle="bold"
-                android:typeface="serif" />
+                android:typeface="serif"
+                android:layout_gravity="center"
+                android:layout_width="60dp"/>
 
             <TextView
                 android:id="@+id/TextView03"
-                android:text=" Min "
+                android:text=" Max "
                 android:textStyle="bold"
-                android:typeface="serif" />
+                android:typeface="serif"
+                android:layout_gravity="center"
+                android:layout_width="60dp"/>
 
             <TextView
                 android:id="@+id/TextView04"
                 android:text=" Stdev "
                 android:textStyle="bold"
-                android:typeface="serif" />
+                android:typeface="serif"
+                android:layout_gravity="center"
+                android:layout_width="60dp"/>
 
         </TableRow>
 
@@ -86,12 +94,12 @@
                 android:text="ERR" />
 
             <TextView
-                android:id="@+id/textView12"
+                android:id="@+id/textView13"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
             <TextView
-                android:id="@+id/textView13"
+                android:id="@+id/textView12"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
@@ -119,12 +127,12 @@
                 android:text="ERR" />
 
             <TextView
-                android:id="@+id/textView22"
+                android:id="@+id/textView23"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
             <TextView
-                android:id="@+id/textView23"
+                android:id="@+id/textView22"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
@@ -157,7 +165,7 @@
                 <edu.stanford.riedel_kruse.euglenascientist.VerticalTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Speed (\u00B5m/s)"
+                    android:text="Speed (mm/s)"
                     android:textSize="10sp"
                     android:gravity="center"
                     android:layout_centerVertical="true"
@@ -193,7 +201,7 @@
                 <edu.stanford.riedel_kruse.euglenascientist.VerticalTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Speed (\u00B5m/s)"
+                    android:text="Speed (mm/s)"
                     android:textSize="10sp"
                     android:gravity="center"
                     android:layout_centerVertical="true"

@@ -200,7 +200,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private Scalar LOWER_HSV_THRESHOLD = new Scalar(30, 30, 0);
     private Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
 
-    final DecimalFormat df = new DecimalFormat("0.00");
+    final DecimalFormat df = new DecimalFormat("0.000");
     final DecimalFormat df1 = new DecimalFormat("0.0");
     private Long mIntervalTimer = 1234567890L;
 
@@ -967,7 +967,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void setBallSpeed(double newSpeed) {
-        mBallSpeed = (mBallSpeed + newSpeed)/2;
+        mBallSpeed = (mBallSpeed + newSpeed)/2000;
         mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed));
     }
 
@@ -1566,7 +1566,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             public void run() {
                 new AlertDialog.Builder(SoccerGameActivity.this)
                         .setTitle("Do you want to keep this measurement?")
-                        .setMessage("Measurement " + currentCount + "\n" + "Velocity: " + df.format(average) + " um/s")
+                        .setMessage("Measurement " + currentCount + "\n" + "Velocity: " + df.format(average) + " mm/s")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 addNewAverage(average);
@@ -1745,8 +1745,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         barEntries2.add(new BarEntry(averageVelocity2Copy.get(3).floatValue(), 3));
         barEntries2.add(new BarEntry(averageVelocity2Copy.get(4).floatValue(), 4));
         BarDataSet barSet2 = new BarDataSet(barEntries2, "Condition 2");
-        barSet2.setColor(Color.rgb(220, 90, 78));
-        barSet2.setValueTextColor(Color.rgb(220, 90, 78));
+        barSet2.setColor(Color.rgb(90,90,220));
+        barSet2.setValueTextColor(Color.rgb(90,90,220));
         barSet2.setValueTextSize(10f);
         barSet2.setDrawValues(false);
 //        barData2.addDataSet(barSet2);
@@ -1812,7 +1812,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
                 YAxis yAxis = comboChart.getAxisLeft();
                 yAxis.setDrawGridLines(true);
-                yAxis.setAxisMaxValue(100);
+                yAxis.setAxisMaxValue(0.1F);
                 yAxis.setLabelCount(5, true);
                 yAxis.setValueFormatter(new MyValueFormatter());
                 YAxis yAxisR = comboChart.getAxisRight();
@@ -1842,7 +1842,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
                 YAxis yAxis2 = comboChart2.getAxisLeft();
                 yAxis2.setDrawGridLines(true);
-                yAxis2.setAxisMaxValue(100);
+                yAxis2.setAxisMaxValue(0.1F);
                 yAxis2.setLabelCount(5, true);
                 yAxis2.setValueFormatter(new MyValueFormatter());
                 YAxis yAxis2R = comboChart2.getAxisRight();
@@ -1868,15 +1868,15 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 TextView cond2Min = (TextView) dialog.findViewById(R.id.textView23);
                 TextView cond2Stdev = (TextView) dialog.findViewById(R.id.textView24);
 
-                cond1Mean.setText(" " + df1.format(stats1.get(0)) + " ");
-                cond1Max.setText(" " + df1.format(stats1.get(1)) + " ");
-                cond1Min.setText(" " + df1.format(stats1.get(2)) + " ");
-                cond1Stdev.setText(" " + df1.format(stats1.get(3)) + " ");
+                cond1Mean.setText(" " + df.format(stats1.get(0)) + " ");
+                cond1Max.setText(" " + df.format(stats1.get(1)) + " ");
+                cond1Min.setText(" " + df.format(stats1.get(2)) + " ");
+                cond1Stdev.setText(" " + df.format(stats1.get(3)) + " ");
 
-                cond2Mean.setText(" " + df1.format(stats2.get(0)) + " ");
-                cond2Max.setText(" " + df1.format(stats2.get(1)) + " ");
-                cond2Min.setText(" " + df1.format(stats2.get(2)) + " ");
-                cond2Stdev.setText(" " + df1.format(stats2.get(3)) + " ");
+                cond2Mean.setText(" " + df.format(stats2.get(0)) + " ");
+                cond2Max.setText(" " + df.format(stats2.get(1)) + " ");
+                cond2Min.setText(" " + df.format(stats2.get(2)) + " ");
+                cond2Stdev.setText(" " + df.format(stats2.get(3)) + " ");
             }
         });
     }
