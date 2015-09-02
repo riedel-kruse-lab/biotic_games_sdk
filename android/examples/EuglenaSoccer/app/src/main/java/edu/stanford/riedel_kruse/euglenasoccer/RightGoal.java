@@ -17,6 +17,7 @@ public class RightGoal extends GameObject {
 
     private int mWidth;
     private int mHeight;
+    private boolean mDrawTapBox = true;
 
     class RightGoalRenderable extends Renderable {
         private Scalar mColor;
@@ -44,7 +45,11 @@ public class RightGoal extends GameObject {
                     new Point(mHeight / 8, mWidth));
             Core.rectangle(frame, bottomTopLeft, bottomBottomRight, mColor, -1);
 
-            Core.line(frame, new Point(frame.width()/2,0), new Point(frame.width()/2,frame.height()), mColor, 1);
+            if(mDrawTapBox) {
+                Core.rectangle(frame, new Point(0,0), new Point(frame.width()/2, frame.height()), mColor, 3);
+                Core.putText(frame, "Tap to select", new Point(frame.width()/50,frame.height()/15), Core.FONT_HERSHEY_PLAIN, 2, mColor);
+//                Core.line(frame, new Point(frame.width() / 2, 0), new Point(frame.width() / 2, frame.height()), mColor, 1);
+            }
         }
     }
 
@@ -60,5 +65,9 @@ public class RightGoal extends GameObject {
 
         mWidth = goalWidth;
         mHeight = goalHeight;
+    }
+
+    public void setTapBoxVisible(boolean isVisible){
+        mDrawTapBox = isVisible;
     }
 }

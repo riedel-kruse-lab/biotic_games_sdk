@@ -105,7 +105,7 @@
             android:layout_centerHorizontal="true"
             android:onClick="onActionButtonPressed"
             android:soundEffectsEnabled="false"
-            android:text="Tap"
+            android:text="Shoot Ball"
             android:textSize="17sp"/>
 
         <TextView

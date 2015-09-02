@@ -361,6 +361,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             End code to display trace before ending game
              */
         }
+
+        if(mTimeMillis%2000>1000){
+            mRightGoal.setTapBoxVisible(false);
+            mLeftGoal.setTapBoxVisible(false);
+        }else{
+            mRightGoal.setTapBoxVisible(true);
+            mLeftGoal.setTapBoxVisible(true);
+        }
     }
 
     @Override

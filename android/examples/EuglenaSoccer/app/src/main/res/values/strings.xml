@@ -13,6 +13,7 @@
     <string name="goal">Goal!</string>
     <string name="scale">100 um</string>
     <string name="speed">%1$.1f um/sec</string>
+    <color name ="tap_color">#FFFF00</color>
 
     <string name="tutorial_button_next">Next</string>
     <string name="tutorial_button_finish">Finish</string>
