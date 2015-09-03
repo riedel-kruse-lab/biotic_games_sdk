@@ -12,7 +12,7 @@ public class MyValueFormatter implements ValueFormatter {
     private DecimalFormat mFormat;
 
     public MyValueFormatter() {
-        mFormat = new DecimalFormat("###,###,###"); // use one decimal
+        mFormat = new DecimalFormat("###,###,###.###"); // use one decimal
     }
 
     @Override
