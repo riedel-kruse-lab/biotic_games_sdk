@@ -384,7 +384,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
                 String.format(mResources.getString(R.string.speed), mBallSpeed),
-                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
         addGameObject(mSpeedText);
         setBallSpeed(0);
 
@@ -845,7 +845,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 mRecentBallPositions.remove(0);
             }
             mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
-            setBallSpeed((60.0/mScaleFactor)*MathUtil.computeAverageSpeed(mRecentBallPositions));
+            Double doubleScaleFactor = (double) mScaleFactor;
+            setBallSpeed((60.0/doubleScaleFactor)*MathUtil.computeAverageSpeed(mRecentBallPositions));
             mPMan.setDirection(mBall.direction());
         }
 
@@ -967,7 +968,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void setBallSpeed(double newSpeed) {
-        mBallSpeed = (mBallSpeed + newSpeed)/2000;
+        mBallSpeed = newSpeed/1000.0;
         mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed));
     }
 
@@ -1552,7 +1553,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         int index = frameCount - 1;
 
-        while (Double.parseDouble(mTimeList.get(index)) > minTime) {
+        while (Double.parseDouble(mTimeList.get(index)) > 500+minTime) {
             sumValues = sumValues + Double.parseDouble(mSpeedList.get(index));
             numValues++;
             index--;
@@ -2251,6 +2252,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 textView.setVisibility(View.GONE);
                 Paint paint = new Paint();
                 paint.setColor(Color.BLACK);
+                paint.setStrokeWidth(4);
+                Paint paint1 = new Paint();
+                paint1.setColor(Color.BLACK);
+                paint1.setTextSize(20);
+                paint1.setFakeBoldText(true);
                 Paint paint2 = new Paint();
                 paint2.setColor(Color.WHITE);
                 Paint paint3 = new Paint();
@@ -2263,6 +2269,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 paint6.setColor(Color.BLUE);
                 Paint paint7 = new Paint();
                 paint7.setColor(Color.LTGRAY);
+                paint7.setStrokeWidth(4);
                 Bitmap bg = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
 
@@ -2306,7 +2313,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //                canvas.drawCircle(listPosXFin.get(listPosXFin.size() - 1).floatValue() / 2f, listPosYFin.get(listPosXFin.size() - 1).floatValue() / 2f, 5, paint4);
 
                 canvas.drawLine(450, 320, (float) (450 + ratio * 2 * mScaleFactor), 320, paint);
-                canvas.drawText("100um", 470, 340, paint);
+                canvas.drawText("0.1mm", 450, 340, paint1);
 
 //                canvas.drawText("Start", 590, 20, paint3);
 //                canvas.drawText("Turn", 590, 40, paint5);

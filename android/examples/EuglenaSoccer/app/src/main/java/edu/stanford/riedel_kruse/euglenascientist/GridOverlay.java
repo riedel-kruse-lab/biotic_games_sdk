@@ -29,7 +29,7 @@ public class GridOverlay extends GameObject {
         @Override
         public void draw(Mat frame) {
 
-            int lineThickness = 2;
+            int lineThickness = 4;
             int frameWidth = frame.cols();
             int frameHeight = frame.rows();
             int frameWidthCount = 0;
