@@ -45,7 +45,7 @@ public class LeftGoal extends GameObject {
 
             if(mDrawTapBox) {
                 Core.rectangle(frame, new Point(frame.width()/2,0), new Point(frame.width(), frame.height()), mColor, 3);
-                Core.putText(frame, "Tap to select", new Point(26*frame.width()/50,frame.height()/15), Core.FONT_HERSHEY_PLAIN, 2, mColor);
+                Core.putText(frame, "Tap to select", new Point(26*frame.width()/50,frame.height()/15), Core.FONT_HERSHEY_PLAIN, 3, mColor, 3);
 //                Core.line(frame, new Point(frame.width() / 2, 0), new Point(frame.width() / 2, frame.height()), mColor, 1);
             }
         }

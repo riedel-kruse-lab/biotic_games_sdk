@@ -136,7 +136,6 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private Point mCurrentDirection;
     private int mSizePreviousDirections = 5;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
@@ -200,19 +199,19 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addGameObject(mLeftGoal);
         addGameObject(mRightGoal);
 
-        LineObject scaleLine = new LineObject(mFieldWidth - 300,
-                mFieldHeight - SoccerField.PADDING * 2 - 50, mFieldWidth - 150,
-                mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
+        LineObject scaleLine = new LineObject(mFieldWidth - 410,
+                mFieldHeight - SoccerField.PADDING * 2 - 60, mFieldWidth - 150,
+                mFieldHeight - SoccerField.PADDING * 2 - 60, COLOR_LIGHT_BLUE, 5);
         addGameObject(scaleLine);
 
-        TextObject scaleText = new TextObject(mFieldWidth - 312.5,
+        TextObject scaleText = new TextObject(mFieldWidth - 400,
                 mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
-                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
         addGameObject(scaleText);
 
-        mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
+        mSpeedText = new TextObject(80, mFieldHeight - SoccerField.PADDING * 2,
                 String.format(mResources.getString(R.string.speed), mBallSpeed),
-                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
         addGameObject(mSpeedText);
         setBallSpeed(0);
 
@@ -346,16 +345,16 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         if (!mGameEnded && mTimeMillis >= 119900) {
             mGameEnded = true;
-            endGame();
+//            endGame();
 
             /*
             Code to display trace before ending game
              */
 
-//            List<Double> xPosList = createTraceList(mXPosList);
-//            List<Double> yPosList = createTraceList(mYPosList);
-//
-//            followLineMessage(xPosList, yPosList);
+            List<Double> xPosList = createTraceList(mXPosList);
+            List<Double> yPosList = createTraceList(mYPosList);
+
+            followLineMessage(xPosList, yPosList);
 
             /*
             End code to display trace before ending game
@@ -629,7 +628,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private void setBallSpeed(double newSpeed) {
         mBallSpeed = newSpeed;
-        mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed));
+        mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed/1000));
     }
 
     public void onActionButtonPressed(View view) {
@@ -682,9 +681,6 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     }
 
     private void passOrBounceBall() {
-        mPassing = true;
-        mBall.setBallPathVisible(false);
-
         // If the ball is not moving, then instead of passing in the direction of the ball, we
         // "bounce" the ball by choosing a random direction for the ball to move in.
         // Logically, a bounce is considered the same as a pass, but in a random starting direction.
@@ -696,6 +692,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             //Change to, if ball is not moving, nothing happens
         }
         else {
+            mPassing = true;
+            mBall.setBallPathVisible(false);
             playSound(mSoundIdPassBall);
         }
     }

@@ -34,7 +34,7 @@ public class SoccerBall extends GameObject {
     private boolean mBallPath;
 
     private int mPassDistance = 800;
-    private int mDashSpacing = 10;
+    private int mDashSpacing = 20;
 
     private int mFieldWidth;
     private int mFieldHeight;
@@ -80,7 +80,7 @@ public class SoccerBall extends GameObject {
                         mBouncedOnceY = true;
                     }
 
-                    Core.line(frame, tempPoint, new Point(passingDirection.x * mDashSpacing + tempPoint.x,passingDirection.y * mDashSpacing + tempPoint.y), TRACKING_CIRCLE_COLOR, 3);
+                    Core.line(frame, tempPoint, new Point(passingDirection.x * mDashSpacing + tempPoint.x,passingDirection.y * mDashSpacing + tempPoint.y), TRACKING_CIRCLE_COLOR, 5);
                     tempPoint= new Point(passingDirection.x * 2 * mDashSpacing + tempPoint.x,passingDirection.y * 2 * mDashSpacing + tempPoint.y);
 
                     if(i+2*mDashSpacing >= mPassDistance){
