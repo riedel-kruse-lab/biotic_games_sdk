@@ -85,14 +85,14 @@
             android:layout_alignParentLeft="true"
             android:onClick="onMeasureVelocityPressed"
             android:text="Speed"
-            android:textSize="17sp"/>
+            android:textSize="20sp"/>
 
         <Button
             android:id="@+id/line_follow_button"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="Start"
-            android:textSize="17sp"
+            android:textSize="20sp"
             android:layout_gravity="center_horizontal"
             android:onClick="startFollowLine"
             android:layout_centerHorizontal="true"
@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="Grid"
-            android:textSize="17sp"
+            android:textSize="20sp"
             android:layout_gravity="center_horizontal"
             android:layout_centerHorizontal="true"
             android:onClick="toggleGrid" />
@@ -112,8 +112,8 @@
             android:id="@+id/scale_button"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="Set Scale"
-            android:textSize="17sp"
+            android:text="Scale"
+            android:textSize="20sp"
             android:layout_centerHorizontal="true"
             android:layout_toRightOf="@+id/measure_velocity_button"
             android:onClick="setScale" />
@@ -124,7 +124,7 @@
             android:layout_height="wrap_content"
             android:onClick="onPlotPressed"
             android:text="Plot"
-            android:textSize="17sp"
+            android:textSize="20sp"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
@@ -136,7 +136,7 @@
             android:layout_height="wrap_content"
             android:onClick="onTraceGeneratorPressed"
             android:text="Trace"
-            android:textSize="17sp"
+            android:textSize="20sp"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"/>
@@ -165,7 +165,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:visibility="invisible"
-            android:textSize="20sp"/>
+            android:textSize="25sp"/>
 
         <Button
             android:id="@+id/action_button"
@@ -210,7 +210,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:textSize="20sp"/>
+            android:textSize="25sp"/>
 
         <Button
             android:id="@+id/end_button"
