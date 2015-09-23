@@ -55,7 +55,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private static final int MILLIS_PER_SEC = 1000;
     private static final int MILLIS_PER_DIRECTION = 30 * 1000;
-    private static final int MILLIS_PER_MESSAGE = 5 * 1000;
+    private static final int MILLIS_PER_MESSAGE = 2 * 1000;
 
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
@@ -136,6 +136,10 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private Point mCurrentDirection;
     private int mSizePreviousDirections = 5;
 
+    private boolean mDockPoint = false;
+
+    private long mTimeSinceTap = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_soccer_game);
@@ -199,10 +203,15 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addGameObject(mLeftGoal);
         addGameObject(mRightGoal);
 
-        LineObject scaleLine = new LineObject(mFieldWidth - 410,
-                mFieldHeight - SoccerField.PADDING * 2 - 60, mFieldWidth - 150,
+        LineObject scaleLine = new LineObject(mFieldWidth - 340,
+                mFieldHeight - SoccerField.PADDING * 2 - 60, mFieldWidth - 260,
                 mFieldHeight - SoccerField.PADDING * 2 - 60, COLOR_LIGHT_BLUE, 5);
         addGameObject(scaleLine);
+
+//        LineObject scaleLine = new LineObject(mFieldWidth - 410,
+//                mFieldHeight - SoccerField.PADDING * 2 - 60, mFieldWidth - 150,
+//                mFieldHeight - SoccerField.PADDING * 2 - 60, COLOR_LIGHT_BLUE, 5);
+//        addGameObject(scaleLine);
 
         TextObject scaleText = new TextObject(mFieldWidth - 400,
                 mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
@@ -345,16 +354,16 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         if (!mGameEnded && mTimeMillis >= 119900) {
             mGameEnded = true;
-//            endGame();
+            endGame();
 
             /*
             Code to display trace before ending game
              */
 
-            List<Double> xPosList = createTraceList(mXPosList);
-            List<Double> yPosList = createTraceList(mYPosList);
-
-            followLineMessage(xPosList, yPosList);
+//            List<Double> xPosList = createTraceList(mXPosList);
+//            List<Double> yPosList = createTraceList(mYPosList);
+//
+//            followLineMessage(xPosList, yPosList);
 
             /*
             End code to display trace before ending game
@@ -367,6 +376,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         }else{
             mRightGoal.setTapBoxVisible(true);
             mLeftGoal.setTapBoxVisible(true);
+        }
+
+        if(mDockPoint){
+            if(mTimeSinceTap==0 || mTimeSinceTap + 300 < mTimeMillis){
+                setScore(mScore-1);
+                mTimeSinceTap = mTimeMillis;
+            }
+            mDockPoint = false;
         }
     }
 
@@ -431,11 +448,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             if(mTouchX < mFieldWidth/2) {
                 mBall.setPosition(new Point(mTouchX, mTouchY));
                 mRecentBallPositions.clear();
+                mDockPoint = true;
             }
         }else{
             if(mTouchX > mFieldWidth/2) {
                 mBall.setPosition(new Point(mTouchX, mTouchY));
                 mRecentBallPositions.clear();
+                mDockPoint = true;
             }
         }
 
@@ -573,7 +592,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         resetBall();
 
         // Increase the score
-        setScore(mScore + 1);
+        setScore(mScore + 5);
 
         playSound(mSoundIdCrowdCheer);
 
@@ -628,7 +647,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private void setBallSpeed(double newSpeed) {
         mBallSpeed = newSpeed;
-        mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed/1000));
+        double tempSpeed = mBallSpeed / (1000*0.7);
+        mSpeedText.setText(String.format(mResources.getString(R.string.speed), tempSpeed));
     }
 
     public void onActionButtonPressed(View view) {
@@ -759,8 +779,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
         Mat zoomMat = new Mat(frame, roi);
 
-        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
-        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
+//        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
+//        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
 
         final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
                 Bitmap.Config.ARGB_8888);
