@@ -211,7 +211,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private String mInputText = "";
 
-    public int mScaleFactor = 60;
+    public int mScaleFactor = 50;
 
     private boolean mIsSettingScale = false;
     private boolean setScalePoint1Tapped = false;
@@ -846,7 +846,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             }
             mBall.setDirection(MathUtil.computeAverageDirection(mRecentBallPositions));
             Double doubleScaleFactor = (double) mScaleFactor;
-            setBallSpeed((60.0/doubleScaleFactor)*MathUtil.computeAverageSpeed(mRecentBallPositions));
+            setBallSpeed(1.4*(50.0/doubleScaleFactor)*MathUtil.computeAverageSpeed(mRecentBallPositions));
             mPMan.setDirection(mBall.direction());
         }
 
@@ -1553,7 +1553,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         int index = frameCount - 1;
 
-        while (Double.parseDouble(mTimeList.get(index)) > 500+minTime) {
+        while (Double.parseDouble(mTimeList.get(index)) > 1000+minTime) {
             sumValues = sumValues + Double.parseDouble(mSpeedList.get(index));
             numValues++;
             index--;
@@ -1813,7 +1813,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
                 YAxis yAxis = comboChart.getAxisLeft();
                 yAxis.setDrawGridLines(true);
-                yAxis.setAxisMaxValue(0.1F);
+                yAxis.setAxisMaxValue(0.15F);
                 yAxis.setLabelCount(5, true);
                 yAxis.setValueFormatter(new MyValueFormatter());
                 YAxis yAxisR = comboChart.getAxisRight();
@@ -1843,7 +1843,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
                 YAxis yAxis2 = comboChart2.getAxisLeft();
                 yAxis2.setDrawGridLines(true);
-                yAxis2.setAxisMaxValue(0.1F);
+                yAxis2.setAxisMaxValue(0.15F);
                 yAxis2.setLabelCount(5, true);
                 yAxis2.setValueFormatter(new MyValueFormatter());
                 YAxis yAxis2R = comboChart2.getAxisRight();
@@ -2218,7 +2218,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
      */
 
     final private int TIME_BEFORE_LIGHT_STIMULUS = 1750;
-    final private int TIME_AFTER_LIGHT_STIMULUS = 4000;
+    final private int TIME_AFTER_LIGHT_STIMULUS = 6000;
     final private int HUMAN_REACTION_TIME = 250;
 
     public void onTraceGeneratorPressed(View view) {
