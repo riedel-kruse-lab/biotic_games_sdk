@@ -15,7 +15,7 @@ import edu.stanford.riedel_kruse.bioticgamessdk.physicalbodies.CircleBody;
 public class ConsumableBall extends GameObject {
 
     private Scalar mColor = new Scalar(250,250,250);
-    private int mRadius = 10;
+    private int mRadius = 15;
     public boolean mIsEaten = false;
 
     class ConsumableBallRenderable extends Renderable {

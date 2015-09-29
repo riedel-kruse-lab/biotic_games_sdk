@@ -357,18 +357,18 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addGameObject(mRightGoal);
 
         LineObject scaleLine = new LineObject(mFieldWidth - 300,
-                mFieldHeight - SoccerField.PADDING * 2 - 50, mFieldWidth - 150,
-                mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
+                mFieldHeight - SoccerField.PADDING * 2 - 70, mFieldWidth - 150,
+                mFieldHeight - SoccerField.PADDING * 2 - 70, COLOR_LIGHT_BLUE, 3);
         addGameObject(scaleLine);
 
         TextObject scaleText = new TextObject(mFieldWidth - 312.5,
                 mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
-                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
         addGameObject(scaleText);
 
         mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
-                String.format(mResources.getString(R.string.speed), mBallSpeed),
-                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+                String.format(mResources.getString(R.string.speed), mBallSpeed/1000),
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
         addGameObject(mSpeedText);
         setBallSpeed(0);
 
@@ -889,7 +889,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private void setBallSpeed(double newSpeed) {
         mBallSpeed = newSpeed;
-        mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed));
+        mSpeedText.setText(String.format(mResources.getString(R.string.speed), mBallSpeed/1000));
     }
 
     public void onActionButtonPressed(View view) {
