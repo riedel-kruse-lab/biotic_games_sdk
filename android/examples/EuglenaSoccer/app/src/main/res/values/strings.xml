@@ -14,6 +14,7 @@
     <string name="scale">0.1mm</string>
     <string name="speed">%1$.3f mm/sec</string>
     <color name ="tap_color">#FFFF00</color>
+    <color name ="button_color">#ff2fa0ff</color>
 
     <string name="tutorial_button_next">Next</string>
     <string name="tutorial_button_finish">Finish</string>
