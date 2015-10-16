@@ -1826,21 +1826,44 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         .show();
 
                 TextView textView = (TextView) dialog.findViewById(R.id.line_score_view);
-                textView.setText("Time: " + df.format(scoreFin) + " seconds\nBalls eaten: " + mBallCountScore);
-                mBallCountScore = 0;
-
+                textView.setVisibility(View.GONE);
                 Paint paint = new Paint();
-                paint.setColor(Color.parseColor("#CD5C5C"));
+                paint.setColor(Color.BLACK);
+                paint.setStrokeWidth(4);
+                Paint paint1 = new Paint();
+                paint1.setColor(Color.BLACK);
+                paint1.setTextSize(20);
+                paint1.setFakeBoldText(true);
                 Paint paint2 = new Paint();
-                paint2.setColor(Color.BLACK);
-                Bitmap bg = Bitmap.createBitmap(480, 800, Bitmap.Config.ARGB_8888);
+                paint2.setColor(Color.WHITE);
+                Paint paint3 = new Paint();
+                paint3.setColor(Color.GREEN);
+                Paint paint4 = new Paint();
+                paint4.setColor(Color.RED);
+                Paint paint5 = new Paint();
+                paint5.setColor(Color.YELLOW);
+                Paint paint6 = new Paint();
+                paint6.setColor(Color.BLUE);
+                Paint paint7 = new Paint();
+                paint7.setColor(Color.LTGRAY);
+                paint7.setStrokeWidth(4);
+                Bitmap bg = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bg);
+
+                canvas.drawRect(0, 0, 640, 360, paint2);
                 for(int i=0; i < listPosXFin.size(); i++){
-                    canvas.drawCircle(listPosXFin.get(i).floatValue()/3.3f, listPosYFin.get(i).floatValue()/1.5f, 2, paint);
+                    canvas.drawCircle(listPosXFin.get(i).floatValue()/2f, listPosYFin.get(i).floatValue()/2f, 2, paint);
                 }
-                canvas.drawLine(xPosFin/3.3f, yPosFin/1.5f, (xPosFin + 600)/3.3f, yPosFin/1.5f, paint2);
-                canvas.drawLine((xPosFin + 600)/3.3f, yPosFin/1.5f, (xPosFin + 600)/3.3f, (yPosFin - 300)/1.5f, paint2);
-                canvas.drawLine((xPosFin + 600)/3.3f, (yPosFin - 300)/1.5f, (xPosFin + 100)/3.3f, (yPosFin - 300)/1.5f, paint2);
+                canvas.drawLine(xPosFin/2f, yPosFin/2f, (xPosFin + 600)/2f, yPosFin/2f, paint4);
+                canvas.drawLine((xPosFin + 600) / 2f, yPosFin / 2f, (xPosFin + 600) / 2f, (yPosFin - 300) / 2f, paint4);
+                canvas.drawLine((xPosFin + 600)/2f, (yPosFin - 300)/2f, (xPosFin + 100)/2f, (yPosFin - 300)/2f, paint4);
+                int width = canvas.getWidth();
+                int height = canvas.getHeight();
+                int widthCount = 0;
+                int heightCount = 0;
+                double ratio = width / (double) mFieldWidth;
+                canvas.drawLine(450, 320, (float) (450 + ratio * 2 * 100), 320, paint);
+                canvas.drawText("0.1mm", 450, 340, paint1);
                 View ll = (View) dialog.findViewById(R.id.line_results_view);
                 ll.setBackground(new BitmapDrawable(getResources(), bg));
             }
