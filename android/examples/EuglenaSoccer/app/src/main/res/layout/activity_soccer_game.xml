@@ -3,33 +3,42 @@
               xmlns:opencv="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#000000"
+              android:background="#ff67b36d"
               android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@android:color/transparent">
 
-
-        <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
-            android:id="@+id/camera_view"
+        <LinearLayout
             android:layout_width="450dp"
-            android:layout_height="fill_parent"
-            opencv:camera_id="any"
-            opencv:show_fps="true"/>
+            android:layout_height="match_parent"
+            android:gravity="center">
+            <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
+                android:id="@+id/camera_view"
+                android:layout_width="435dp"
+                android:layout_height="248dp"
+                android:layout_gravity="center"
+                opencv:camera_id="any"
+                opencv:show_fps="true"
+                android:background="@drawable/border_background"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/zoom_view"
-                android:layout_width="fill_parent"
+                android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center"
+                android:background="@drawable/border_background_rounded"/>
 
             <LinearLayout
                 android:id="@+id/tutorial_layout"
@@ -57,62 +66,69 @@
 
     <RelativeLayout
         android:layout_width="450dp"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:background="@android:color/transparent">
+
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart"
             android:layout_centerVertical="true"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:visibility="invisible"/>
-    </RelativeLayout>
+            android:visibility="invisible"
+            android:background="@android:color/transparent"/>
 
-    <RelativeLayout
-        android:layout_width="450dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="9dp">
-
-        <Button
-            android:id="@+id/measure_velocity_button"
-            android:layout_width="100dp"
+        <RelativeLayout
+            android:layout_width="450dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:onClick="onMeasureVelocityPressed"
-            android:text="Speed"
-            android:textSize="17sp"
-            android:visibility="gone"/>
+            android:layout_alignParentStart="true"
+            android:background="@android:color/transparent">
 
-        <Button
-            android:id="@+id/line_follow_button"
-            android:layout_height="wrap_content"
-            android:layout_width="200dp"
-            android:text="PacEuglena"
-            android:textSize="17sp"
-            android:layout_alignParentTop="true"
-            android:layout_gravity="center"
-            android:gravity="center_horizontal"
-            android:onClick="startFollowLine"/>
+            <Button
+                android:id="@+id/measure_velocity_button"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:onClick="onMeasureVelocityPressed"
+                android:text="Speed"
+                android:textSize="17sp"
+                android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/plot_button"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:onClick="onPlotPressed"
-            android:text="Plot"
-            android:textSize="17sp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:visibility="gone"/>
+            <Button
+                android:id="@+id/line_follow_button"
+                android:layout_height="wrap_content"
+                android:layout_width="170dp"
+                android:text="PacEuglena"
+                android:textSize="17sp"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:onClick="startFollowLine"
+                android:background="@drawable/custom_button"
+                style="@style/button_text"/>
 
-        <TextView
-            android:id="@+id/message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/plot_button"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:onClick="onPlotPressed"
+                android:text="Plot"
+                android:textSize="17sp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"/>
+        </RelativeLayout>
     </RelativeLayout>
 
     <RelativeLayout
@@ -122,7 +138,8 @@
         android:layout_alignParentBottom="true"
         android:paddingTop="9dp"
         android:paddingLeft="15dp"
-        android:paddingRight="15dp">
+        android:paddingRight="15dp"
+        android:background="@android:color/transparent">
 
         <TextView
             android:id="@+id/score"

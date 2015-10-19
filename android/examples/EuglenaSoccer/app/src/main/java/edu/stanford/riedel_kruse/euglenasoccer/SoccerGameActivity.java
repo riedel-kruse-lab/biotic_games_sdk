@@ -1862,7 +1862,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 int widthCount = 0;
                 int heightCount = 0;
                 double ratio = width / (double) mFieldWidth;
-                canvas.drawLine(450, 320, (float) (450 + ratio * 2 * 100), 320, paint);
+                canvas.drawLine(450, 320, (float) (450 + ratio * 2 * 70), 320, paint);
                 canvas.drawText("0.1mm", 450, 340, paint1);
                 View ll = (View) dialog.findViewById(R.id.line_results_view);
                 ll.setBackground(new BitmapDrawable(getResources(), bg));
