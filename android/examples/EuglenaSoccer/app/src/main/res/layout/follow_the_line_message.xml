@@ -3,6 +3,7 @@
     android:orientation="vertical" android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
+    android:background="@drawable/background_flat"
     android:id="@+id/follow_layout">
 
     <LinearLayout
@@ -19,6 +20,7 @@
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_margin="10dp"
+            android:textColor="#ffffff"
             android:typeface="serif"/>
 
         <TextView

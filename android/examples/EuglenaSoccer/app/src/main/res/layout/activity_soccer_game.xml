@@ -3,7 +3,7 @@
               xmlns:opencv="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#ff67b36d"
+              android:background="@drawable/background"
               android:orientation="vertical">
 
     <LinearLayout
@@ -22,7 +22,7 @@
                 android:layout_height="248dp"
                 android:layout_gravity="center"
                 opencv:camera_id="any"
-                opencv:show_fps="true"
+                opencv:show_fps="false"
                 android:background="@drawable/border_background"/>
         </LinearLayout>
 
@@ -194,6 +194,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:textColor="#ffffff"
             android:textSize="20sp"/>
 
         <Button

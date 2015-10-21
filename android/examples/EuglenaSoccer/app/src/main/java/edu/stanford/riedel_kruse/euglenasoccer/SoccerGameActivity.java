@@ -109,6 +109,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
     private static final Scalar COLOR_LIGHT_BLUE = new Scalar(200, 200, 250);
+    private static final Scalar COLOR_BLACK = new Scalar(0,0,0);
 
     private static final int GAME_OVER_SCORE = 2;
 
@@ -358,17 +359,17 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         LineObject scaleLine = new LineObject(mFieldWidth - 300,
                 mFieldHeight - SoccerField.PADDING * 2 - 70, mFieldWidth - 150,
-                mFieldHeight - SoccerField.PADDING * 2 - 70, COLOR_LIGHT_BLUE, 3);
+                mFieldHeight - SoccerField.PADDING * 2 - 70, COLOR_BLACK, 5);
         addGameObject(scaleLine);
 
         TextObject scaleText = new TextObject(mFieldWidth - 312.5,
                 mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
-                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_BLACK, 6);
         addGameObject(scaleText);
 
         mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
                 String.format(mResources.getString(R.string.speed), mBallSpeed/1000),
-                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_BLACK, 6);
         addGameObject(mSpeedText);
         setBallSpeed(0);
 
@@ -1825,6 +1826,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                         })
                         .show();
 
+
+
                 TextView textView = (TextView) dialog.findViewById(R.id.line_score_view);
                 textView.setVisibility(View.GONE);
                 Paint paint = new Paint();
@@ -1832,7 +1835,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 paint.setStrokeWidth(4);
                 Paint paint1 = new Paint();
                 paint1.setColor(Color.BLACK);
-                paint1.setTextSize(20);
+                paint1.setTextSize(25);
                 paint1.setFakeBoldText(true);
                 Paint paint2 = new Paint();
                 paint2.setColor(Color.WHITE);
@@ -1863,9 +1866,13 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
                 int heightCount = 0;
                 double ratio = width / (double) mFieldWidth;
                 canvas.drawLine(450, 320, (float) (450 + ratio * 2 * 70), 320, paint);
-                canvas.drawText("0.1mm", 450, 340, paint1);
+                canvas.drawText("0.1 mm", 450, 345, paint1);
                 View ll = (View) dialog.findViewById(R.id.line_results_view);
                 ll.setBackground(new BitmapDrawable(getResources(), bg));
+
+                Button b = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                if(b != null)
+                    b.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_flat));
             }
         });
     }
