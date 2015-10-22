@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+                android:background="@drawable/background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,6 +16,7 @@
             android:layout_height="wrap_content"
             android:textSize="35sp"
             android:text="Game Over!"
+            style="@style/button_text"
             android:textStyle="bold"/>
 
         <TextView
@@ -38,6 +40,7 @@
             android:layout_marginTop="30dp"
             android:textSize="20sp"
             android:text="High Scores:"
+            style="@style/button_text"
             android:textStyle="bold"/>
 
         <LinearLayout
@@ -52,6 +55,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:text="Done"
-            android:onClick="onDoneClicked"/>
+            android:onClick="onDoneClicked"
+            style="@style/button_text"
+            android:background="@drawable/background"/>
     </LinearLayout>
 </RelativeLayout>

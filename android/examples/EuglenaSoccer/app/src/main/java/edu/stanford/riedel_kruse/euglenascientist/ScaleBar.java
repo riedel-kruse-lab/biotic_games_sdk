@@ -28,7 +28,7 @@ public class ScaleBar extends GameObject {
         @Override
         public void draw(Mat frame) {
             Core.line(frame, mStart, new Point(mStart.x + mScaleSize * 2, mStart.y), mColor, mThickness);
-            Core.putText(frame, "0.1mm", new Point(mStart.x, mStart.y + 55), Core.FONT_HERSHEY_PLAIN, 4, new Scalar(200, 200, 250), 4);
+            Core.putText(frame, "0.1 mm", new Point(mStart.x, mStart.y + 55), Core.FONT_HERSHEY_PLAIN, 4, new Scalar(0, 0, 0), 6);
 //            TextObject scaleText = new TextObject(mScaleFactor*((mFieldWidth * 3/4)/mScaleFactor),
 //                mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
 //                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);

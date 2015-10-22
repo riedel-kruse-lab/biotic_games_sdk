@@ -89,6 +89,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private static final Scalar COLOR_RED = new Scalar(255, 0, 0);
     private static final Scalar COLOR_YELLOW = new Scalar(255, 255, 0);
     private static final Scalar COLOR_LIGHT_BLUE = new Scalar(200, 200, 250);
+    private static final Scalar COLOR_BLACK = new Scalar(0,0,0);
 
     private static final int GAME_OVER_SCORE = 2;
 
@@ -373,18 +374,18 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //                mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
 
         scaleLine = new ScaleBar(new Point(mScaleFactor*((mFieldWidth * 3/4)/mScaleFactor),
-                mFieldHeight - SoccerField.PADDING * 2 - 50), mScaleFactor, COLOR_LIGHT_BLUE, 3);
+                mFieldHeight - SoccerField.PADDING * 2 - 50), mScaleFactor, COLOR_BLACK, 5);
 
         addGameObject(scaleLine);
 
 //        TextObject scaleText = new TextObject(mScaleFactor*((mFieldWidth * 3/4)/mScaleFactor),
 //                mFieldHeight - SoccerField.PADDING * 2, mResources.getString(R.string.scale),
-//                Core.FONT_HERSHEY_PLAIN, 3, COLOR_LIGHT_BLUE, 4);
+//                Core.FONT_HERSHEY_PLAIN, 3, COLOR_BLACK, 6);
 //        addGameObject(scaleText);
 
         mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
                 String.format(mResources.getString(R.string.speed), mBallSpeed),
-                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 4);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_BLACK, 6);
         addGameObject(mSpeedText);
         setBallSpeed(0);
 
@@ -2313,7 +2314,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //                canvas.drawCircle(listPosXFin.get(listPosXFin.size() - 1).floatValue() / 2f, listPosYFin.get(listPosXFin.size() - 1).floatValue() / 2f, 5, paint4);
 
                 canvas.drawLine(450, 320, (float) (450 + ratio * 2 * mScaleFactor), 320, paint);
-                canvas.drawText("0.1mm", 450, 340, paint1);
+                canvas.drawText("0.1 mm", 450, 340, paint1);
 
 //                canvas.drawText("Start", 590, 20, paint3);
 //                canvas.drawText("Turn", 590, 40, paint5);

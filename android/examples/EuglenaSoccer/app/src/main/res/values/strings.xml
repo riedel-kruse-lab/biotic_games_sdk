@@ -11,7 +11,7 @@
     <string name="pass">Pass</string>
     <string name="out_of_bounds">Out of bounds!</string>
     <string name="goal">Goal!</string>
-    <string name="scale">100 um</string>
+    <string name="scale">0.1 mm</string>
     <string name="speed">%1$.3f mm/sec</string>
 
     <string name="tutorial_button_next">Next</string>

@@ -3,6 +3,7 @@
     android:layout_width="300dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:background="@drawable/background"
     android:orientation="vertical">
 
     <TableLayout
@@ -27,6 +28,7 @@
                 android:gravity="center"
                 android:text="Speed Statistics (mm/s)"
                 android:textSize="18dp"
+                style="@style/button_text"
                 android:textStyle="bold"
                 android:typeface="serif" />
         </TableRow>
@@ -40,12 +42,14 @@
             <TextView
                 android:id="@+id/TextView00"
                 android:text="Condition "
+                android:textColor="#ffffff"
                 android:textStyle="bold"
                 android:typeface="serif" />
 
             <TextView
                 android:id="@+id/TextView01"
                 android:text=" Mean "
+                android:textColor="#ffffff"
                 android:textStyle="bold"
                 android:typeface="serif"
                 android:layout_gravity="center"
@@ -54,6 +58,7 @@
             <TextView
                 android:id="@+id/TextView02"
                 android:text=" Min "
+                android:textColor="#ffffff"
                 android:textStyle="bold"
                 android:typeface="serif"
                 android:layout_gravity="center"
@@ -62,6 +67,7 @@
             <TextView
                 android:id="@+id/TextView03"
                 android:text=" Max "
+                android:textColor="#ffffff"
                 android:textStyle="bold"
                 android:typeface="serif"
                 android:layout_gravity="center"
@@ -70,6 +76,7 @@
             <TextView
                 android:id="@+id/TextView04"
                 android:text=" Stdev "
+                android:textColor="#ffffff"
                 android:textStyle="bold"
                 android:typeface="serif"
                 android:layout_gravity="center"
@@ -86,26 +93,31 @@
             <TextView
                 android:id="@+id/textView10"
                 android:text="First"
+                android:textColor="#ffffff"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView11"
                 android:gravity="center_horizontal"
+                android:textColor="#ffffff"
                 android:text="ERR" />
 
             <TextView
                 android:id="@+id/textView13"
                 android:gravity="center_horizontal"
+                android:textColor="#ffffff"
                 android:text="ERR" />
 
             <TextView
                 android:id="@+id/textView12"
                 android:gravity="center_horizontal"
+                android:textColor="#ffffff"
                 android:text="ERR" />
 
             <TextView
                 android:id="@+id/textView14"
                 android:gravity="center_horizontal"
+                android:textColor="#ffffff"
                 android:text="ERR" />
 
         </TableRow>
@@ -119,25 +131,30 @@
             <TextView
                 android:id="@+id/textView20"
                 android:text="Second "
+                android:textColor="#ffffff"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView21"
+                android:textColor="#ffffff"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
             <TextView
                 android:id="@+id/textView23"
+                android:textColor="#ffffff"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
             <TextView
                 android:id="@+id/textView22"
                 android:gravity="center_horizontal"
+                android:textColor="#ffffff"
                 android:text="ERR" />
 
             <TextView
                 android:id="@+id/textView24"
+                android:textColor="#ffffff"
                 android:gravity="center_horizontal"
                 android:text="ERR" />
 
@@ -166,6 +183,7 @@
                 <edu.stanford.riedel_kruse.euglenascientist.VerticalTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
                     android:text="Speed (mm/s)"
                     android:textSize="14sp"
                     android:gravity="center"
@@ -177,12 +195,14 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:text="Measurement #"
+                    android:textColor="#ffffff"
                     android:textSize="14sp"
                     android:gravity="center"/>
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
+                    android:textColor="#ffffff"
                     android:text="Condition 1"
                     android:textSize="16sp"
                     android:gravity="center"/>
@@ -205,6 +225,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Speed (mm/s)"
+                    android:textColor="#ffffff"
                     android:textSize="14sp"
                     android:gravity="center"
                     android:layout_centerVertical="true"
@@ -215,11 +236,13 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:text="Measurement #"
+                    android:textColor="#ffffff"
                     android:textSize="14sp"
                     android:gravity="center"/>
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
                     android:layout_alignParentTop="true"
                     android:text="Condition 2"
                     android:textSize="16sp"

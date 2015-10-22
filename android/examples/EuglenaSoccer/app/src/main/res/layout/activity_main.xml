@@ -4,7 +4,8 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center"
-              android:orientation="vertical">
+              android:orientation="vertical"
+    android:background="@drawable/background">
 
     <TextView
         android:layout_width="fill_parent"
@@ -12,7 +13,8 @@
         android:textSize="35sp"
         android:gravity="center_horizontal"
         android:text="Euglena Scientist"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        style="@style/button_text"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -33,7 +35,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/play"
-        android:onClick="startGame"/>
+        android:onClick="startGame"
+        android:textColor="#ffffff"
+        android:background="@drawable/custom_button"/>
 
     <GridLayout
         android:layout_width="wrap_content"
@@ -47,7 +51,9 @@
             android:layout_columnSpan="1"
             android:layout_gravity="fill_horizontal"
             android:text="@string/tutorial"
-            android:onClick="startTutorial"/>
+            android:onClick="startTutorial"
+            android:textColor="#ffffff"
+            android:background="@drawable/custom_button"/>
 
         <Button
             android:id="@+id/highScoresButton"
@@ -56,7 +62,8 @@
             android:layout_gravity="fill_horizontal"
             android:onClick="onHighScoresClicked"
             android:text="@string/high_scores"
-            />
+            android:textColor="#ffffff"
+            android:background="@drawable/custom_button"/>
 
         <Button
             android:id="@+id/infoButton"
@@ -64,7 +71,9 @@
             android:layout_columnSpan="1"
             android:layout_gravity="fill_horizontal"
             android:onClick="infoButtonPressed"
-            android:text="@string/biotics_info"/>
+            android:text="@string/biotics_info"
+            android:textColor="#ffffff"
+            android:background="@drawable/custom_button"/>
 
         <Button
             android:id="@+id/creditButton"
@@ -72,7 +81,9 @@
             android:layout_columnSpan="1"
             android:layout_gravity="fill_horizontal"
             android:onClick="creditsButtonPressed"
-            android:text="@string/credits"/>
+            android:text="@string/credits"
+            android:textColor="#ffffff"
+            android:background="@drawable/custom_button"/>
 
     </GridLayout>
 </LinearLayout>

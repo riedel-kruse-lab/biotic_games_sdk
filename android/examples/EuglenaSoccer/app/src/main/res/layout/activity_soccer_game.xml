@@ -1,35 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:opencv="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="#000000"
-              android:orientation="vertical">
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@android:color/transparent">
 
-
-        <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
-            android:id="@+id/camera_view"
+        <LinearLayout
             android:layout_width="450dp"
-            android:layout_height="fill_parent"
-            opencv:camera_id="any"
-            opencv:show_fps="true"/>
+            android:layout_height="match_parent"
+            android:gravity="center">
+            <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
+                android:id="@+id/camera_view"
+                android:layout_width="435dp"
+                android:layout_height="248dp"
+                android:layout_gravity="center"
+                opencv:camera_id="any"
+                opencv:show_fps="false"
+                android:background="@drawable/border_background"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/zoom_view"
-                android:layout_width="fill_parent"
+                android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center"
+                android:background="@drawable/border_background_rounded"/>
 
             <LinearLayout
                 android:id="@+id/tutorial_layout"
@@ -74,8 +83,7 @@
     <RelativeLayout
         android:layout_width="450dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="9dp">
+        android:layout_alignParentTop="true">
 
         <Button
             android:id="@+id/measure_velocity_button"
@@ -85,7 +93,9 @@
             android:layout_alignParentLeft="true"
             android:onClick="onMeasureVelocityPressed"
             android:text="Speed"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            style="@style/button_text"
+            android:background="@drawable/custom_button"/>
 
         <Button
             android:id="@+id/line_follow_button"
@@ -106,7 +116,9 @@
             android:textSize="20sp"
             android:layout_gravity="center_horizontal"
             android:layout_centerHorizontal="true"
-            android:onClick="toggleGrid" />
+            android:onClick="toggleGrid"
+            style="@style/button_text"
+            android:background="@drawable/custom_button"/>
 
         <Button
             android:id="@+id/scale_button"
@@ -116,7 +128,9 @@
             android:textSize="20sp"
             android:layout_centerHorizontal="true"
             android:layout_toRightOf="@+id/measure_velocity_button"
-            android:onClick="setScale" />
+            android:onClick="setScale"
+            style="@style/button_text"
+            android:background="@drawable/custom_button"/>
 
         <Button
             android:id="@+id/plot_button"
@@ -139,7 +153,9 @@
             android:textSize="20sp"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            style="@style/button_text"
+            android:background="@drawable/custom_button"/>
 
         <TextView
             android:id="@+id/message"
@@ -210,7 +226,8 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:textSize="25sp"/>
+            android:textSize="25sp"
+            style="@style/button_text"/>
 
         <Button
             android:id="@+id/end_button"
