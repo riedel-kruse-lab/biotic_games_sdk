@@ -3,6 +3,7 @@
               xmlns:opencv="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="@drawable/background"
               android:orientation="vertical">
 
     <LinearLayout
@@ -11,25 +12,33 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
-            android:id="@+id/camera_view"
+        <LinearLayout
             android:layout_width="450dp"
-            android:layout_height="260dp"
-            android:layout_gravity="center_vertical"
-            opencv:camera_id="any"
-            opencv:show_fps="true"/>
+            android:layout_height="match_parent"
+            android:gravity="center">
+            <edu.stanford.riedel_kruse.bioticgamessdk.CameraView
+                android:id="@+id/camera_view"
+                android:layout_width="435dp"
+                android:layout_height="248dp"
+                android:layout_gravity="center"
+                opencv:camera_id="any"
+                opencv:show_fps="false"
+                android:background="@drawable/border_background"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/zoom_view"
-                android:layout_width="fill_parent"
+                android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center"
+                android:background="@drawable/border_background_rounded"/>
 
             <LinearLayout
                 android:id="@+id/tutorial_layout"
@@ -107,7 +116,9 @@
             android:onClick="onActionButtonPressed"
             android:soundEffectsEnabled="false"
             android:text="Shoot Ball"
-            android:textSize="21sp"/>
+            android:textSize="20sp"
+            style="@style/button_text"
+            android:background="@drawable/custom_button"/>
 
         <TextView
             android:id="@+id/time"
