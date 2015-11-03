@@ -268,7 +268,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         CameraView cameraView = getCameraView();
 
         Camera.Parameters params = cameraView.getCameraParameters();
-        params.setZoom((int) (params.getMaxZoom() / 3.3));
+        params.setZoom((int) (params.getMaxZoom() / 2));
 //        params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_FLUORESCENT);
 //        params.setAutoWhiteBalanceLock(true);
         cameraView.setCameraParameters(params);
@@ -374,7 +374,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 //                mFieldHeight - SoccerField.PADDING * 2 - 50, COLOR_LIGHT_BLUE, 3);
 
         scaleLine = new ScaleBar(new Point(mScaleFactor*((mFieldWidth * 3/4)/mScaleFactor),
-                mFieldHeight - SoccerField.PADDING * 2 - 50), mScaleFactor, COLOR_BLACK, 5);
+                mFieldHeight - SoccerField.PADDING * 2 - 50), mScaleFactor, COLOR_LIGHT_BLUE, 5);
 
         addGameObject(scaleLine);
 
@@ -385,7 +385,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         mSpeedText = new TextObject(150, mFieldHeight - SoccerField.PADDING * 2,
                 String.format(mResources.getString(R.string.speed), mBallSpeed),
-                Core.FONT_HERSHEY_PLAIN, 4, COLOR_BLACK, 6);
+                Core.FONT_HERSHEY_PLAIN, 4, COLOR_LIGHT_BLUE, 6);
         addGameObject(mSpeedText);
         setBallSpeed(0);
 

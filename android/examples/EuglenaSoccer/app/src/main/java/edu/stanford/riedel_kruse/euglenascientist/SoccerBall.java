@@ -14,7 +14,7 @@ import edu.stanford.riedel_kruse.bioticgamessdk.physicalbodies.CircleBody;
  * Created by dchiu on 3/28/15.
  */
 public class SoccerBall extends GameObject {
-    public static final int RADIUS = 20;
+    public static final int RADIUS = 30;
     private static final Scalar COLOR = new Scalar(255, 255, 255);
     private static final Scalar OUTLINE_COLOR = new Scalar(0, 0, 0);
     private static final int OUTLINE_THICKNESS = 5;

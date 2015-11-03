@@ -87,7 +87,7 @@
 
         <Button
             android:id="@+id/measure_velocity_button"
-            android:layout_width="100dp"
+            android:layout_width="105dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
@@ -111,19 +111,19 @@
         <Button
             android:id="@+id/grid_button"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="105dp"
             android:text="Grid"
             android:textSize="20sp"
-            android:layout_gravity="center_horizontal"
-            android:layout_centerHorizontal="true"
             android:onClick="toggleGrid"
             style="@style/button_text"
-            android:background="@drawable/custom_button"/>
+            android:background="@drawable/custom_button"
+            android:layout_toRightOf="@+id/scale_button"
+            android:layout_toEndOf="@+id/scale_button" />
 
         <Button
             android:id="@+id/scale_button"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="105dp"
             android:text="Scale"
             android:textSize="20sp"
             android:layout_centerHorizontal="true"
@@ -134,7 +134,7 @@
 
         <Button
             android:id="@+id/plot_button"
-            android:layout_width="100dp"
+            android:layout_width="125dp"
             android:layout_height="wrap_content"
             android:onClick="onPlotPressed"
             android:text="Plot"
@@ -146,16 +146,15 @@
 
         <Button
             android:id="@+id/trace_generator"
-            android:layout_width="100dp"
+            android:layout_width="105dp"
             android:layout_height="wrap_content"
             android:onClick="onTraceGeneratorPressed"
             android:text="Trace"
             android:textSize="20sp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
             style="@style/button_text"
-            android:background="@drawable/custom_button"/>
+            android:background="@drawable/custom_button"
+            android:layout_toRightOf="@+id/grid_button"
+            android:layout_toEndOf="@+id/grid_button" />
 
         <TextView
             android:id="@+id/message"
