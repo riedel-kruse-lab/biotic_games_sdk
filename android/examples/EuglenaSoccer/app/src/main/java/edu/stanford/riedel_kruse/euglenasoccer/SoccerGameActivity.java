@@ -81,8 +81,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private Tutorial mTutorial;
 
-    private Scalar LOWER_HSV_THRESHOLD = new Scalar(30, 30, 0);
-    private Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
+    private Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 70, 20);
+    private Scalar UPPER_HSV_THRESHOLD = new Scalar(120, 255, 120);
 
     private enum Direction {
         LEFT,
@@ -568,8 +568,14 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = new Rect();
         roi.x = Math.max((int) ballLocation.x - SoccerBall.RADIUS, 0);
         roi.y = Math.max((int) ballLocation.y - SoccerBall.RADIUS, 0);
-        roi.width = Math.min(SoccerBall.RADIUS * 2, mFieldWidth - roi.x);
-        roi.height = Math.min(SoccerBall.RADIUS * 2, mFieldHeight - roi.y);
+        if(mBallSpeed >0) {
+            roi.width = Math.min(SoccerBall.RADIUS * 2, mFieldWidth - roi.x);
+            roi.height = Math.min(SoccerBall.RADIUS * 2, mFieldHeight - roi.y);
+        }else
+        {
+            roi.width = Math.min(SoccerBall.RADIUS * 3, mFieldWidth - roi.x);
+            roi.height = Math.min(SoccerBall.RADIUS * 3, mFieldHeight - roi.y);
+        }
 
         return roi;
     }
@@ -779,8 +785,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
         Mat zoomMat = new Mat(frame, roi);
 
-//        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
-//        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
+        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
+        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
 
         final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
                 Bitmap.Config.ARGB_8888);
