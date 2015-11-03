@@ -198,8 +198,9 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
     private boolean mStartMeasuring = false;
     private boolean dataCollectionFinished = false;
     private boolean mFollowLine = false;
-    private Scalar LOWER_HSV_THRESHOLD = new Scalar(30, 30, 0);
-    private Scalar UPPER_HSV_THRESHOLD = new Scalar(96, 200, 255);
+    private Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 20);
+    private Scalar UPPER_HSV_THRESHOLD = new Scalar(120, 255, 130);
+
 
     final DecimalFormat df = new DecimalFormat("0.000");
     final DecimalFormat df1 = new DecimalFormat("0.0");
@@ -212,7 +213,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private String mInputText = "";
 
-    public int mScaleFactor = 50;
+    public int mScaleFactor = 70;
 
     private boolean mIsSettingScale = false;
     private boolean setScalePoint1Tapped = false;
