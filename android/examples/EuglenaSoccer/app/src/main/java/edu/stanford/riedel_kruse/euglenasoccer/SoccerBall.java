@@ -33,7 +33,7 @@ public class SoccerBall extends GameObject {
     private boolean mDrawDirection;
     private boolean mBallPath;
 
-    private int mPassDistance = 800;
+    private int mPassDistance = 600;
     private int mDashSpacing = 20;
 
     private int mFieldWidth;

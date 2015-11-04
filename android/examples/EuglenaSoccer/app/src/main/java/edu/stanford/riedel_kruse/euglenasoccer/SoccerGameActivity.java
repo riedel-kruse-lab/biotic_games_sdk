@@ -63,11 +63,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private static final int GAME_OVER_SCORE = 5;
 
-    private static final int PASS_TIME = 800;
+    private static final int PASS_TIME = 400;
     /**
      * How fast the ball moves when passed in pixels/ms.
      */
-    private static final double PASS_SPEED = 1;
+    private static final double PASS_SPEED = 1.5;
 
     private static final int NUM_RECENT_POSITIONS = 20;
 
@@ -81,8 +81,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private Tutorial mTutorial;
 
-    private Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 70, 20);
-    private Scalar UPPER_HSV_THRESHOLD = new Scalar(120, 255, 120);
+    private Scalar LOWER_HSV_THRESHOLD = new Scalar(50, 50, 20);
+    private Scalar UPPER_HSV_THRESHOLD = new Scalar(120, 255, 130);
 
     private enum Direction {
         LEFT,
@@ -180,7 +180,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         CameraView cameraView = getCameraView();
 
         Camera.Parameters params = cameraView.getCameraParameters();
-        params.setZoom((int) (params.getMaxZoom() / 3.3));
+        params.setZoom((int) (params.getMaxZoom() / 2));
         cameraView.setCameraParameters(params);
 
         // Store image width and height for future use
@@ -204,7 +204,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         addGameObject(mRightGoal);
 
         LineObject scaleLine = new LineObject(mFieldWidth - 340,
-                mFieldHeight - SoccerField.PADDING * 2 - 60, mFieldWidth - 260,
+                mFieldHeight - SoccerField.PADDING * 2 - 60, mFieldWidth - 220,
                 mFieldHeight - SoccerField.PADDING * 2 - 60, COLOR_LIGHT_BLUE, 5);
         addGameObject(scaleLine);
 
@@ -352,7 +352,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Data tracking stuff end
          */
 
-        if (!mGameEnded && mTimeMillis >= 119900) {
+        if (!mGameEnded && mTimeMillis >= 59900) {
             mGameEnded = true;
             endGame();
 
@@ -496,7 +496,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
             }
 
             int distance = (int) (timeDelta * PASS_SPEED);
-            newPosition = new Point(mPreviousDirections.get(0).x, mPreviousDirections.get(0).y);
+            newPosition = new Point(mPreviousDirections.get(2).x, mPreviousDirections.get(2).y);
             mBall.setDirection(new Point(newPosition.x, newPosition.y));
             newPosition.x *= distance;
             newPosition.y *= distance;
@@ -527,11 +527,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
         if (newPosition.x < 0 || newPosition.x > mFieldWidth || newPosition.y < 0
                 || newPosition.y > mFieldHeight) {
-            if (!mPassing) {
-                onOutOfBounds();
-                playSound(mSoundIdOutOfBounds);
-            }
-            else {
+//            if (!mPassing) {
+//                onOutOfBounds();
+//                playSound(mSoundIdOutOfBounds);
+//            }
+//            else {
                 Point newDirection = mBall.direction();
                 if (newPosition.x < 0) {
                     newDirection.x *= -1;
@@ -553,11 +553,11 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
                 mBall.setPosition(newPosition);
                 mBall.setDirection(newDirection);
-                mPreviousDirections.set(0,newDirection);
+                mPreviousDirections.set(2,newDirection);
 
                 playSound(mSoundIdWallBounce);
             }
-        }
+//        }
     }
 
     private Rect roiForBall() {
@@ -653,7 +653,7 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
 
     private void setBallSpeed(double newSpeed) {
         mBallSpeed = newSpeed;
-        double tempSpeed = mBallSpeed / (1000*0.7);
+        double tempSpeed = mBallSpeed / (1000*0.9);
         mSpeedText.setText(String.format(mResources.getString(R.string.speed), tempSpeed));
     }
 
@@ -785,8 +785,8 @@ public class SoccerGameActivity extends BioticGameActivity implements JoystickLi
         Rect roi = roiForBall();
         Mat zoomMat = new Mat(frame, roi);
 
-        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
-        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
+//        Imgproc.cvtColor(zoomMat, zoomMat, Imgproc.COLOR_BGR2HSV);
+//        Core.inRange(zoomMat, LOWER_HSV_THRESHOLD, UPPER_HSV_THRESHOLD, zoomMat);
 
         final Bitmap zoomBitmap = Bitmap.createBitmap(zoomMat.cols(), zoomMat.rows(),
                 Bitmap.Config.ARGB_8888);
