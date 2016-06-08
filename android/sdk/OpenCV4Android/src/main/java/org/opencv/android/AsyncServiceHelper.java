@@ -30,7 +30,8 @@ class AsyncServiceHelper
         }
         else
         {
-            AppContext.unbindService(helper.mServiceConnection);InstallService(AppContext, Callback);return false;
+            AppContext.unbindService(helper.mServiceConnection);InstallService(AppContext, Callback);
+            return false;
         }
     }
 
