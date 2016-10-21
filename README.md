@@ -1,3 +1,6 @@
+# Link to LudusScope Paper
+http://journals.plos.org/plosone/article?id=info%3Adoi/10.1371/journal.pone.0162602
+
 # How to use the SDK
 ## Setup
 1. If you do not already have it, download and install [Android Studio](http://developer.android.com/sdk/index.html). This will also install the Android SDK.
