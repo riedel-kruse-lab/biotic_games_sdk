@@ -1,6 +1,13 @@
 # Link to LudusScope Paper
 http://journals.plos.org/plosone/article?id=info%3Adoi/10.1371/journal.pone.0162602
 
+# Accessing Applications
+To access a minimal example of a Biotic Games app, navigate to /biotic_games_sdk/android/examples/EuglenaSoccer. We do not recommend running on an emulator, as there is no camera functionality.
+
+To access the fully featured applications as shown in the paper, change the branch to "soccer_with_tracing" and "follow_the_line" to get to the EuglenaSoccer and PacEuglena games respectively.
+
+The code for the minimal version is much simpler to follow and also more likely to survive updates to Android Studio.
+
 # How to use the SDK
 ## Setup
 1. If you do not already have it, download and install [Android Studio](http://developer.android.com/sdk/index.html). This will also install the Android SDK.
